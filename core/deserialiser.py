@@ -1,6 +1,6 @@
 import yaml
 from errors.RWErrors import NonLaTeXableError, NonYAMLableError
-
+from utils import unpack, trim
 
 def read_tex(f):
     """
@@ -11,7 +11,7 @@ def read_tex(f):
         content = stream.read()
         splitted = content.split(r'\begin{document}')
         if len(splitted) == 1:
-            raise NonLaTeXableError({"file": f})
+            raise NonLaTeXableError(file=f)
         header = splitted[0]
         content = splitted[1].split(r'\end{document}')[0]
     return content, header
@@ -25,7 +25,7 @@ def parse_yaml(stream: str):
     try:
         decoded = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
-        raise NonYAMLableError({"err": exc})
+        raise NonYAMLableError(err=exc)
 
     return decoded
 
@@ -35,7 +35,9 @@ def read_model_from_tex(f):
     content, header = read_tex(f)
     # step 2: extract yaml data
     raw_model = parse_yaml(content)
-    return header, raw_model
+    raw_model = unpack(raw_model)
+    raw_model_ = {trim(k):v for k,v in raw_model.items()}
+    return header, raw_model_
 
 
 def main():

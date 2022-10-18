@@ -3,15 +3,12 @@
 
 class Error(Exception):
     header = ""
-
-    def __init__(self, data):
-        self.data = data
-        super().__init__(self.header.format(self.data))
+    def __init__(self, **kwargs):
+        super().__init__(self.header.format(**kwargs))
 
 
 class Warn(Warning):
     header = ""
-
     def __init__(self, data):
         self.data = data
         super().__init__(self.header.format(self.data))
@@ -28,3 +25,7 @@ class NonLaTeXableError(Error):
 class NonYAMLableError(Error):
     header = "Seems like you have not formatted model in yaml notation correctly.\n" \
              "Here's error: {err}"
+
+
+class NonSympyfiableError(Error):
+    header = "There is unprocessable sympy entity {err}"
