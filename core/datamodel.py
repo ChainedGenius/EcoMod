@@ -14,14 +14,23 @@ class Phase(Function):
         obj.__dict__.update(kwargs)
         return obj
 
-
-class Boundary(Relational):
-    def __new__(cls, lhs, rhs, rel_op, **kwargs):
-        obj = Relational(lhs, rhs, rel_op)
-        #obj.__dict__ = {}
-        #obj.__dict__.update(kwargs)
-        return obj
-
+class Boundary:
+    pass
+# class Boundary(Relational):
+#     rel_op = "=="
+#     def __new__(cls, lhs, rhs, rel_op, **kwargs):
+#         obj = Relational.__new__(cls, lhs, rhs, rel_op)
+#         #obj.__dict__ = {}
+#         #obj.__dict__.update(kwargs)
+#         return obj
+#
+# class IBoundary(Relational):
+#     rel_op = "=="
+#     def __new__(cls, lhs, rhs, rel_op, **kwargs):
+#         obj = Relational.__new__(cls, lhs, rhs, rel_op)
+#         #obj.__dict__ = {}
+#         #obj.__dict__.update(kwargs)
+#         return obj
 
 
 if __name__ == "__main__":
