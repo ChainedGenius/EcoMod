@@ -1,5 +1,3 @@
-
-
 def unpack(yaml_dict):
     ret = {}
     for k, v in yaml_dict.items():
@@ -11,6 +9,7 @@ def unpack(yaml_dict):
 
     return ret
 
+
 def trim(s: str, i=1, j=-1):
     """
     :param s: input string
@@ -20,6 +19,7 @@ def trim(s: str, i=1, j=-1):
     """
     return s[i:j]
 
+
 def extract_dim_desc(raw_desc):
     try:
         dim = "".join("".join(raw_desc.split('[')[1:]).split(']')[:-1])
@@ -27,3 +27,10 @@ def extract_dim_desc(raw_desc):
         dim = "no dim"
     desc = raw_desc.split('[')[0]
     return dim, desc
+
+
+def set_equality(set1, set2):
+    if len(set1 - set2) + len(set2 - set1) == 0:
+        return True
+    else:
+        return False

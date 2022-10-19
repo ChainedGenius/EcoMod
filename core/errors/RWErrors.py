@@ -29,3 +29,7 @@ class NonYAMLableError(Error):
 
 class NonSympyfiableError(Error):
     header = "There is unprocessable sympy entity {err}"
+
+
+class VariableAmbiguity(Error):
+    header = "There is two variables matches the same thing {var1} and {var2}"
