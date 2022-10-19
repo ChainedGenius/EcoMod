@@ -1,3 +1,7 @@
+import re
+from itertools import chain
+
+
 def unpack(yaml_dict):
     ret = {}
     for k, v in yaml_dict.items():
@@ -34,3 +38,37 @@ def set_equality(set1, set2):
         return True
     else:
         return False
+
+
+def embrace(s: str, brackets='()'):
+    return brackets[0] + s + brackets[1]
+
+
+def find_objective_markers(s: str):
+    ARROW_MARKERS = ["to", "Rightarrow", "rightarrow", "->", "-->"]
+    OBJECTIVE_MARKERS = ["max", "min", "extr"]
+    MARKER_REGEXP = "{a}[ ]*{o}".format(
+        a="*".join([embrace(a) for a in ARROW_MARKERS]) + "*",
+        o="*".join([embrace(o) for o in OBJECTIVE_MARKERS]) + "*"
+    )
+    matches = re.findall(MARKER_REGEXP, s)
+    matches = set(chain(*[i for i in matches]))
+    matches.remove('')
+    if matches:
+        return True, re.sub(MARKER_REGEXP, '', s)
+    else:
+        return False, s
+
+
+def list_substract(a, b):
+    """
+    :param a:
+    :param b:
+    :return: a - b
+    """
+    return [i for i in a if i not in b]
+
+if __name__ == "__main__":
+    s = "$J = \int_0^T (\exp^{-\delta*t} \ln(c(x(t))))dt ->        max$"
+    a = find_objective_markers(s)
+    print(a)

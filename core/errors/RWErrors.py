@@ -3,12 +3,14 @@
 
 class Error(Exception):
     header = ""
+
     def __init__(self, **kwargs):
         super().__init__(self.header.format(**kwargs))
 
 
 class Warn(Warning):
     header = ""
+
     def __init__(self, data):
         self.data = data
         super().__init__(self.header.format(self.data))
@@ -33,3 +35,20 @@ class NonSympyfiableError(Error):
 
 class VariableAmbiguity(Error):
     header = "There is two variables matches the same thing {var1} and {var2}"
+
+
+class ExtraVariableError(Error):
+    header = "There are extra variables in model {vars}"
+
+
+class TimeVariableNotFound(Error):
+    header = "There is no variable which express Time in model"
+
+
+class ObjectiveFunctionNotFound(Error):
+    header = "There is no expression which realize objective function in model.\n" \
+             " Please check this substring: '-->[extr,max,min]' to be in input"
+
+
+class AnyPropertyNotFound(Error):
+    header = "We cannot find this in your model : {attr}"
