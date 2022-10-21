@@ -1,8 +1,44 @@
 import random
+from itertools import chain
 
-from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols
+from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq
 from sympy.parsing.latex import parse_latex
 from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
+from multipledispatch import dispatch
+from sympy import GreaterThan
+
+def KKT_mask(dual: dict):
+    return [*chain(*[(GreaterThan(v, 0), Eq(k*v, 0)) for k, v in dual.items()])]
+
+def euler_mask(L, x, t):
+    if x.args and t in x.args:
+        x = x.func
+    else:
+        raise TypeError('Wrong time :)')
+    x_prime = x(t).diff(t)
+    L_x_prime = L.diff(x_prime)
+    L_x = L.diff(x(t))
+    return simplify(Derivative(L_x_prime, t) - L_x)
+
+
+def transversality_mask(L, x, t, l, t0, t1):
+    if x.args and t in x.args:
+        x = x.func
+    else:
+        raise TypeError('Wrong time :)')
+    # lhs
+    x_prime = x(t).diff(t)
+    L_x_prime = L.diff(x_prime)
+    # rhs
+    l_x_t_0 = l.diff(x(t).subs({t: t0}))
+    l_x_t_1 = -l.diff(x(t).subs({t: t1}))
+    return Eq(L_x_prime.simplify().subs({t: t0}), l_x_t_0), Eq(L_x_prime.simplify().subs({t: t1}), l_x_t_1)
+
+
+def generate_symbols(tag, count, cls):
+    query = [tag + "_" + str(i) + " " for i in range(count)]
+    query = ''.join(query)[:-1]
+    return symbols(query, cls=cls)
 
 
 def spec_funcs():
@@ -40,6 +76,18 @@ def deriv_degree(bc):
     return deg
 
 
+@dispatch(dict)
+def span(d: dict):
+    from sympy.core.numbers import Zero
+    ret = Zero()
+    for k, v in d.items():
+        ret += k * v
+
+    return ret
+
+
+@dispatch(set, set)
+@dispatch(list, list)
 def span(coefs, variables):
     if len(coefs) != len(variables):
         raise TypeError

@@ -1,13 +1,12 @@
 from itertools import chain
 
-
-
 from utils import iterable_substract
 from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed
 from deserialiser import read_model_from_tex
 from sympyfier import sympify, ecomodify
-from ecomod_utils import deriv_degree, pi_theorem, spec_funcs
+from ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
+    transversality_mask, KKT_mask
 from numpy import prod
 
 
@@ -31,6 +30,9 @@ class Agent(object):
         self.inequations = inequations
         self.objectives = objectives
         self.dim_dict = dim_dict
+        # dual variables k:v where k = real phase or ineq constraint, v = dual
+        self.lambdas = {}  # for conjugate arbitrary constants
+        self.duals = {}  # for conjugate functions
 
     def __validation(self):
         # step 0: check objective
@@ -67,11 +69,16 @@ class Agent(object):
         from numpy.random import rand
         errors = []
         spec_stack = []
-        random_coef = rand(len(self.dim_dict,))
-        casted_dict = {Symbol(kv[0].name): kv[1]*random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
-        randomize_dict = {Symbol(kv[0].name): Symbol(kv[0].name)*random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
+        random_coef = rand(len(self.dim_dict, ))
+        casted_dict = {Symbol(kv[0].name): kv[1] * random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
+        randomize_dict = {Symbol(kv[0].name): Symbol(kv[0].name) * random_coef[i] for i, kv in
+                          enumerate(self.dim_dict.items())}
         for expr in self.expr:
             expr_copy = expr.copy()
+            if expr.rhs == 0:
+                from sympy import exp
+                spec_stack.append(exp(expr.lhs))
+                continue
             if not checker(expr, casted_dict, randomize_dict, spec_stack):
                 errors.append(expr_copy)
 
@@ -90,6 +97,20 @@ class Agent(object):
         if not p:
             raise AnyPropertyNotFound(attr='Phase variables')
 
+    def __generate_duals(self):
+        from sympy import Symbol, Function
+        # step 1: create lambdas
+        lambda_factor = self.objectives + self.boundaries
+        lambdas_count = len(lambda_factor)
+        self.lambdas = {
+            (eq2func(lambda_factor[i]) if lambda_factor[i] not in self.objectives else lambda_factor[i].args[1]): v for
+            i, v in enumerate(generate_symbols(tag='lambda', count=lambdas_count, cls=Symbol))}
+        # step 2: create conjugates funcs (duals)
+        alpha_factors = self.transitions + self.inequations
+        alpha_count = len(alpha_factors)
+        self.duals = {eq2func(alpha_factors[i]): d(self.time) for i, d in
+                      enumerate(generate_symbols(tag='alpha', count=alpha_count, cls=Function))}
+
     @property
     def time(self):
         # two ways: integration argument, under derivative
@@ -101,7 +122,7 @@ class Agent(object):
             ret1 = None
         # method 2
         try:
-            ret2 = [eq for eq, deg in self.diff_degree().items() if deg == 1][0]
+            ret2 = [eq for eq, deg in self.diff_degree(deg=1).items() if deg == 1][0]
         except:
             ret2 = None
         if not ret1 and not ret2:
@@ -121,7 +142,7 @@ class Agent(object):
     @property
     def transitions(self):
         # linear Differential equations in model
-        return [eq for eq in self.diff_degree(1).keys()]
+        return [eq for eq in self.diff_degree(deg=1).keys()]
 
     @property
     def phases(self):
@@ -150,6 +171,44 @@ class Agent(object):
     def variables(self):
         return self.functions + self.variables
 
+    @property
+    def boundaries(self):
+        # Equality types
+        return [*self.diff_degree(deg=0).keys()]
+
+    @property
+    def Lagrangian(self):
+        from sympy import Integral
+        return span(self.duals) + span(
+            {k: v for k, v in self.lambdas.items() if k in [i.args[1] for i in self.objectives]}).replace(
+            lambda x: isinstance(x, Integral), lambda x: x.args[0])
+
+    @property
+    def lagrangian(self):
+        return span({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
+
+    # ECOMOD CORE SOFT
+    def euler_equations(self):
+        ret = []
+        for x in self.phases:
+            ret.append(euler_mask(self.Lagrangian, x, self.time))
+        return ret
+
+    def transversality_conditions(self):
+        ret = []
+        for x in self.phases:
+            # for all t_0, t_1
+            ret.extend(transversality_mask(self.Lagrangian, x, self.time, self.lagrangian, *self.time_horizon))
+
+        return ret
+
+    def control_optimality(self):
+        return [self.Lagrangian.diff(c) for c in self.controls]
+
+    def KKT(self):
+        _duals = {k: v for k, v in self.duals.items() if k not in [eq2func(e) for e in self.transitions]}
+        return KKT_mask(_duals)
+
     def diff_degree(self, deg=None):
         """
         :param deg: int. Derivative degree of returning equations
@@ -158,8 +217,11 @@ class Agent(object):
         ret = {}
         for eq in self.equations:
             ret[eq] = deriv_degree(eq)
-        if deg:
-            return {eq: d for eq, d in ret.items() if d == deg}
+        # casting values to int
+        ret = {k: int(v.__str__()) for k, v in ret.items()}
+        if deg is not None:
+            ret = [eq for eq, d in ret.items() if d == deg]
+            return {k: deg for k in ret}
         return ret
 
     def read_from_tex(self, f):
@@ -169,17 +231,16 @@ class Agent(object):
 
     def process(self):
         self.__validation()
+        self.__generate_duals()
 
 
 if __name__ == "__main__":
     f = 'inputs/agent.tex'
     A = Agent().read_from_tex(f)
     A.process()
-    print(A.equations)
-    print(A.objectives)
-    print(A.time)
-    print(A.time_horizon)
-    print(A.transitions)
-    print(A.phases)
-    print(A.controls)
-    print(A.dim_dict)
+    print(A.Lagrangian)
+    print(A.lagrangian)
+    print(A.euler_equations())
+    print(A.transversality_conditions())
+    print(A.control_optimality())
+    print(A.KKT())

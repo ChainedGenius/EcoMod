@@ -3,3 +3,4 @@ numpy
 scipy
 antlr4-python3-runtime==4.10
 pyyaml
+multipledispatch==0.6.0
