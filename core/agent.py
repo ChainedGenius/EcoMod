@@ -1,15 +1,20 @@
 from itertools import chain
 
-from utils import list_substract
-from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound
+
+
+from utils import iterable_substract
+from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
+    DimensionCheckingFailed
 from deserialiser import read_model_from_tex
 from sympyfier import sympify, ecomodify
-from ecomod_utils import deriv_degree
+from ecomod_utils import deriv_degree, pi_theorem, spec_funcs
 from numpy import prod
 
 
 class Agent(object):
-    def __init__(self, objectives=None, inequations=None, equations=None, functions=None, params=None):
+    def __init__(self, objectives=None, inequations=None, equations=None, functions=None, params=None, dim_dict=None):
+        if dim_dict is None:
+            dim_dict = []
         if objectives is None:
             objectives = []
         if inequations is None:
@@ -25,6 +30,7 @@ class Agent(object):
         self.equations = equations
         self.inequations = inequations
         self.objectives = objectives
+        self.dim_dict = dim_dict
 
     def __validation(self):
         # step 0: check objective
@@ -33,16 +39,56 @@ class Agent(object):
         # step 1: check completeness
         # passed in ecomodify
         # step 2: check compliance (all functions has diff eqs, all other functions == controls)
-        self.__extract_phases_controls()
+        self.__extract_phases_controls()  # there are internal exception if we had problems
         # step 3: dimension check in eq\ineq
         self.__dimension_check()
         pass
 
     def __dimension_check(self):
-        pass
+        def checker(_expr, _casted_dict, _randomize_dict, _spec_stack):
+            # remove spec functions
+            specs = _expr.find(lambda x: x.__class__ in spec_funcs())
+            _spec_stack.extend(specs)
+            _expr = _expr.xreplace({s: 1 for s in specs})
+            # cast all to dummies
+            _expr = _expr.replace(lambda x: x.is_Function or x.is_symbol, lambda x: Symbol(x.name))
+
+            # deal with Integrals and Derivatives
+            _expr = _expr.replace(lambda x: isinstance(x, Integral), lambda x: x.args[0] * x.args[1][0])
+            _expr = _expr.replace(lambda x: isinstance(x, Derivative), lambda x: x.args[0] / x.args[1][0])
+            # subs
+            # randomize all
+            _expr = _expr.copy()
+            _expr = _expr.subs(_randomize_dict)
+            _expr = (_expr.lhs / _expr.rhs).subs(_casted_dict)
+            return _expr.is_Number
+
+        from sympy import Symbol, Integral, Derivative, Eq
+        from numpy.random import rand
+        errors = []
+        spec_stack = []
+        random_coef = rand(len(self.dim_dict,))
+        casted_dict = {Symbol(kv[0].name): kv[1]*random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
+        randomize_dict = {Symbol(kv[0].name): Symbol(kv[0].name)*random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
+        for expr in self.expr:
+            expr_copy = expr.copy()
+            if not checker(expr, casted_dict, randomize_dict, spec_stack):
+                errors.append(expr_copy)
+
+        # spec stack check
+        spec_stack = [Eq(ss.args[0], 1) for ss in spec_stack]
+        for ss in spec_stack:
+            if not checker(ss, casted_dict, randomize_dict, spec_stack):
+                errors.append(ss)
+
+        if errors:
+            report_str = '\n'.join([i.__str__() for i in errors])
+            raise DimensionCheckingFailed(expr=report_str)
 
     def __extract_phases_controls(self):
-        pass
+        p = self.phases
+        if not p:
+            raise AnyPropertyNotFound(attr='Phase variables')
 
     @property
     def time(self):
@@ -84,8 +130,8 @@ class Agent(object):
         phases = [d.args[0] for d in derivas]
         indicator = prod([(p in self.functions) for p in phases])
         if indicator != 1:
-            missing_var = list_substract(phases, self.functions)
-            missing_transition = list_substract(self.functions, phases)
+            missing_var = iterable_substract(phases, self.functions)
+            missing_transition = iterable_substract(self.functions, phases)
             if missing_var:
                 raise AnyPropertyNotFound(attr=missing_var)
             if missing_transition:
@@ -94,7 +140,15 @@ class Agent(object):
 
     @property
     def controls(self):
-        return list_substract(self.functions, self.phases)
+        return iterable_substract(self.functions, self.phases)
+
+    @property
+    def expr(self):
+        return self.equations + self.inequations + self.objectives
+
+    @property
+    def variables(self):
+        return self.functions + self.variables
 
     def diff_degree(self, deg=None):
         """
@@ -127,3 +181,5 @@ if __name__ == "__main__":
     print(A.time_horizon)
     print(A.transitions)
     print(A.phases)
+    print(A.controls)
+    print(A.dim_dict)

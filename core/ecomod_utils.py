@@ -2,6 +2,16 @@ import random
 
 from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols
 from sympy.parsing.latex import parse_latex
+from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
+
+
+def spec_funcs():
+    return {sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log}
+
+
+def is_spec_function(func):
+    spec = {sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log}
+    return func.__class__ in spec
 
 
 def eq2func(eq):
@@ -39,6 +49,7 @@ def span(coefs, variables):
         ret += i * j
 
     return ret
+
 
 def pi_theorem(vars, eq):
     ret = True  # bool return

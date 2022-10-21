@@ -1,5 +1,5 @@
-from sympy import Eq, Function, Symbol
-from sympy.core.relational import Relational
+from sympy import Function, Symbol
+
 
 class Parameter(Symbol):  # superclass for ECOMOD params
     def __new__(cls, name, **kwargs):
@@ -9,13 +9,53 @@ class Parameter(Symbol):  # superclass for ECOMOD params
 
 
 class Phase(Function):
-    def __new__(cls, name, *args, **kwargs):
+    def __new__(cls, name, dim, desc, *args):
         obj = Function(name)(*args)
-        obj.__dict__.update(kwargs)
+        # TODO: add dim desc as attributes of class
         return obj
+
+    # def __new__(cls, name, *args, **kwargs):
+    #     obj = Symbol.__xnew__(cls, name)
+    #     obj.dim = kwargs["dim"]
+    #     obj.desc = kwargs["desc"]
+    #     obj = Function(obj)(*args)  # TODO: CHECK WHY functions in sympyfier == []
+    #     return obj
+
+    # def __init__(self, name, *args, **kwargs):
+    #     self.obj = Function(name)(*args)
+    #     self.__dict__.update(kwargs)
+
+    # @property
+    # def dim(self):
+    #     self.__dict__.update({'dim': self.dim})
+    #     return self.dim
+    #
+    # @dim.setter
+    # def dim(self, dim):
+    #     if isinstance(dim, str):
+    #         self.dim = dim
+    #         self.__dict__.update({'dim': self.dim})
+    #     else:
+    #         raise TypeError('Dimension must be a string')
+    #
+    # @property
+    # def desc(self):
+    #     self.__dict__.update({'desc': self.desc})
+    #     return self.desc
+    #
+    # @desc.setter
+    # def desc(self, desc):
+    #     if isinstance(desc, str):
+    #         self.desc = desc
+    #         self.__dict__.update({'desc': self.desc})
+    #     else:
+    #         raise TypeError('Dimension must be a string')
+
 
 class Boundary:
     pass
+
+
 # class Boundary(Relational):
 #     rel_op = "=="
 #     def __new__(cls, lhs, rhs, rel_op, **kwargs):

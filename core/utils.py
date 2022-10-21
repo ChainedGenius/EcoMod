@@ -60,13 +60,13 @@ def find_objective_markers(s: str):
         return False, s
 
 
-def list_substract(a, b):
+def iterable_substract(a, b):
     """
     :param a:
     :param b:
     :return: a - b
     """
-    return [i for i in a if i not in b]
+    return a.__class__([i for i in a if i not in b])
 
 if __name__ == "__main__":
     s = "$J = \int_0^T (\exp^{-\delta*t} \ln(c(x(t))))dt ->        max$"

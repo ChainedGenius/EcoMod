@@ -52,3 +52,12 @@ class ObjectiveFunctionNotFound(Error):
 
 class AnyPropertyNotFound(Error):
     header = "We cannot find this in your model : {attr}"
+
+
+class DimensionInExpression(Error):
+    header = "Please remove dimension for this expression: {expr} in input file."
+
+
+class DimensionCheckingFailed(Error):
+    header = "Please check these expression to be right in terms of dimension.\n" \
+             "There are: {expr}"
