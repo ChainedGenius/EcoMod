@@ -7,8 +7,10 @@ from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
 from multipledispatch import dispatch
 from sympy import GreaterThan
 
+
 def KKT_mask(dual: dict):
-    return [*chain(*[(GreaterThan(v, 0), Eq(k*v, 0)) for k, v in dual.items()])]
+    return [*chain(*[(GreaterThan(v, 0), Eq(k * v, 0)) for k, v in dual.items()])]
+
 
 def euler_mask(L, x, t):
     if x.args and t in x.args:
