@@ -1,5 +1,22 @@
 import re
 from itertools import chain
+from functools import wraps
+from time import perf_counter
+from logging import Logger
+
+
+def timeit(func):
+    logger = Logger('timer')
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        st = perf_counter()
+        func(*args, **kwargs)
+        et = perf_counter()
+        #logger.info(msg=f'Elapsed time: {et - st}')
+        print(f'Elapsed time: {et - st}')
+
+    return wrapper
 
 
 def unpack(yaml_dict):
@@ -67,6 +84,7 @@ def iterable_substract(a, b):
     :return: a - b
     """
     return a.__class__([i for i in a if i not in b])
+
 
 if __name__ == "__main__":
     s = "$J = \int_0^T (\exp^{-\delta*t} \ln(c(x(t))))dt ->        max$"

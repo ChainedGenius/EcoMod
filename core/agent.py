@@ -1,6 +1,6 @@
 from itertools import chain
 
-from utils import iterable_substract
+from utils import iterable_substract, timeit
 from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed
 from deserialiser import read_model_from_tex
@@ -11,7 +11,7 @@ from numpy import prod
 
 
 class Agent(object):
-    def __init__(self, objectives=None, inequations=None, equations=None, functions=None, params=None, dim_dict=None):
+    def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None, dim_dict=None):
         if dim_dict is None:
             dim_dict = []
         if objectives is None:
@@ -30,9 +30,12 @@ class Agent(object):
         self.inequations = inequations
         self.objectives = objectives
         self.dim_dict = dim_dict
+        self.name = name
         # dual variables k:v where k = real phase or ineq constraint, v = dual
         self.lambdas = {}  # for conjugate arbitrary constants
         self.duals = {}  # for conjugate functions
+        # linking part)
+        self.links = []
 
     def __validation(self):
         # step 0: check objective
@@ -224,23 +227,34 @@ class Agent(object):
             return {k: deg for k in ret}
         return ret
 
-    def read_from_tex(self, f):
+    @classmethod
+    def read_from_tex(cls, f):
+        from pathlib import Path
+        name = Path(f).stem
         header, raw_model = read_model_from_tex(f)
         model = ecomodify(raw_model)
-        return Agent(*model)
+        return cls(name, *model)
 
-    def process(self):
-        self.__validation()
+    def process(self, skip_validation=False):
+        if not skip_validation:
+            self.__validation()
+
         self.__generate_duals()
 
 
-if __name__ == "__main__":
+@timeit
+def main():
     f = 'inputs/agent.tex'
     A = Agent().read_from_tex(f)
     A.process()
+    print(A.name)
     print(A.Lagrangian)
     print(A.lagrangian)
     print(A.euler_equations())
     print(A.transversality_conditions())
     print(A.control_optimality())
     print(A.KKT())
+
+if __name__ == "__main__":
+    main()
+
