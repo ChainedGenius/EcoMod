@@ -40,7 +40,7 @@ def transversality_mask(L, x, t, l, t0, t1):
 def generate_symbols(tag, count, cls):
     query = [tag + "_" + str(i) + " " for i in range(count)]
     query = ''.join(query)[:-1]
-    return symbols(query, cls=cls)
+    return symbols(query, cls=cls) if count != 1 else [symbols(query, cls=cls)]
 
 
 def spec_funcs():

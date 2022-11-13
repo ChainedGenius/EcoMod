@@ -61,3 +61,5 @@ class DimensionInExpression(Error):
 class DimensionCheckingFailed(Error):
     header = "Please check these expression to be right in terms of dimension.\n" \
              "There are: {expr}"
+
+

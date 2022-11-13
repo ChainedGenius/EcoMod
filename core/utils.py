@@ -6,7 +6,6 @@ from logging import Logger
 
 
 def timeit(func):
-    logger = Logger('timer')
 
     @wraps(func)
     def wrapper(*args, **kwargs):

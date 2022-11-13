@@ -1,5 +1,8 @@
 from itertools import chain
+from typing import List
 
+from logger import log
+from market import Flow
 from utils import iterable_substract, timeit
 from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed
@@ -10,8 +13,9 @@ from ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols,
 from numpy import prod
 
 
-class Agent(object):
-    def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None, dim_dict=None):
+class AbstractAgent(object):
+    def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None,
+                 dim_dict=None):
         if dim_dict is None:
             dim_dict = []
         if objectives is None:
@@ -37,6 +41,7 @@ class Agent(object):
         # linking part)
         self.links = []
 
+    @log(comment="Agent ready for validation")
     def __validation(self):
         # step 0: check objective
         if not self.objectives:
@@ -100,6 +105,7 @@ class Agent(object):
         if not p:
             raise AnyPropertyNotFound(attr='Phase variables')
 
+    @log(comment='Agent ready for analysis')
     def __generate_duals(self):
         from sympy import Symbol, Function
         # step 1: create lambdas
@@ -125,7 +131,8 @@ class Agent(object):
             ret1 = None
         # method 2
         try:
-            ret2 = [eq for eq, deg in self.diff_degree(deg=1).items() if deg == 1][0]
+            from sympy import Derivative
+            ret2 = [eq.find(Derivative).pop().args[1][0] for eq, deg in self.diff_degree(deg=1).items() if deg == 1][0]
         except:
             ret2 = None
         if not ret1 and not ret2:
@@ -190,6 +197,18 @@ class Agent(object):
     def lagrangian(self):
         return span({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
 
+    @property
+    def kwargs(self):
+        return {
+            'name': self.name,
+            'objectives': self.objectives,
+            'inequations': self.inequations,
+            'equations': self.equations,
+            'functions': self.functions,
+            'params': self.params,
+            'dim_dict': self.dim_dict
+        }
+
     # ECOMOD CORE SOFT
     def euler_equations(self):
         ret = []
@@ -228,6 +247,7 @@ class Agent(object):
         return ret
 
     @classmethod
+    @log(comment='\nParsing new agent file.')
     def read_from_tex(cls, f):
         from pathlib import Path
         name = Path(f).stem
@@ -235,6 +255,7 @@ class Agent(object):
         model = ecomodify(raw_model)
         return cls(name, *model)
 
+    @log(comment='Agent ready for economic processing')
     def process(self, skip_validation=False):
         if not skip_validation:
             self.__validation()
@@ -242,19 +263,76 @@ class Agent(object):
         self.__generate_duals()
 
 
+class LinkedAgent(AbstractAgent):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.flows = []
+
+    def add_flow(self, flow: Flow):
+        if flow.receiver != self and flow.producer != self:
+            print('This flow do not affect this agent')
+        else:
+            self.flows.append(flow)
+
+    def delete_flow(self, flow: Flow):
+        try:
+            self.flows.remove(flow)
+        except ValueError:
+            # TODO: create custom error
+            print('There is no such flow in Agent file')
+
+    def print_flows(self):
+        return "\n".join([f'[{flow}]' for flow in self.flows])
+
+    @staticmethod
+    def from_abstract(a: AbstractAgent):
+        kwargs = a.kwargs
+        return LinkedAgent(*kwargs.values())
+
+
+
+class LAgentValidator(object):
+    # for links mb redirected to Lagents class
+    def __variable_check(self, agents: List[AbstractAgent]):
+        pass
+
+    def __dimension_check(self, agents: List[AbstractAgent]):
+        pass
+
+    # isolated model checks
+    def __variable_completeness(self, agents: List[AbstractAgent]):
+        pass
+
+    def validate_agents(self, agents: List[AbstractAgent]):
+        self.__variable_check(agents)
+        self.__dimension_check(agents)
+        self.__variable_completeness(agents)
+
+
+
+
+def create_empty_agent(name):
+    return AbstractAgent(name=name)
+
+
 @timeit
 def main():
-    f = 'inputs/agent.tex'
-    A = Agent().read_from_tex(f)
+    f = '../inputs/agent.tex'
+    # f = 'test1.tex'
+    A = LinkedAgent.read_from_tex(f)
     A.process()
-    print(A.name)
-    print(A.Lagrangian)
-    print(A.lagrangian)
-    print(A.euler_equations())
-    print(A.transversality_conditions())
-    print(A.control_optimality())
-    print(A.KKT())
+    B = create_empty_agent('B')
+    C = create_empty_agent('C')
+    A.add_flow(Flow(A, C, 3, 'rub'))
+    # print(A.__class__())
+    # print(A.name)
+    # print(A.Lagrangian)
+    # print(A.lagrangian)
+    # print(A.euler_equations())
+    # print(A.transversality_conditions())
+    # print(A.control_optimality())
+    # print(A.KKT())
+    print(A.print_flows())
 
 if __name__ == "__main__":
     main()
-

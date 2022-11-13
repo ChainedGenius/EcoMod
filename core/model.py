@@ -1,82 +1,36 @@
-from agent import Agent
+from agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agent
 from typing import List
 
+from logger import log
+from market import MarketValidator, Flow
 from utils import timeit
 
 
-class Flow(object):
-    """
-        Here we will contain parsing results from flows file?
-    """
-
-    def __init__(self, producer, receiver, value):
-        self.producer = producer
-        self.receiver = receiver
-        self.value = value
-        pass
 
 
-class Market(object):
-    def __init__(self, eq, dim, lagents):
-        self.eq = eq
-        self.dim = dim
-        self.lagents = lagents
-        pass
 
-
-class LinkedAgent(Agent):
-    def __init__(self, flows: List[Flow]):
-        super().__init__()
-        self.flows = flows
-
-
-class MarketValidator(object):
-    def __market_closureness(self, markets):
-        pass
-
-    def validate_market(self, markets):
-        self.__market_closureness(markets)
-
-
-class LAgentValidator(object):
-    # for links mb redirected to Lagents class
-    def __variable_check(self, agents: List[Agent]):
-        pass
-
-    def __dimension_check(self, agents: List[Agent]):
-        pass
-
-    # isolated model checks
-    def __variable_completeness(self, agents: List[Agent]):
-        pass
-
-    def validate_agents(self, agents: List[Agent]):
-        self.__variable_check(agents)
-        self.__dimension_check(agents)
-        self.__variable_completeness(agents)
 
 
 class AgentMerger(object):
 
-    def __find_ambiguity(self, lagents: List[Agent]):
+    def __find_ambiguity(self, lagents: List[AbstractAgent]):
         """
         Ambiguity == same variable name, but wrong dimension
         :return: True if found ambiguity, else False
         """
         pass
 
-    def __rename_agent_local_variables(self, lagents: List[Agent]):
+    def __rename_agent_local_variables(self, lagents: List[AbstractAgent]):
         pass
 
     def __other_merge_routine(self):
         "other merge routine"
         pass
 
-    def merge(self, lagents: List[Agent]):
+    def merge(self, lagents: List[AbstractAgent]):
         self.__find_ambiguity(lagents)
         self.__other_merge_routine()
         self.__rename_agent_local_variables(lagents)
-
 
 
 class ModelValidator(MarketValidator, LAgentValidator, AgentMerger):
@@ -99,29 +53,34 @@ class Model(ModelValidator):
     def process(self):
         self.validate(self.markets, self.lagents)
 
+    @log
     @timeit
     def visualize(self):
         from hypernetx import Hypergraph
         from itertools import chain
         from hypernetx.drawing.rubber_band import draw
-        agent_names = [a.name for a in self.lagents]
-        flows = chain([a.flows for a in self.lagents])
-        edges = [{l.producer.name, l.receiver.name} for l in flows]
+        import matplotlib.pyplot as plt
+        isolated = {f'isolated {idx}': {i.name} for idx, i in enumerate(self.lagents) if not i.flows}
+        flows = chain(*[a.flows for a in self.lagents])
+        edges = {f'{l.value} ({l.dim})': {l.producer.name, l.receiver.name} for l in flows}
+        edges.update(isolated)
         hg = Hypergraph(edges)
         draw(hg)
+        plt.show()
 
 
 if __name__ == "__main__":
-    from hypernetx import Hypergraph
-    from itertools import chain
-    from hypernetx.drawing.rubber_band import draw
-    import matplotlib.pyplot as plt
-    f1 = 'inputs/agent.tex'
-    A1 = Agent().read_from_tex(f1)
-    A1.process(skip_validation=True)
-    f2 = 'inputs/agent2.tex'
-    A2 = Agent().read_from_tex(f2)
-    A2.process(skip_validation=True)
-    hg = Hypergraph({0: (A1.name, A2.name)})
-    fig = draw(hg)
-    plt.show()
+    f1 = '../inputs/agent.tex'
+    f2 = '../inputs/agent2.tex'
+    a1 = LinkedAgent.read_from_tex(f1)
+    a1.process()
+    a2 = LinkedAgent.read_from_tex(f2)
+    a3 = LinkedAgent.from_abstract(create_empty_agent('agent3'))
+    a4 = LinkedAgent.from_abstract(create_empty_agent('agent4'))
+    flow1 = Flow(a1, a2, 50, 'rub')
+    flow2 = Flow(a2, a1, 1, 'tv')
+    a1.add_flow(flow1)
+    a2.add_flow(flow2)
+    m = Model([], [a1,a2,a3,a4])
+    m.visualize()
+    # TODO: wrap all test cases to different directories
