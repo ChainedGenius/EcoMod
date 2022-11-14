@@ -3,6 +3,7 @@ from core.market import Flow
 from core.model import Model
 from core.utils import timeit
 
+
 @timeit
 def simple_linked_agents():
     f = '../inputs/agent.tex'
@@ -22,10 +23,11 @@ def simple_linked_agents():
     print(A.KKT())
     print(A.print_flows())
 
+
 @timeit
 def simple_model_viz():
-    f1 = '../inputs/agent.tex'
-    f2 = '../inputs/agent2.tex'
+    f1 = '../models/inputs/agent.tex'
+    f2 = '../models/inputs/agent2.tex'
     a1 = LinkedAgent.read_from_tex(f1)
     a1.process()
     a2 = LinkedAgent.read_from_tex(f2)
@@ -38,6 +40,32 @@ def simple_model_viz():
     m = Model([], [a1, a2, a3, a4])
     m.visualize('test.png')
 
+@timeit
+def agent_dump():
+    # broken scenario
+    """
+        raise TemplateNotFound(template)
+        jinja2.exceptions.TemplateNotFound: LAgent.tex
+
+    """
+    f1 = '../models/inputs/agent.tex'
+    A = LinkedAgent.read_from_tex(f1)
+    A.process()
+    A.dump('../models/outputs/Amodel')
+
+@timeit
+def p_model():
+    f1 = '../models/inputs/Pmodel/H.tex'
+    H = LinkedAgent.read_from_tex(f1)
+    H.process(skip_validation=True)
+    print(H.controls)
+
+    f2 = '../models/inputs/Pmodel/P.tex'
+    P = LinkedAgent.read_from_tex(f2)
+    P.process(skip_validation=True)
+    print(P.controls)
+    print(P.phases)
+
 
 if __name__ == "__main__":
-    simple_linked_agents()
+    agent_dump()

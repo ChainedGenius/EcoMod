@@ -1,9 +1,11 @@
 from itertools import chain
+from pathlib import Path
 from typing import List
 from numpy import prod
 
 from core.logger import log
 from core.market import Flow
+from core.pprint import AgentTemplateEngine, exec_tex
 from core.utils import iterable_substract, timeit
 from core.errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed
@@ -170,8 +172,12 @@ class AbstractAgent(object):
         return phases
 
     @property
+    def external(self):
+        return [ext for ext in self.functions if "_" in ext.name]
+
+    @property
     def controls(self):
-        return iterable_substract(self.functions, self.phases)
+        return iterable_substract(self.functions, self.phases + self.external)
 
     @property
     def expr(self):
@@ -262,6 +268,27 @@ class AbstractAgent(object):
 
         self.__generate_duals()
 
+    @log(comment='Dumping agent file')
+    def dump(self, destination=None):
+        if not destination:
+            destination='.'
+        engine = AgentTemplateEngine()
+        engine.render({
+            "PHASES": self.phases,
+            "CONTROLS": self.controls,
+            "INFOS": self.external,
+            "EULERS": self.euler_equations(),
+            "OPTIMAS": self.control_optimality(),
+            "TRANSVERS": self.transversality_conditions(),
+            "KKT": self.KKT()
+        })
+        tex_directorypath = Path(destination)/self.name
+        tex_filepath = (tex_directorypath/self.name).with_suffix('.tex')
+        engine.dump(tex_filepath)
+        exec_tex(tex_filepath, tex_directorypath)
+
+
+
 
 class LinkedAgent(AbstractAgent):
     def __init__(self, *args):
@@ -333,4 +360,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    print('Done')

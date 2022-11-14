@@ -7,7 +7,7 @@ def read_tex(f):
     :param f: filename or fd
     :return: yaml parsable object + header
     """
-    with open(f, 'r') as stream:
+    with open(f, 'r', encoding='utf-8') as stream:
         content = stream.read()
         splitted = content.split(r'\begin{document}')
         if len(splitted) == 1:

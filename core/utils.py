@@ -76,6 +76,11 @@ def find_objective_markers(s: str):
         return False, s
 
 
+def dict_substract(a, b):
+    # a - b
+    return {k: v for k, v in a.items() if (k, v) not in b.items()}
+
+
 def iterable_substract(a, b):
     """
     :param a:

@@ -4,6 +4,7 @@ import numpy as np
 from sympy import Function, Symbol, Number, sympify as real_sympify
 from sympy.core.relational import Relational, Eq
 from sympy.parsing.latex import parse_latex
+from sympy.parsing.latex.errors import LaTeXParsingError
 
 from core.datamodel import Parameter, Phase
 from core.ecomod_utils import spec_funcs, is_spec_function
@@ -25,13 +26,16 @@ def sympify(raw_obj):
     is_objective = find_objective_markers(raw_obj[0])
     if is_objective[0]:
         raw_latex = is_objective[1]
-    decoded = _xsympify(raw_latex)
+    try:
+        decoded = _xsympify(raw_latex)
+    except LaTeXParsingError:
+        raise NonSympyfiableError(err=raw_obj)
     dim, desc = extract_dim_desc(raw_obj[1])
     if dim == "":
         dim = 1
     if decoded.args:
         # case if not Symbol
-        if decoded.__str__() == raw_latex:
+        if decoded.__str__() == raw_latex.replace('\\', ''):
             # case if Function
             # decoded = Phase(decoded.name, *decoded.args, dim=dim, desc=desc)
             decoded = Phase(decoded.name, dim, desc, *decoded.args)
@@ -165,12 +169,14 @@ def ecomodify(raw_model):
     test2 = set([i.func for i in params + functions if i.func])
     if not set_equality(test1, test2):
         print(test1, test2)
+        #TODO: custom errors
         raise TypeError("Ecomodify problems")
     # args porting tests
     test1 = set(chain(*[i.args if np.prod([k.is_Function or k.is_symbol for k in i.args]) else i.atoms() for i in fs_all_ ]))
     test2 = set([i for i in params + functions])
     numbersDOTtk = test1 - test2  # cicada meme
     if np.prod([issubclass(i.__class__, Number) for i in numbersDOTtk]) == 0:
+        #TODO: custom errors
         print(test1, test2)
         raise TypeError("Ecomodify problems")
 

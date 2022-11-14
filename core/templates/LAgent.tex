@@ -1,0 +1,44 @@
+\documentclass{article}
+\begin{document}
+\section{Example}
+
+
+\section{Обозначения}
+%# Раздел для записи всевозможных переменных. Все переменные List[LaTeX]
+
+Фазовые переменные: \VAR{PHASES}
+Управляемые параметры: \VAR{CONTROLS}
+Информационные переменные: \VAR{INFOS}
+
+\section{Условия оптимальности}
+%# Раздел для записи условий оптимальности <- результат работы ECOMOD CORE
+\subsection{Уравнения Эйлера}
+\begin{itemize}
+%% for E in EULERS
+    \item $\VAR{E}$
+%% endfor
+\end{itemize}
+
+\subsection{Условия оптимальности по управлению}
+\begin{itemize}
+%% for O in OPTIMAS
+    \item $\VAR{O}$
+%% endfor
+\end{itemize}
+
+\subsection{Условия трансверсальности}
+\begin{itemize}
+%% for T in TRANSVERS
+    \item $\VAR{T}$
+%% endfor
+\end{itemize}
+
+\subsection{Условия доп. нежёсткости}
+\begin{itemize}
+%% for K in KKT
+    \item $\VAR{K}$
+%% endfor
+\end{itemize}
+
+\section{Уравнения связи}
+\end{document}
