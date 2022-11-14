@@ -1,16 +1,16 @@
 from itertools import chain
 from typing import List
-
-from logger import log
-from market import Flow
-from utils import iterable_substract, timeit
-from errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
-    DimensionCheckingFailed
-from deserialiser import read_model_from_tex
-from sympyfier import sympify, ecomodify
-from ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask
 from numpy import prod
+
+from core.logger import log
+from core.market import Flow
+from core.utils import iterable_substract, timeit
+from core.errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
+    DimensionCheckingFailed
+from core.deserialiser import read_model_from_tex
+from core.sympyfier import sympify, ecomodify
+from core.ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
+    transversality_mask, KKT_mask
 
 
 class AbstractAgent(object):
@@ -290,7 +290,6 @@ class LinkedAgent(AbstractAgent):
         return LinkedAgent(*kwargs.values())
 
 
-
 class LAgentValidator(object):
     # for links mb redirected to Lagents class
     def __variable_check(self, agents: List[AbstractAgent]):
@@ -309,8 +308,6 @@ class LAgentValidator(object):
         self.__variable_completeness(agents)
 
 
-
-
 def create_empty_agent(name):
     return AbstractAgent(name=name)
 
@@ -318,21 +315,22 @@ def create_empty_agent(name):
 @timeit
 def main():
     f = '../inputs/agent.tex'
-    # f = 'test1.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process()
-    B = create_empty_agent('B')
-    C = create_empty_agent('C')
+    B = LinkedAgent.from_abstract(create_empty_agent('B'))
+    C = LinkedAgent.from_abstract(create_empty_agent('C'))
     A.add_flow(Flow(A, C, 3, 'rub'))
-    # print(A.__class__())
-    # print(A.name)
-    # print(A.Lagrangian)
-    # print(A.lagrangian)
-    # print(A.euler_equations())
-    # print(A.transversality_conditions())
-    # print(A.control_optimality())
-    # print(A.KKT())
+    B.add_flow(Flow(A, B, 6, 'tv'))
+    print(A.__class__())
+    print(A.name)
+    print(A.Lagrangian)
+    print(A.lagrangian)
+    print(A.euler_equations())
+    print(A.transversality_conditions())
+    print(A.control_optimality())
+    print(A.KKT())
     print(A.print_flows())
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 import yaml
-from errors.RWErrors import NonLaTeXableError, NonYAMLableError
-from utils import unpack, trim
+from core.errors.RWErrors import NonLaTeXableError, NonYAMLableError
+from core.utils import unpack, trim
 
 def read_tex(f):
     """

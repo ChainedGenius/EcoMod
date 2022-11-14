@@ -1,15 +1,14 @@
-import sympy
-from sympy import Function, Symbol, Number, FunctionClass, sympify as real_sympify
-from sympy.core.relational import Relational, Eq, Unequality
+from itertools import chain
+
+import numpy as np
+from sympy import Function, Symbol, Number, sympify as real_sympify
+from sympy.core.relational import Relational, Eq
 from sympy.parsing.latex import parse_latex
 
-from ecomod_utils import spec_funcs, is_spec_function
-from utils import extract_dim_desc, set_equality, find_objective_markers, iterable_substract
-from datamodel import Parameter, Phase, Boundary
-from errors.RWErrors import NonSympyfiableError, VariableAmbiguity, ExtraVariableError, DimensionInExpression
-from itertools import chain
-import numpy as np
-
+from core.datamodel import Parameter, Phase
+from core.ecomod_utils import spec_funcs, is_spec_function
+from core.errors.RWErrors import NonSympyfiableError, VariableAmbiguity, ExtraVariableError, DimensionInExpression
+from core.utils import extract_dim_desc, set_equality, find_objective_markers, iterable_substract
 
 
 def _xsympify(raw_str):

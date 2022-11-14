@@ -13,15 +13,13 @@ class Flow(object):
     def __str__(self):
         return f'{self.producer.name} ---- {self.value} ---> {self.receiver.name}'
 
+
 class Market(object):
     def __init__(self, eq, dim, lagents):
         self.eq = eq
         self.dim = dim
         self.lagents = lagents
         pass
-
-
-
 
 
 class MarketValidator(object):

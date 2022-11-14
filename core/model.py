@@ -1,14 +1,9 @@
-from agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agent
 from typing import List
 
-from logger import log
-from market import MarketValidator, Flow
-from utils import timeit
-
-
-
-
-
+from core.logger import log
+from core.market import MarketValidator, Flow
+from core.agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agent
+from core.utils import timeit
 
 
 class AgentMerger(object):
@@ -53,9 +48,8 @@ class Model(ModelValidator):
     def process(self):
         self.validate(self.markets, self.lagents)
 
-    @log
-    @timeit
-    def visualize(self):
+    @log(comment="")
+    def visualize(self, f):
         from hypernetx import Hypergraph
         from itertools import chain
         from hypernetx.drawing.rubber_band import draw
@@ -66,7 +60,8 @@ class Model(ModelValidator):
         edges.update(isolated)
         hg = Hypergraph(edges)
         draw(hg)
-        plt.show()
+        if f:
+            plt.savefig(f)
 
 
 if __name__ == "__main__":
@@ -81,6 +76,5 @@ if __name__ == "__main__":
     flow2 = Flow(a2, a1, 1, 'tv')
     a1.add_flow(flow1)
     a2.add_flow(flow2)
-    m = Model([], [a1,a2,a3,a4])
+    m = Model([], [a1, a2, a3, a4])
     m.visualize()
-    # TODO: wrap all test cases to different directories
