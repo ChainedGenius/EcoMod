@@ -37,7 +37,7 @@ def simple_model_viz():
     flow2 = Flow(a2, a1, 1, 'tv')
     a1.add_flow(flow1)
     a2.add_flow(flow2)
-    m = Model([], [a1, a2, a3, a4])
+    m = Model('1', [], [a1, a2, a3, a4])
     m.visualize('test.png')
 
 @timeit
@@ -66,6 +66,21 @@ def p_model():
     print(P.controls)
     print(P.phases)
 
+@timeit
+def p_model_dump():
+    f1 = '../models/inputs/Pmodel/H.tex'
+    H = LinkedAgent.read_from_tex(f1)
+    H.process(skip_validation=True)
+
+    f2 = '../models/inputs/Pmodel/P.tex'
+    P = LinkedAgent.read_from_tex(f2)
+    P.process(skip_validation=True)
+
+    M = Model('Pmodel', [], [H, P])
+    M.process()
+    M.dump('../models/outputs/Pmodel')
+
+
 
 if __name__ == "__main__":
-    agent_dump()
+    p_model_dump()

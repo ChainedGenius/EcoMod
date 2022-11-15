@@ -5,7 +5,16 @@ from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivativ
 from sympy.parsing.latex import parse_latex
 from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
 from multipledispatch import dispatch
-from sympy import GreaterThan
+from sympy import GreaterThan, Basic
+from sympy.printing.latex import latex
+
+
+def latexify(exprs: list, to_str=False):
+    ret = [latex(e) for e in exprs]
+    if not to_str:
+        return ret
+
+    return ',~'.join(ret)
 
 
 def KKT_mask(dual: dict):
@@ -20,7 +29,7 @@ def euler_mask(L, x, t):
     x_prime = x(t).diff(t)
     L_x_prime = L.diff(x_prime)
     L_x = L.diff(x(t))
-    return simplify(Derivative(L_x_prime, t) - L_x)
+    return Eq(simplify(Derivative(L_x_prime, t) - L_x), 0)
 
 
 def transversality_mask(L, x, t, l, t0, t1):

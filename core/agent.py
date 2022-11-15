@@ -12,7 +12,7 @@ from core.errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound
 from core.deserialiser import read_model_from_tex
 from core.sympyfier import sympify, ecomodify
 from core.ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask
+    transversality_mask, KKT_mask, latexify
 
 
 class AbstractAgent(object):
@@ -231,7 +231,8 @@ class AbstractAgent(object):
         return ret
 
     def control_optimality(self):
-        return [self.Lagrangian.diff(c) for c in self.controls]
+        from sympy import Eq
+        return [Eq(self.Lagrangian.diff(c), 0) for c in self.controls]
 
     def KKT(self):
         _duals = {k: v for k, v in self.duals.items() if k not in [eq2func(e) for e in self.transitions]}
@@ -268,26 +269,34 @@ class AbstractAgent(object):
 
         self.__generate_duals()
 
+    def compress(self, to_tex=False, headers=True):
+        ret = {
+            "PHASES": latexify(self.phases, to_str=True), # because we render in one line
+            "CONTROLS": latexify(self.controls, to_str=True), # same
+            "INFOS": latexify(self.external, to_str=True), # same
+            "EULERS": latexify(self.euler_equations()),
+            "OPTIMAS": latexify(self.control_optimality()),
+            "TRANSVERS": latexify(self.transversality_conditions()),
+            "KKT": latexify(self.KKT())
+        }
+        if not to_tex:
+            return ret
+        else:
+            engine = AgentTemplateEngine()
+            if headers:
+                return engine.render(ret)
+            return engine.render(ret).split(r'\begin{document}')[1].split(r'\end{document}')[0]
+
     @log(comment='Dumping agent file')
     def dump(self, destination=None):
         if not destination:
-            destination='.'
+            destination = '.'
         engine = AgentTemplateEngine()
-        engine.render({
-            "PHASES": self.phases,
-            "CONTROLS": self.controls,
-            "INFOS": self.external,
-            "EULERS": self.euler_equations(),
-            "OPTIMAS": self.control_optimality(),
-            "TRANSVERS": self.transversality_conditions(),
-            "KKT": self.KKT()
-        })
-        tex_directorypath = Path(destination)/self.name
-        tex_filepath = (tex_directorypath/self.name).with_suffix('.tex')
+        engine.render(self.compress())
+        tex_directorypath = Path(destination) / self.name
+        tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')
         engine.dump(tex_filepath)
         exec_tex(tex_filepath, tex_directorypath)
-
-
 
 
 class LinkedAgent(AbstractAgent):

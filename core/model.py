@@ -1,8 +1,10 @@
+from pathlib import Path
 from typing import List
 
 from core.logger import log
 from core.market import MarketValidator, Flow
 from core.agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agent
+from core.pprint import ModelTemplateEngine, exec_tex
 from core.utils import timeit
 
 
@@ -40,15 +42,30 @@ class Model(ModelValidator):
         Merged model with several agents and markets
     """
 
-    def __init__(self, markets, lagents):
+    def __init__(self, name, markets, lagents: List[LinkedAgent]):
         self.markets = markets
         self.lagents = lagents
+        self.name = name
         pass
 
     def process(self):
         self.validate(self.markets, self.lagents)
 
-    @log(comment="")
+    def dump(self, destination=None):
+        if not destination:
+            destination = '.'
+        engine = ModelTemplateEngine()
+        data = {}
+        for agent in self.lagents:
+            data[agent.name] = agent.compress(to_tex=True, headers=False)
+        template_data = {"DATA": data, "BALANCES": []}
+        engine.render(template_data)
+        tex_directorypath = Path(destination) / self.name
+        tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')
+        engine.dump(tex_filepath)
+        exec_tex(tex_filepath, tex_directorypath)
+
+    @log(comment="Visualizing...")
     def visualize(self, f):
         from hypernetx import Hypergraph
         from itertools import chain
@@ -76,5 +93,5 @@ if __name__ == "__main__":
     flow2 = Flow(a2, a1, 1, 'tv')
     a1.add_flow(flow1)
     a2.add_flow(flow2)
-    m = Model([], [a1, a2, a3, a4])
+    m = Model('1', [], [a1, a2, a3, a4])
     m.visualize()

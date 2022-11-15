@@ -1,44 +1,44 @@
 \documentclass{article}
+\usepackage[english,russian]{babel}
 \begin{document}
-\section{Example}
 
-
-\section{Обозначения}
+\subsection{Variables}
 %# Раздел для записи всевозможных переменных. Все переменные List[LaTeX]
 
-Фазовые переменные: \VAR{PHASES}
-Управляемые параметры: \VAR{CONTROLS}
-Информационные переменные: \VAR{INFOS}
+Phase variables: $\VAR{PHASES}$
+\newline
+Control parameters: $\VAR{CONTROLS}$
+\newline
+Exogenous parameters: $\VAR{INFOS}$
 
-\section{Условия оптимальности}
+\subsection{Optimality conditions}
 %# Раздел для записи условий оптимальности <- результат работы ECOMOD CORE
-\subsection{Уравнения Эйлера}
+\subsubsection{Euler equations}
 \begin{itemize}
 %% for E in EULERS
     \item $\VAR{E}$
 %% endfor
 \end{itemize}
 
-\subsection{Условия оптимальности по управлению}
+\subsubsection{Control optimality conditions}
 \begin{itemize}
 %% for O in OPTIMAS
     \item $\VAR{O}$
 %% endfor
 \end{itemize}
 
-\subsection{Условия трансверсальности}
+\subsubsection{Transversality conditions}
 \begin{itemize}
 %% for T in TRANSVERS
     \item $\VAR{T}$
 %% endfor
 \end{itemize}
 
-\subsection{Условия доп. нежёсткости}
+\subsubsection{Primal feasibility, Dual feasibility and Complementary slackness conditions}
 \begin{itemize}
 %% for K in KKT
     \item $\VAR{K}$
 %% endfor
 \end{itemize}
 
-\section{Уравнения связи}
 \end{document}

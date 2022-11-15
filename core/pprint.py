@@ -1,6 +1,6 @@
 from os import startfile
 from os.path import exists
-from pathlib import Path
+from pathlib import Path, PosixPath
 from shutil import rmtree, move
 from subprocess import run
 from tempfile import mkdtemp
@@ -22,7 +22,7 @@ class TexTemplateEngine(object):
             line_comment_prefix='%#',
             trim_blocks=True,
             autoescape=False,
-            loader=FileSystemLoader(Path('./templates').absolute())
+            loader=FileSystemLoader(Path('../templates'))
         )
         self.template = self.latex_jinja_env.get_template(self.template_name)
         self.rendered = ""
@@ -44,7 +44,8 @@ class TexTemplateEngine(object):
         if not self.rendered:
             # TODO: custom warn
             raise RuntimeError('Render it first')
-
+        if not filename.parent.exists():
+            filename.parent.mkdir(parents=True)
         with open(filename, 'w') as f:
             f.write(self.rendered)
 
@@ -53,11 +54,15 @@ class AgentTemplateEngine(TexTemplateEngine):
     template_name = 'LAgent.tex'
 
 
+class ModelTemplateEngine(TexTemplateEngine):
+    template_name = 'Model.tex'
+
+
 def exec_tex(tex_filename, destination, open=False):
     SUFFIXES = ['.pdf', '.log', '.aux']
 
     filename = Path(tex_filename).stem
-    package_destination = Path(destination) / filename  # Filepath without suffix
+    package_destination = Path(destination)  # Filepath without suffix
     if not Path(package_destination).exists():
         package_destination.mkdir(parents=True)
 
@@ -70,6 +75,8 @@ def exec_tex(tex_filename, destination, open=False):
             move(Path.cwd() / real_filename, real_file_path)
             if suffix == '.pdf':
                 pdf_destination = package_destination / real_filename
+    except PermissionError:
+        raise PermissionError('File is currently opened or you have no permission to do this.')
     finally:
         rmtree(temp_dir)
 
@@ -92,5 +99,6 @@ def exec_tex(tex_filename, destination, open=False):
 if __name__ == '__main__':
     # exec_tex('../models/inputs/Pmodel/H.tex', '../models/outputs/Pmodel')
     a = AgentTemplateEngine()
-    a.render({'PHASES': '3333', 'CONTROLS': '4444', "INFOS": "6666", "EULERS": [r'\beta +1 = 0', r'\frac{dx(t)}{dt} = 123']})
+    a.render(
+        {'PHASES': '3333', 'CONTROLS': '4444', "INFOS": "6666", "EULERS": [r'\beta +1 = 0', r'\frac{dx(t)}{dt} = 123']})
     a.dump('../models/outputs/Pmodel/H/H.tex')
