@@ -1,12 +1,39 @@
 import random
 from itertools import chain
 
-from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq
+from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq, Symbol
 from sympy.parsing.latex import parse_latex
 from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
 from multipledispatch import dispatch
 from sympy import GreaterThan, Basic
 from sympy.printing.latex import latex
+
+
+def is_substricted(symb, tag=None):
+    # simple heuristics
+    if not tag:
+        return True if "_{" in symb.__str__() else False
+    else:
+        ret = True if f"_{{{tag}}}" in symb.__str__() else False
+        return ret
+
+
+def remove_subscript(symb):
+    if is_substricted(symb):
+        if symb.args:
+            # case if function
+            return symbols(symb.name.split('_')[0], cls=Function)(*symb.args)
+        return symbols(symb.name.split('_')[0], cls=Symbol)
+    return symb
+
+
+def add_subscript(symb, tag):
+    if not is_substricted(symb):
+        if symb.args:
+            # case if function
+            return symbols(f'{symb.name}_{{{tag}}}', cls=Function)(*symb.args)
+        return symbols(f'{symb.name}_{{{tag}}}', cls=Symbol)
+    return symb
 
 
 def latexify(exprs: list, to_str=False):

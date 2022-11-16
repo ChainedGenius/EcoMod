@@ -40,13 +40,21 @@ class ModelValidator(MarketValidator, LAgentValidator, AgentMerger):
 class Model(ModelValidator):
     """
         Merged model with several agents and markets
+        or
+        agents and balances
+        or
+        agents and flows
     """
 
-    def __init__(self, name, markets, lagents: List[LinkedAgent]):
-        self.markets = markets
+    def __init__(self, name, balances=None, lagents: List[LinkedAgent] = None):
+        self.balances = balances
         self.lagents = lagents
         self.name = name
-        pass
+        self.markets = []
+
+    def add_agent(self, lagent: LinkedAgent):
+        if lagent not in self.lagents:
+            self.lagents.append(lagent)
 
     def process(self):
         self.validate(self.markets, self.lagents)
@@ -58,7 +66,7 @@ class Model(ModelValidator):
         data = {}
         for agent in self.lagents:
             data[agent.name] = agent.compress(to_tex=True, headers=False)
-        template_data = {"DATA": data, "BALANCES": []}
+        template_data = {"DATA": data, "BALANCES": self.balances.compress()["BALANCES"]}
         engine.render(template_data)
         tex_directorypath = Path(destination) / self.name
         tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')

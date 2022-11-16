@@ -54,7 +54,7 @@ def sympify(raw_obj):
     return decoded, is_objective[0]
 
 
-def ecomodify(raw_model):
+def ecomodify(raw_model, xreplace=True):
     def dim_dict(_raw_model):
         # not real python dict: list of tuples
         return [(k, real_sympify(extract_dim_desc(v)[0])) if extract_dim_desc(v)[0] != "" else (k, "") for k, v in _raw_model.items()]
@@ -106,7 +106,10 @@ def ecomodify(raw_model):
                     res = res.func(*var1.args)
             return res
         else:
-            raise VariableAmbiguity(var1=res[0], var2=res[1])
+            try:
+                raise VariableAmbiguity(var1=res[0], var2=res[1])
+            except IndexError:
+                raise VariableAmbiguity(var1=res[0], var2=res[1])
 
     inequations = []
     equations = []
@@ -131,59 +134,60 @@ def ecomodify(raw_model):
     # print(list(set(used_old)))
     # print(list(set(used)))
     # print(functions + params)
-    fs_all = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
-                         equations + inequations + objectives]))
-    fs_all_new = [find_analog(fs, functions + params) for fs in fs_all]
-    fs_map = {fs: find_analog(fs, functions + params) for fs in fs_all}
-    # print(fs_all_new)
-    # test1 = set(chain(*[v.args for v in fs_all_new]))
-    # for i in test1:
-    #     if i.args:
-    #         print(i.args[0].__class__,i.__class__,i.args)
+    if xreplace:
+        fs_all = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
+                             equations + inequations + objectives]))
+        fs_all_new = [find_analog(fs, functions + params) for fs in fs_all]
+        fs_map = {fs: find_analog(fs, functions + params) for fs in fs_all}
+        # print(fs_all_new)
+        # test1 = set(chain(*[v.args for v in fs_all_new]))
+        # for i in test1:
+        #     if i.args:
+        #         print(i.args[0].__class__,i.__class__,i.args)
 
-    # xreplacing
+        # xreplacing
 
-    functions = [f.xreplace(fs_map) for f in functions]
-    params = [p.xreplace(fs_map) for p in params]
-    equations = [e.xreplace(fs_map) for e in equations]
-    inequations = [i.xreplace(fs_map) for i in inequations]
-    objectives = [o.xreplace(fs_map) for o in objectives]
-    # v0 hack
-    try:
-        dim_dict = {fs_map[parse_latex(i[0])]: i[1] for i in dim_dict if i[1] != ''}
-    except KeyError as exc:
-        raise DimensionInExpression(expr=exc)
+        functions = [f.xreplace(fs_map) for f in functions]
+        params = [p.xreplace(fs_map) for p in params]
+        equations = [e.xreplace(fs_map) for e in equations]
+        inequations = [i.xreplace(fs_map) for i in inequations]
+        objectives = [o.xreplace(fs_map) for o in objectives]
+        # v0 hack
+        try:
+            dim_dict = {fs_map[parse_latex(i[0])]: i[1] for i in dim_dict if i[1] != ''}
+        except KeyError as exc:
+            raise DimensionInExpression(expr=exc)
 
-    # functions = [f.subs(fs_map) for f in functions]
-    # params = [p.subs(fs_map) for p in params]
-    # equations = [e.subs(fs_map) for e in equations]
-    # inequations = [i.subs(fs_map) for i in inequations]
-    # objectives = [o.subs(fs_map) for o in objectives]
+        # functions = [f.subs(fs_map) for f in functions]
+        # params = [p.subs(fs_map) for p in params]
+        # equations = [e.subs(fs_map) for e in equations]
+        # inequations = [i.subs(fs_map) for i in inequations]
+        # objectives = [o.subs(fs_map) for o in objectives]
 
-    # compatibility testing
-    # func porting tests
-    # ----------- UNCOMMENT -------------------------
-    fs_all_ = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
-                          equations + inequations + objectives]))
-    test1 = iterable_substract(set([i.func for i in fs_all_ if i.func]), spec_funcs())
-    test2 = set([i.func for i in params + functions if i.func])
-    if not set_equality(test1, test2):
-        print(test1, test2)
-        #TODO: custom errors
-        raise TypeError("Ecomodify problems")
-    # args porting tests
-    test1 = set(chain(*[i.args if np.prod([k.is_Function or k.is_symbol for k in i.args]) else i.atoms() for i in fs_all_ ]))
-    test2 = set([i for i in params + functions])
-    numbersDOTtk = test1 - test2  # cicada meme
-    if np.prod([issubclass(i.__class__, Number) for i in numbersDOTtk]) == 0:
-        #TODO: custom errors
-        print(test1, test2)
-        raise TypeError("Ecomodify problems")
+        # compatibility testing
+        # func porting tests
+        # ----------- UNCOMMENT -------------------------
+        fs_all_ = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
+                              equations + inequations + objectives]))
+        test1 = iterable_substract(set([i.func for i in fs_all_ if i.func]), spec_funcs())
+        test2 = set([i.func for i in params + functions if i.func])
+        if not set_equality(test1, test2):
+            print(test1, test2)
+            #TODO: custom errors
+            raise TypeError("Ecomodify problems")
+        # args porting tests
+        test1 = set(chain(*[i.args if np.prod([k.is_Function or k.is_symbol for k in i.args]) else i.atoms() for i in fs_all_ ]))
+        test2 = set([i for i in params + functions])
+        numbersDOTtk = test1 - test2  # cicada meme
+        if np.prod([issubclass(i.__class__, Number) for i in numbersDOTtk]) == 0:
+            #TODO: custom errors
+            print(test1, test2)
+            raise TypeError("Ecomodify problems")
 
-    # completeness
-    completion_names = set(j.name for j in chain(*[i.atoms(Function).union(i.atoms(Symbol)) for i in fs_all_]) if not is_spec_function(j))
-    inited_names = set(j.name for j in functions + params)
-    if completion_names != inited_names:
-        raise ExtraVariableError(vars=completion_names - inited_names)
+        # completeness
+        completion_names = set(j.name for j in chain(*[i.atoms(Function).union(i.atoms(Symbol)) for i in fs_all_]) if not is_spec_function(j))
+        inited_names = set(j.name for j in functions + params)
+        if completion_names != inited_names:
+            raise ExtraVariableError(vars=completion_names - inited_names)
     # ---------------------UNCOMMENT-----------------
     return objectives, inequations, equations, functions, params, dim_dict

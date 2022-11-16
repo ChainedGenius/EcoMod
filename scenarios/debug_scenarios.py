@@ -1,8 +1,22 @@
 from core.agent import LinkedAgent, create_empty_agent
-from core.market import Flow
+from core.market import Flow, Market, Balances
 from core.model import Model
 from core.utils import timeit
 
+@timeit
+def simple_agent():
+    from sympy import Function
+    from itertools import chain
+    f = '../models/inputs/Pmodel/H.tex'
+    A = LinkedAgent.read_from_tex(f)
+    A.process(skip_validation=True)
+    print(A.lagrangian)
+    print(A.Lagrangian)
+    print(A.phases)
+    print(A.transversality_conditions())
+    print('*'*17)
+    for x in A.phases:
+        print(A.Lagrangian.diff(x.diff(A.time)))
 
 @timeit
 def simple_linked_agents():
@@ -58,13 +72,12 @@ def p_model():
     f1 = '../models/inputs/Pmodel/H.tex'
     H = LinkedAgent.read_from_tex(f1)
     H.process(skip_validation=True)
-    print(H.controls)
+    print(H.__dict__)
 
     f2 = '../models/inputs/Pmodel/P.tex'
     P = LinkedAgent.read_from_tex(f2)
     P.process(skip_validation=True)
-    print(P.controls)
-    print(P.phases)
+    print(P.__dict__)
 
 @timeit
 def p_model_dump():
@@ -76,7 +89,8 @@ def p_model_dump():
     P = LinkedAgent.read_from_tex(f2)
     P.process(skip_validation=True)
 
-    M = Model('Pmodel', [], [H, P])
+    B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
+    M = Model('Pmodel', B, [H, P])
     M.process()
     M.dump('../models/outputs/Pmodel')
 

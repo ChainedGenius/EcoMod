@@ -12,7 +12,7 @@ from core.errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound
 from core.deserialiser import read_model_from_tex
 from core.sympyfier import sympify, ecomodify
 from core.ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask, latexify
+    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted
 
 
 class AbstractAgent(object):
@@ -42,6 +42,8 @@ class AbstractAgent(object):
         self.duals = {}  # for conjugate functions
         # linking part)
         self.links = []
+
+        self.processed = False
 
     @log(comment="Agent ready for validation")
     def __validation(self):
@@ -111,13 +113,13 @@ class AbstractAgent(object):
     def __generate_duals(self):
         from sympy import Symbol, Function
         # step 1: create lambdas
-        lambda_factor = self.objectives + self.boundaries
+        lambda_factor = self.objectives + self.boundaries + self.constant_ineqs
         lambdas_count = len(lambda_factor)
         self.lambdas = {
             (eq2func(lambda_factor[i]) if lambda_factor[i] not in self.objectives else lambda_factor[i].args[1]): v for
             i, v in enumerate(generate_symbols(tag='lambda', count=lambdas_count, cls=Symbol))}
         # step 2: create conjugates funcs (duals)
-        alpha_factors = self.transitions + self.inequations
+        alpha_factors = self.transitions + iterable_substract(self.inequations, self.constant_ineqs)
         alpha_count = len(alpha_factors)
         self.duals = {eq2func(alpha_factors[i]): d(self.time) for i, d in
                       enumerate(generate_symbols(tag='alpha', count=alpha_count, cls=Function))}
@@ -173,7 +175,7 @@ class AbstractAgent(object):
 
     @property
     def external(self):
-        return [ext for ext in self.functions if "_" in ext.name]
+        return [ext for ext in self.functions if (is_substricted(ext) and not is_substricted(ext, tag=self.name))]
 
     @property
     def controls(self):
@@ -185,12 +187,16 @@ class AbstractAgent(object):
 
     @property
     def variables(self):
-        return self.functions + self.variables
+        return self.functions + self.params
 
     @property
     def boundaries(self):
-        # Equality types
+        # Equality types (deg=0) and constant ineqs
         return [*self.diff_degree(deg=0).keys()]
+
+    @property
+    def constant_ineqs(self):
+        return [i for i in self.inequations if self.time not in i.free_symbols]
 
     @property
     def Lagrangian(self):
@@ -236,7 +242,8 @@ class AbstractAgent(object):
 
     def KKT(self):
         _duals = {k: v for k, v in self.duals.items() if k not in [eq2func(e) for e in self.transitions]}
-        return KKT_mask(_duals)
+        _lambdas = {k: v for k, v in self.lambdas.items() if k not in [o.rhs for o in self.objectives]}
+        return KKT_mask(_duals) + KKT_mask(_lambdas)
 
     def diff_degree(self, deg=None):
         """
@@ -268,12 +275,13 @@ class AbstractAgent(object):
             self.__validation()
 
         self.__generate_duals()
+        self.processed = True
 
     def compress(self, to_tex=False, headers=True):
         ret = {
-            "PHASES": latexify(self.phases, to_str=True), # because we render in one line
-            "CONTROLS": latexify(self.controls, to_str=True), # same
-            "INFOS": latexify(self.external, to_str=True), # same
+            "PHASES": latexify(self.phases, to_str=True),  # because we render in one line
+            "CONTROLS": latexify(self.controls, to_str=True),  # same
+            "INFOS": latexify(self.external, to_str=True),  # same
             "EULERS": latexify(self.euler_equations()),
             "OPTIMAS": latexify(self.control_optimality()),
             "TRANSVERS": latexify(self.transversality_conditions()),
@@ -303,6 +311,21 @@ class LinkedAgent(AbstractAgent):
     def __init__(self, *args):
         super().__init__(*args)
         self.flows = []
+        self.__merge_prepare()
+        self.process(skip_validation=True)
+
+    def __merge_prepare(self):
+        # gaining tagged system
+        merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls}
+        merge_map_t0 = {f.subs(self.time, self.time_horizon[0]):  add_subscript(f.subs(self.time, self.time_horizon[0]), self.name) for f in self.functions}
+        merge_map_t1 = {f.subs(self.time, self.time_horizon[1]): add_subscript(f.subs(self.time, self.time_horizon[1]), self.name) for f in self.functions}
+        merge_map = merge_map | merge_map_t0 | merge_map_t1
+        new_kwargs = {}
+        for k, v in self.kwargs.items():
+            if k != 'name':
+                new_kwargs[k] = [expr.xreplace(merge_map) for expr in v]
+
+        self.__dict__.update(new_kwargs)
 
     def add_flow(self, flow: Flow):
         if flow.receiver != self and flow.producer != self:
