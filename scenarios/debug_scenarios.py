@@ -1,4 +1,4 @@
-from core.agent import LinkedAgent, create_empty_agent
+from core.agent import LinkedAgent, create_empty_agents
 from core.market import Flow, Market, Balances
 from core.model import Model
 from core.utils import timeit
@@ -23,8 +23,8 @@ def simple_linked_agents():
     f = '../inputs/agent.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process()
-    B = LinkedAgent.from_abstract(create_empty_agent('B'))
-    C = LinkedAgent.from_abstract(create_empty_agent('C'))
+    B = LinkedAgent.from_abstract(create_empty_agents('B'))
+    C = LinkedAgent.from_abstract(create_empty_agents('C'))
     A.add_flow(Flow(A, C, 3, 'rub'))
     B.add_flow(Flow(A, B, 6, 'tv'))
     print(A.__class__())
@@ -45,8 +45,8 @@ def simple_model_viz():
     a1 = LinkedAgent.read_from_tex(f1)
     a1.process()
     a2 = LinkedAgent.read_from_tex(f2)
-    a3 = LinkedAgent.from_abstract(create_empty_agent('agent3'))
-    a4 = LinkedAgent.from_abstract(create_empty_agent('agent4'))
+    a3 = LinkedAgent.from_abstract(create_empty_agents('agent3'))
+    a4 = LinkedAgent.from_abstract(create_empty_agents('agent4'))
     flow1 = Flow(a1, a2, 50, 'rub')
     flow2 = Flow(a2, a1, 1, 'tv')
     a1.add_flow(flow1)
@@ -95,6 +95,22 @@ def p_model_dump():
     M.dump('../models/outputs/Pmodel')
 
 
+@timeit
+def model_viz():
+    # no real ecomod models
+    # only viz scenario
+    A, B, C, D, E = create_empty_agents('A B C D E', cls=LinkedAgent)
+    f1 = Flow(A, C, 1, '')
+    f2 = Flow(C, D, 2, '')
+    f3 = Flow(C, E, 3, '')
+    f4 = Flow(D, E, 4, '')
+    A.add_flow(f1)
+    C.add_flow(f2)
+    C.add_flow(f3)
+    D.add_flow(f4)
+    M = Model('viz', [], [A, B, C, D, E])
+    M.visualize('../models/outputs/Pmodel')
+
 
 if __name__ == "__main__":
-    p_model_dump()
+    model_viz()

@@ -3,7 +3,7 @@ from typing import List
 
 from core.logger import log
 from core.market import MarketValidator, Flow
-from core.agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agent
+from core.agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agents
 from core.pprint import ModelTemplateEngine, exec_tex
 from core.utils import timeit
 
@@ -95,8 +95,8 @@ if __name__ == "__main__":
     a1 = LinkedAgent.read_from_tex(f1)
     a1.process()
     a2 = LinkedAgent.read_from_tex(f2)
-    a3 = LinkedAgent.from_abstract(create_empty_agent('agent3'))
-    a4 = LinkedAgent.from_abstract(create_empty_agent('agent4'))
+    a3 = LinkedAgent.from_abstract(create_empty_agents('agent3'))
+    a4 = LinkedAgent.from_abstract(create_empty_agents('agent4'))
     flow1 = Flow(a1, a2, 50, 'rub')
     flow2 = Flow(a2, a1, 1, 'tv')
     a1.add_flow(flow1)

@@ -312,7 +312,6 @@ class LinkedAgent(AbstractAgent):
         super().__init__(*args)
         self.flows = []
         self.__merge_prepare()
-        self.process(skip_validation=True)
 
     def __merge_prepare(self):
         # gaining tagged system
@@ -367,8 +366,9 @@ class LAgentValidator(object):
         self.__variable_completeness(agents)
 
 
-def create_empty_agent(name):
-    return AbstractAgent(name=name)
+def create_empty_agents(names, cls=AbstractAgent):
+    names = names.split(' ')
+    return [cls(name) for name in names] if len(names) != 1 else cls(names)
 
 
 @timeit
@@ -376,8 +376,8 @@ def main():
     f = '../inputs/agent.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process()
-    B = LinkedAgent.from_abstract(create_empty_agent('B'))
-    C = LinkedAgent.from_abstract(create_empty_agent('C'))
+    B = LinkedAgent.from_abstract(create_empty_agents('B'))
+    C = LinkedAgent.from_abstract(create_empty_agents('C'))
     A.add_flow(Flow(A, C, 3, 'rub'))
     B.add_flow(Flow(A, B, 6, 'tv'))
     print(A.__class__())

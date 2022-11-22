@@ -18,6 +18,14 @@ class Flow(object):
     def __str__(self):
         return f'{self.producer.name} ---- {self.value} ---> {self.receiver.name}'
 
+    def invert(self, new=False):
+        if new:
+            return Flow(self.receiver, self.producer, self.value, self.dim)
+        else:
+            buf = [self.producer, self.receiver]
+            self.producer = buf[1]
+            self.receiver = buf[0]
+
 
 class Market(object):
     def __init__(self, eq, dim, lagents):
