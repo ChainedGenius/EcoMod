@@ -89,6 +89,8 @@ def p_model_dump():
     P = LinkedAgent.read_from_tex(f2)
     P.process(skip_validation=True)
 
+
+
     B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
     M = Model('Pmodel', B, [H, P])
     M.process()
@@ -111,6 +113,21 @@ def model_viz():
     M = Model('viz', [], [A, B, C, D, E])
     M.visualize('../models/outputs/Pmodel')
 
+@timeit
+def pgmodel():
+    f1 = '../models/inputs/Pmodel/H.tex'
+    H = LinkedAgent.read_from_tex(f1)
+    H.process(skip_validation=True)
+
+    f2 = '../models/inputs/Pmodel/P.tex'
+    P = LinkedAgent.read_from_tex(f2)
+    P.process(skip_validation=True)
+    G = create_empty_agents('G', cls=LinkedAgent)
+
+    B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
+    M = Model('Pmodel', B, [H, P])
+    M.process()
+    M.dump('../models/outputs/Pmodel')
 
 if __name__ == "__main__":
     model_viz()
