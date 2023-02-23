@@ -11,9 +11,8 @@ class Error(Exception):
 class Warn(Warning):
     header = ""
 
-    def __init__(self, data):
-        self.data = data
-        super().__init__(self.header.format(self.data))
+    def __init__(self, **kwargs):
+        super().__init__(self.header.format(**kwargs))
 
 
 """# File contains text level errors for ECOMOD"""
@@ -63,3 +62,13 @@ class DimensionCheckingFailed(Error):
              "There are: {expr}"
 
 
+class NoSuchFlow(Warn):
+    header = "There is no such flow {flow} in this agent {agent}"
+
+
+class NotRendered(Warn):
+    header = "This model is not rendered: {model}"
+
+
+class NotSubscriptedBalance(Error):
+    header = 'Not all variables are tagged by agent tag. Agent tags {agent_names}'

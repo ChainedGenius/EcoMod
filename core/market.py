@@ -1,5 +1,6 @@
 from core.deserialiser import read_tex, read_model_from_tex
 from core.ecomod_utils import is_substricted, remove_subscript, latexify
+from core.errors.RWErrors import NotSubscriptedBalance
 from core.sympyfier import ecomodify
 
 
@@ -61,8 +62,7 @@ class Balances(object):
 
         ret = prod([is_substricted(a) for a in self.atoms()])
         if ret != 1:
-            # TODO: custom error
-            raise TypeError(f'Not all variables are tagged by agent tag. Agent tags {self.agent_names}')
+            raise NotSubscriptedBalance(agent_names=self.agent_names)
 
     def validate(self):
         self.__only_tagged()

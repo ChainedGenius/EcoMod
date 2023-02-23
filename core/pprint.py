@@ -6,6 +6,8 @@ from subprocess import run
 from tempfile import mkdtemp
 from jinja2 import Environment, FileSystemLoader, meta
 
+from core.errors.RWErrors import NotRendered
+
 
 class TexTemplateEngine(object):
     template_name = 'basic.tex'
@@ -42,8 +44,7 @@ class TexTemplateEngine(object):
 
     def dump(self, filename):
         if not self.rendered:
-            # TODO: custom warn
-            raise RuntimeError('Render it first')
+            raise NotRendered(model=filename.stem)
         if not filename.parent.exists():
             filename.parent.mkdir(parents=True)
         with open(filename, 'w') as f:

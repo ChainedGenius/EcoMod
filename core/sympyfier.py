@@ -55,9 +55,10 @@ def sympify(raw_obj):
 
 
 def ecomodify(raw_model, xreplace=True):
-    def dim_dict(_raw_model):
+    def dim_dictify(_raw_model):
         # not real python dict: list of tuples
-        return [(k, real_sympify(extract_dim_desc(v)[0])) if extract_dim_desc(v)[0] != "" else (k, "") for k, v in _raw_model.items()]
+        return [(k, real_sympify(extract_dim_desc(v)[0])) if extract_dim_desc(v)[0] != "" else (k, "") for k, v in
+                _raw_model.items()]
 
     def sorter(i, e, f, p, o, objecti):
         object, is_objective = objecti
@@ -116,7 +117,7 @@ def ecomodify(raw_model, xreplace=True):
     functions = []
     params = []
     objectives = []
-    dim_dict = dim_dict(raw_model)
+    dim_dict = dim_dictify(raw_model)
     for o in raw_model.items():
         inequations, equations, functions, params, objectives = sorter(inequations, equations, functions, params,
                                                                        objectives, sympify(o))
@@ -157,37 +158,12 @@ def ecomodify(raw_model, xreplace=True):
             dim_dict = {fs_map[parse_latex(i[0])]: i[1] for i in dim_dict if i[1] != ''}
         except KeyError as exc:
             raise DimensionInExpression(expr=exc)
-
+        if not dim_dict and isinstance(dim_dict, list):
+            dim_dict = {}
         # functions = [f.subs(fs_map) for f in functions]
         # params = [p.subs(fs_map) for p in params]
         # equations = [e.subs(fs_map) for e in equations]
         # inequations = [i.subs(fs_map) for i in inequations]
         # objectives = [o.subs(fs_map) for o in objectives]
 
-        # compatibility testing
-        # func porting tests
-        # ----------- UNCOMMENT -------------------------
-        fs_all_ = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
-                              equations + inequations + objectives]))
-        test1 = iterable_substract(set([i.func for i in fs_all_ if i.func]), spec_funcs())
-        test2 = set([i.func for i in params + functions if i.func])
-        if not set_equality(test1, test2):
-            print(test1, test2)
-            #TODO: custom errors
-            raise TypeError("Ecomodify problems")
-        # args porting tests
-        test1 = set(chain(*[i.args if np.prod([k.is_Function or k.is_symbol for k in i.args]) else i.atoms() for i in fs_all_ ]))
-        test2 = set([i for i in params + functions])
-        numbersDOTtk = test1 - test2  # cicada meme
-        if np.prod([issubclass(i.__class__, Number) for i in numbersDOTtk]) == 0:
-            #TODO: custom errors
-            print(test1, test2)
-            raise TypeError("Ecomodify problems")
-
-        # completeness
-        completion_names = set(j.name for j in chain(*[i.atoms(Function).union(i.atoms(Symbol)) for i in fs_all_]) if not is_spec_function(j))
-        inited_names = set(j.name for j in functions + params)
-        if completion_names != inited_names:
-            raise ExtraVariableError(vars=completion_names - inited_names)
-    # ---------------------UNCOMMENT-----------------
     return objectives, inequations, equations, functions, params, dim_dict

@@ -1,25 +1,119 @@
 from itertools import chain
 from pathlib import Path
-from typing import List
+
 from numpy import prod
 
+from core.deserialiser import read_model_from_tex
+from core.ecomod_utils import deriv_degree, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
+    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function
+from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
+    DimensionCheckingFailed, ExtraVariableError, ObjectiveFunctionNotFound, NonSympyfiableError, NoSuchFlow
 from core.logger import log
 from core.market import Flow
 from core.pprint import AgentTemplateEngine, exec_tex
-from core.utils import iterable_substract, timeit
-from core.errors.RWErrors import TimeVariableNotFound, ObjectiveFunctionNotFound, AnyPropertyNotFound, \
-    DimensionCheckingFailed
-from core.deserialiser import read_model_from_tex
-from core.sympyfier import sympify, ecomodify
-from core.ecomod_utils import deriv_degree, pi_theorem, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted
+from core.sympyfier import ecomodify
+from core.utils import iterable_substract, timeit, set_equality
 
 
-class AbstractAgent(object):
+class AgentValidator(object):
+    emitent = None
+
+    @staticmethod
+    def __dimension_check(dim_dict, exprs):
+        from sympy import Symbol, Integral, Derivative, Eq
+        from numpy.random import rand
+
+        def checker(_expr, _casted_dict, _randomize_dict, _spec_stack):
+            # remove spec functions
+            specs = _expr.find(lambda x: x.__class__ in spec_funcs())
+            _spec_stack.extend(specs)
+            _expr = _expr.xreplace({s: 1 for s in specs})
+            # cast all to dummies
+            _expr = _expr.replace(lambda x: x.is_Function or x.is_symbol, lambda x: Symbol(x.name))
+
+            # deal with Integrals and Derivatives
+            _expr = _expr.replace(lambda x: isinstance(x, Integral), lambda x: x.args[0] * x.args[1][0])
+            _expr = _expr.replace(lambda x: isinstance(x, Derivative), lambda x: x.args[0] / x.args[1][0])
+            # subs
+            # randomize all
+            _expr = _expr.copy()
+            _expr = _expr.subs(_randomize_dict)
+            _expr = (_expr.lhs / _expr.rhs).subs(_casted_dict)
+            return _expr.is_Number
+
+        errors = []
+        spec_stack = []
+        random_coef = rand(len(dim_dict, ))
+        casted_dict = {Symbol(kv[0].name): kv[1] * random_coef[i] for i, kv in enumerate(dim_dict.items())}
+        randomize_dict = {Symbol(kv[0].name): Symbol(kv[0].name) * random_coef[i] for i, kv in
+                          enumerate(dim_dict.items())}
+        for expr in exprs:
+            expr_copy = expr.copy()
+            if expr.rhs == 0:
+                from sympy import exp
+                spec_stack.append(exp(expr.lhs))
+                continue
+            if not checker(expr, casted_dict, randomize_dict, spec_stack):
+                errors.append(expr_copy)
+
+        # spec stack check
+        spec_stack = [Eq(ss.args[0], 1) for ss in spec_stack]
+        for ss in spec_stack:
+            if not checker(ss, casted_dict, randomize_dict, spec_stack):
+                errors.append(ss)
+
+        if errors:
+            report_str = '\n'.join([i.__str__() for i in errors])
+            raise DimensionCheckingFailed(expr=report_str)
+
+    @staticmethod
+    def __variable_completeness(objectives, inequations, equations, functions, params):
+        from sympy import Function, Number
+        from sympy import Symbol
+        # compatibility testing
+        # func porting tests
+        # ----------- UNCOMMENT -------------------------
+        fs_all_ = set(chain(*[eq.free_symbols.union([f.simplify() for f in eq.atoms(Function)]) for eq in
+                              equations + inequations + objectives]))
+        test1 = iterable_substract(set([i.func for i in fs_all_ if i.func]), spec_funcs())
+        test2 = set([i.func for i in params + functions if i.func])
+        if not set_equality(test1, test2):
+            print(test1, test2)
+            raise NonSympyfiableError(err=f'{test1.__str__()} vs {test2.__str__()}')
+        # args porting tests
+        test1 = set(
+            chain(*[i.args if prod([k.is_Function or k.is_symbol for k in i.args]) else i.atoms() for i in fs_all_]))
+        test2 = set([i for i in params + functions])
+        numbersDOTtk = test1 - test2  # cicada meme
+        if prod([issubclass(i.__class__, Number) for i in numbersDOTtk]) == 0:
+            raise NonSympyfiableError(err=f'{test1.__str__()} vs {test2.__str__()}')
+
+        # completeness
+        completion_names = set(j.name for j in chain(*[i.atoms(Function).union(i.atoms(Symbol)) for i in fs_all_]) if
+                               not is_spec_function(j))
+        inited_names = set(j.name for j in functions + params)
+        if completion_names != inited_names:
+            raise ExtraVariableError(vars=completion_names - inited_names)
+        # ---------------------UNCOMMENT-----------------
+
+    def validate(self, objectives, inequations, equations, functions, params, dim_dict):
+        if self.emitent is False:
+            if not objectives:
+                raise ObjectiveFunctionNotFound()
+        # STEP 1: check completeness
+        self.__variable_completeness(objectives, inequations, equations, functions, params)
+        # STEP 2: dimension check
+        if dim_dict:
+            self.__dimension_check(dim_dict, equations + inequations + objectives)
+
+
+class AbstractAgent(AgentValidator):
+    emitent = False
+
     def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None,
                  dim_dict=None):
         if dim_dict is None:
-            dim_dict = []
+            dim_dict = {}
         if objectives is None:
             objectives = []
         if inequations is None:
@@ -45,70 +139,6 @@ class AbstractAgent(object):
 
         self.processed = False
 
-    @log(comment="Agent ready for validation")
-    def __validation(self):
-        # step 0: check objective
-        if not self.objectives:
-            raise ObjectiveFunctionNotFound()
-        # step 1: check completeness
-        # passed in ecomodify
-        # step 2: check compliance (all functions has diff eqs, all other functions == controls)
-        self.__extract_phases_controls()  # there are internal exception if we had problems
-        # step 3: dimension check in eq\ineq
-        self.__dimension_check()
-        pass
-
-    def __dimension_check(self):
-        def checker(_expr, _casted_dict, _randomize_dict, _spec_stack):
-            # remove spec functions
-            specs = _expr.find(lambda x: x.__class__ in spec_funcs())
-            _spec_stack.extend(specs)
-            _expr = _expr.xreplace({s: 1 for s in specs})
-            # cast all to dummies
-            _expr = _expr.replace(lambda x: x.is_Function or x.is_symbol, lambda x: Symbol(x.name))
-
-            # deal with Integrals and Derivatives
-            _expr = _expr.replace(lambda x: isinstance(x, Integral), lambda x: x.args[0] * x.args[1][0])
-            _expr = _expr.replace(lambda x: isinstance(x, Derivative), lambda x: x.args[0] / x.args[1][0])
-            # subs
-            # randomize all
-            _expr = _expr.copy()
-            _expr = _expr.subs(_randomize_dict)
-            _expr = (_expr.lhs / _expr.rhs).subs(_casted_dict)
-            return _expr.is_Number
-
-        from sympy import Symbol, Integral, Derivative, Eq
-        from numpy.random import rand
-        errors = []
-        spec_stack = []
-        random_coef = rand(len(self.dim_dict, ))
-        casted_dict = {Symbol(kv[0].name): kv[1] * random_coef[i] for i, kv in enumerate(self.dim_dict.items())}
-        randomize_dict = {Symbol(kv[0].name): Symbol(kv[0].name) * random_coef[i] for i, kv in
-                          enumerate(self.dim_dict.items())}
-        for expr in self.expr:
-            expr_copy = expr.copy()
-            if expr.rhs == 0:
-                from sympy import exp
-                spec_stack.append(exp(expr.lhs))
-                continue
-            if not checker(expr, casted_dict, randomize_dict, spec_stack):
-                errors.append(expr_copy)
-
-        # spec stack check
-        spec_stack = [Eq(ss.args[0], 1) for ss in spec_stack]
-        for ss in spec_stack:
-            if not checker(ss, casted_dict, randomize_dict, spec_stack):
-                errors.append(ss)
-
-        if errors:
-            report_str = '\n'.join([i.__str__() for i in errors])
-            raise DimensionCheckingFailed(expr=report_str)
-
-    def __extract_phases_controls(self):
-        p = self.phases
-        if not p:
-            raise AnyPropertyNotFound(attr='Phase variables')
-
     @log(comment='Agent ready for analysis')
     def __generate_duals(self):
         from sympy import Symbol, Function
@@ -119,7 +149,7 @@ class AbstractAgent(object):
             (eq2func(lambda_factor[i]) if lambda_factor[i] not in self.objectives else lambda_factor[i].args[1]): v for
             i, v in enumerate(generate_symbols(tag='lambda', count=lambdas_count, cls=Symbol))}
         # step 2: create conjugates funcs (duals)
-        alpha_factors = self.transitions + iterable_substract(self.inequations, self.constant_ineqs)
+        alpha_factors = self.transitions + iterable_substract(self.inequations, self.constant_ineqs) + self.boundaries
         alpha_count = len(alpha_factors)
         self.duals = {eq2func(alpha_factors[i]): d(self.time) for i, d in
                       enumerate(generate_symbols(tag='alpha', count=alpha_count, cls=Function))}
@@ -221,6 +251,12 @@ class AbstractAgent(object):
             'dim_dict': self.dim_dict
         }
 
+
+    @property
+    def args(self):
+        return self.objectives, self.inequations, self.equations, self.functions, self.params, self.dim_dict
+
+
     # ECOMOD CORE SOFT
     def euler_equations(self):
         ret = []
@@ -272,7 +308,7 @@ class AbstractAgent(object):
     @log(comment='Agent ready for economic processing')
     def process(self, skip_validation=False):
         if not skip_validation:
-            self.__validation()
+            self.validate(*self.args)
 
         self.__generate_duals()
         self.processed = True
@@ -308,6 +344,8 @@ class AbstractAgent(object):
 
 
 class LinkedAgent(AbstractAgent):
+    emitent = False
+
     def __init__(self, *args):
         super().__init__(*args)
         self.flows = []
@@ -316,8 +354,12 @@ class LinkedAgent(AbstractAgent):
     def __merge_prepare(self):
         # gaining tagged system
         merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls}
-        merge_map_t0 = {f.subs(self.time, self.time_horizon[0]):  add_subscript(f.subs(self.time, self.time_horizon[0]), self.name) for f in self.functions}
-        merge_map_t1 = {f.subs(self.time, self.time_horizon[1]): add_subscript(f.subs(self.time, self.time_horizon[1]), self.name) for f in self.functions}
+        merge_map_t0 = {
+            f.subs(self.time, self.time_horizon[0]): add_subscript(f.subs(self.time, self.time_horizon[0]), self.name)
+            for f in self.functions}
+        merge_map_t1 = {
+            f.subs(self.time, self.time_horizon[1]): add_subscript(f.subs(self.time, self.time_horizon[1]), self.name)
+            for f in self.functions}
         merge_map = merge_map | merge_map_t0 | merge_map_t1
         new_kwargs = {}
         for k, v in self.kwargs.items():
@@ -336,8 +378,7 @@ class LinkedAgent(AbstractAgent):
         try:
             self.flows.remove(flow)
         except ValueError:
-            # TODO: create custom error
-            print('There is no such flow in Agent file')
+            raise NoSuchFlow(flow=flow.__str__(), agent=self.name)
 
     def print_flows(self):
         return "\n".join([f'[{flow}]' for flow in self.flows])
@@ -346,24 +387,6 @@ class LinkedAgent(AbstractAgent):
     def from_abstract(a: AbstractAgent):
         kwargs = a.kwargs
         return LinkedAgent(*kwargs.values())
-
-
-class LAgentValidator(object):
-    # for links mb redirected to Lagents class
-    def __variable_check(self, agents: List[AbstractAgent]):
-        pass
-
-    def __dimension_check(self, agents: List[AbstractAgent]):
-        pass
-
-    # isolated model checks
-    def __variable_completeness(self, agents: List[AbstractAgent]):
-        pass
-
-    def validate_agents(self, agents: List[AbstractAgent]):
-        self.__variable_check(agents)
-        self.__dimension_check(agents)
-        self.__variable_completeness(agents)
 
 
 def create_empty_agents(names, cls=AbstractAgent):

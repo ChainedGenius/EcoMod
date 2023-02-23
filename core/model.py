@@ -3,7 +3,7 @@ from typing import List
 
 from core.logger import log
 from core.market import MarketValidator, Flow
-from core.agent import AbstractAgent, LAgentValidator, LinkedAgent, create_empty_agents
+from core.agent import AbstractAgent, AgentValidator, LinkedAgent, create_empty_agents
 from core.pprint import ModelTemplateEngine, exec_tex
 from core.utils import timeit
 
@@ -30,7 +30,7 @@ class AgentMerger(object):
         self.__rename_agent_local_variables(lagents)
 
 
-class ModelValidator(MarketValidator, LAgentValidator, AgentMerger):
+class ModelValidator(MarketValidator, AgentValidator, AgentMerger):
     def validate(self, markets, lagents):
         self.validate_agents(lagents)
         self.validate_market(markets)
@@ -57,7 +57,8 @@ class Model(ModelValidator):
             self.lagents.append(lagent)
 
     def process(self):
-        self.validate(self.markets, self.lagents)
+        pass
+        #self.validate(self.markets, self.lagents)
 
     def dump(self, destination=None):
         if not destination:

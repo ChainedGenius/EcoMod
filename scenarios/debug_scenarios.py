@@ -3,6 +3,7 @@ from core.market import Flow, Market, Balances
 from core.model import Model
 from core.utils import timeit
 
+
 @timeit
 def simple_agent():
     from sympy import Function
@@ -14,9 +15,10 @@ def simple_agent():
     print(A.Lagrangian)
     print(A.phases)
     print(A.transversality_conditions())
-    print('*'*17)
+    print('*' * 17)
     for x in A.phases:
         print(A.Lagrangian.diff(x.diff(A.time)))
+
 
 @timeit
 def simple_linked_agents():
@@ -54,6 +56,7 @@ def simple_model_viz():
     m = Model('1', [], [a1, a2, a3, a4])
     m.visualize('test.png')
 
+
 @timeit
 def agent_dump():
     # broken scenario
@@ -67,6 +70,7 @@ def agent_dump():
     A.process()
     A.dump('../models/outputs/Amodel')
 
+
 @timeit
 def p_model():
     f1 = '../models/inputs/Pmodel/H.tex'
@@ -79,17 +83,16 @@ def p_model():
     P.process(skip_validation=True)
     print(P.__dict__)
 
+
 @timeit
 def p_model_dump():
     f1 = '../models/inputs/Pmodel/H.tex'
     H = LinkedAgent.read_from_tex(f1)
-    H.process(skip_validation=True)
+    H.process()
 
     f2 = '../models/inputs/Pmodel/P.tex'
     P = LinkedAgent.read_from_tex(f2)
-    P.process(skip_validation=True)
-
-
+    P.process()
 
     B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
     M = Model('Pmodel', B, [H, P])
@@ -113,6 +116,7 @@ def model_viz():
     M = Model('viz', [], [A, B, C, D, E])
     M.visualize('../models/outputs/Pmodel')
 
+
 @timeit
 def pgmodel():
     f1 = '../models/inputs/Pmodel/H.tex'
@@ -129,5 +133,6 @@ def pgmodel():
     M.process()
     M.dump('../models/outputs/Pmodel')
 
+
 if __name__ == "__main__":
-    model_viz()
+    p_model_dump()
