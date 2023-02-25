@@ -14,16 +14,68 @@ from core.pprint import AgentTemplateEngine, exec_tex
 from core.sympyfier import ecomodify
 from core.utils import iterable_substract, timeit, set_equality
 
+from typing import Union, List, Dict
+
 
 class AgentValidator(object):
+    """
+        Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.
+        Methods:
+            Private:
+                1. __dimension_check
+                    Uses KV-storage gained from input Agent model with variables -> dimensions to proceed
+                    Dimension check in Agent equations and inequations (expressions).
+                2. __variable_completeness
+                    Checks if there are no extra initialized Agent variables in model, which are unused in
+                    model Expressions and if there are uninitialized variables in model.
+            Open:
+                1. validate
+                    Provides full blackbox checks + emitent check
+
+        Class variables:
+            emitent = None: bool
+            Shows that this Validation process is for Simple Agents -- with objective functional.
+    """
     emitent = None
 
     @staticmethod
-    def __dimension_check(dim_dict, exprs):
+    def __dimension_check(dim_dict: Union[List, Dict], exprs: List):
+        """
+        Algorithm:
+            1. for e in exprs:
+            2.      case when
+                        any Arg of Analytical Func then Arg -> SpecStack
+            3.          e.subs(Arg, 1)
+            4.          -> checker(e)
+            5.      else
+            6.          continue
+            7. for s in SpecStack:
+            8.      -> checker(s)
+
+
+        :param dim_dict: Union[List, Dict] -- KV-storage: variable -> dimension
+        :param exprs: List[Expr, Eq, ...] -- List of Agent model expressions
+
+        :return: None if no Errors else: Union[DimensionCheckingFailed, AnyError]
+        """
         from sympy import Symbol, Integral, Derivative, Eq
         from numpy.random import rand
 
         def checker(_expr, _casted_dict, _randomize_dict, _spec_stack):
+            """
+            RDS Algorithm:
+                1. Generate random coefficients for each variable: Dict(rc). -> randomizeDict: variable[i] -> rc[i] * variable[i]
+                2. Replace Integrals and Differential to product and fraction respectively
+                3. Substitute expr variables with help of Dict(rc)
+
+
+            :param _expr: [Expr, Eq, ...] -- Expression to be observed in dimension checking.
+            :param _casted_dict: Dict -- additional internal representation
+            :param _randomize_dict: Dict -- KV-storage variable -> rand_coef * variable. Special heuristic to proceed dimension check.
+            :param _spec_stack: List[Expr] -- storage for Expr arguments inside Pure analytical functions.
+
+            :return: bool -- True|False -- result of RDS (Randomized Dimension Substitution)
+            """
             # remove spec functions
             specs = _expr.find(lambda x: x.__class__ in spec_funcs())
             _spec_stack.extend(specs)
@@ -68,6 +120,15 @@ class AgentValidator(object):
 
     @staticmethod
     def __variable_completeness(objectives, inequations, equations, functions, params):
+        """
+        Simple variable existing check. ( .atoms method)
+        :param objectives: Agent objectives functions
+        :param inequations: Agent inequation boundaries
+        :param equations: Agent equation boundaries
+        :param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)
+        :param params: Agent not-functional variables
+        :return:
+        """
         from sympy import Function, Number
         from sympy import Symbol
         # compatibility testing
@@ -97,6 +158,16 @@ class AgentValidator(object):
         # ---------------------UNCOMMENT-----------------
 
     def validate(self, objectives, inequations, equations, functions, params, dim_dict):
+        """
+        See __variable_completeness and __dimension_check docstrings.
+        :param objectives: Agent objectives functions
+        :param inequations: Agent inequation boundaries
+        :param equations: Agent equation boundaries
+        :param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)
+        :param params: Agent not-functional variables
+        :param dim_dict: Union[List, Dict] -- KV-storage: variable -> dimension
+        :return: Union[AnyError, NonSympyfiableError, ExtraVariableError, DimensionCheckingFailed]
+        """
         if self.emitent is False:
             if not objectives:
                 raise ObjectiveFunctionNotFound()
@@ -108,6 +179,50 @@ class AgentValidator(object):
 
 
 class AbstractAgent(AgentValidator):
+    """
+        Core methods for Agent models.
+        Methods:
+            Constructors:
+                1. __init__: Init Agent from its parts: see method args.
+                2. read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at `/models/inputs/`.
+            Private:
+                1. __generate_duals: Generate dual variables and functions due to Lagrange principum.
+            Public:
+                Additional:
+                    1. Support system:
+                    Methods that helps system to understand which variables are phase, which are controls etc.
+                        1. time : extract time variable in agent model
+                        2. time_horizon : extract time horizon boundaries from integral part of objective functions
+                        3. transitions : extract first-order differential equations from all boundaries
+                        4. phases : extract phase variables from all functions
+                        5. external : extract exogenous constants from all functions
+                        6. controls : extract control variables from all functions
+                        7. variables : extract all model variable (not-functions)
+                        8. expr : extract all expressions (with objectives)
+                        9. boundaries : all equations and inequations (no differential equations)
+                        10. constant_ineqs : inequations with no terminal values
+                        11. diff_degree : Divide all expressions over differential equation degrees
+                        12. validate : provide Agent model validation from subclass
+
+                    2. Misc
+                    Basic class methods to provide comfort.
+                        1. args : Args to re-init
+                        2. kwargs : Kwargs to re-init
+                        3. process : Pre-process model to be used in core methods
+                        4. compress : Evaluate all Pontragin Principle conditions
+                        5. dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]
+
+                    3. Core
+                    Methods that conduct Maximum Principle Conditions due to Lagrange principum.
+                        1. Lagrangian : integral part of L
+                        2. lagrangian : termination part of L
+                        3. euler_equations : Euler-Lagrange equations
+                        4. transversality_conditions : Transversality conditions
+                        5. control_optimality : Control optimality conditions
+                        6. KKT: Dual-feasibility and Complementary Slackness conditions
+
+
+    """
     emitent = False
 
     def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None,
@@ -141,6 +256,12 @@ class AbstractAgent(AgentValidator):
 
     @log(comment='Agent ready for analysis')
     def __generate_duals(self):
+        """
+        Lambdas -- dual variables, conducted by count of Len(chain(objectives, boundaries, constant_ineqs))
+        Alphas -- dual functions, conducted by count of Len(chain(transitions, [inequations - constant_ineqs] + boundaries))
+        :return: self.lambdas -- List[Symbol]
+                 self.alphas -- List[Function]
+        """
         from sympy import Symbol, Function
         # step 1: create lambdas
         lambda_factor = self.objectives + self.boundaries + self.constant_ineqs
@@ -156,6 +277,12 @@ class AbstractAgent(AgentValidator):
 
     @property
     def time(self):
+        """
+        Extract time variable from:
+            1. Integral in objectives
+            2. Differential variable in boundaries
+        :return: Time : Union[Symbol, TimeVariableNotFound]
+        """
         # two ways: integration argument, under derivative
         from sympy import Integral
         # method 1
@@ -175,6 +302,10 @@ class AbstractAgent(AgentValidator):
 
     @property
     def time_horizon(self):
+        """
+        If time is extracted from objective integrals then collect integral boundaries.
+        :return: Union[Tuple, AnyPropertyNotFound]
+        """
         from sympy import Integral
         # method 1
         try:
@@ -185,11 +316,19 @@ class AbstractAgent(AgentValidator):
 
     @property
     def transitions(self):
+        """
+        Extract linear differential equations from model.
+        :return: List[Eq]
+        """
         # linear Differential equations in model
         return [eq for eq in self.diff_degree(deg=1).keys()]
 
     @property
     def phases(self):
+        """
+        Extract phase variables from model: functions which appears as arguments in Differential operators in transitions
+        :return: Union[List[Symbol], AnyPropertyNotFound]
+        """
         from sympy import Derivative
         derivas = set(chain(*[d.find(Derivative) for d in [t for t in self.transitions]]))
         phases = [d.args[0] for d in derivas]
@@ -205,31 +344,61 @@ class AbstractAgent(AgentValidator):
 
     @property
     def external(self):
+        """
+        Extract exogenous functions, they must be substricted
+        :return: List[Symbol]
+        """
         return [ext for ext in self.functions if (is_substricted(ext) and not is_substricted(ext, tag=self.name))]
 
     @property
     def controls(self):
+        """
+        Extract all controls: controls = functions - external - phases
+        :return: List[Symbol]
+        """
         return iterable_substract(self.functions, self.phases + self.external)
 
     @property
     def expr(self):
+        """
+        All expressions in model
+        :return: List[Expr]
+        """
         return self.equations + self.inequations + self.objectives
 
     @property
     def variables(self):
+        """
+        All symbols in model
+        :return: List[Symbol]
+        """
         return self.functions + self.params
 
     @property
     def boundaries(self):
+        """
+        Expressions with these types:
+            1. Differential degree == 0
+            2. Constant inequalities
+        :return: List[Expr]
+        """
         # Equality types (deg=0) and constant ineqs
         return [*self.diff_degree(deg=0).keys()]
 
     @property
     def constant_ineqs(self):
+        """
+        Constant inequalities: those which contains only functions in terminant (constant) values.
+        :return:
+        """
         return [i for i in self.inequations if self.time not in i.free_symbols]
 
     @property
     def Lagrangian(self):
+        """
+        Intergal part of L
+        :return: Expr
+        """
         from sympy import Integral
         return span(self.duals) + span(
             {k: v for k, v in self.lambdas.items() if k in [i.args[1] for i in self.objectives]}).replace(
@@ -237,10 +406,18 @@ class AbstractAgent(AgentValidator):
 
     @property
     def lagrangian(self):
+        """
+        Terminant part of L
+        :return: Expr
+        """
         return span({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
 
     @property
     def kwargs(self):
+        """
+        Kwargs, to re-init
+        :return:
+        """
         return {
             'name': self.name,
             'objectives': self.objectives,
@@ -251,20 +428,32 @@ class AbstractAgent(AgentValidator):
             'dim_dict': self.dim_dict
         }
 
-
     @property
     def args(self):
+        """
+        Args, to re-init
+        :return:
+        """
         return self.objectives, self.inequations, self.equations, self.functions, self.params, self.dim_dict
-
 
     # ECOMOD CORE SOFT
     def euler_equations(self):
+        """
+        Euler Equations:
+        d/dt L_{x'} = L_{x}
+        :return: List[Eq]
+        """
         ret = []
         for x in self.phases:
             ret.append(euler_mask(self.Lagrangian, x, self.time))
         return ret
 
     def transversality_conditions(self):
+        """
+        Transversality conditions:
+        L_{x'}(t_i) = (-1)^i l_{x(t_i)}
+        :return: List[Eq]
+        """
         ret = []
         for x in self.phases:
             # for all t_0, t_1
@@ -273,18 +462,27 @@ class AbstractAgent(AgentValidator):
         return ret
 
     def control_optimality(self):
+        """
+        Control optimality conditions, using smoothness of L function wrt control variables
+        :return: List[Eq]
+        """
         from sympy import Eq
         return [Eq(self.Lagrangian.diff(c), 0) for c in self.controls]
 
     def KKT(self):
+        """
+        Dual feasibility and Complementary slackness conditions
+        :return: List[Expr]
+        """
         _duals = {k: v for k, v in self.duals.items() if k not in [eq2func(e) for e in self.transitions]}
         _lambdas = {k: v for k, v in self.lambdas.items() if k not in [o.rhs for o in self.objectives]}
         return KKT_mask(_duals) + KKT_mask(_lambdas)
 
     def diff_degree(self, deg=None):
         """
+        Returns all expr with Derivative degree == deg.
         :param deg: int. Derivative degree of returning equations
-        :return:
+        :return: Dict[Expr->deg] if None else Dict[Expr->`deg`]
         """
         ret = {}
         for eq in self.equations:
@@ -299,6 +497,11 @@ class AbstractAgent(AgentValidator):
     @classmethod
     @log(comment='\nParsing new agent file.')
     def read_from_tex(cls, f):
+        """
+        Contructor from .tex files. See Knowledge base to get guidelines.
+        :param f: filename or fd
+        :return: Agent
+        """
         from pathlib import Path
         name = Path(f).stem
         header, raw_model = read_model_from_tex(f)
@@ -307,6 +510,11 @@ class AbstractAgent(AgentValidator):
 
     @log(comment='Agent ready for economic processing')
     def process(self, skip_validation=False):
+        """
+        Process model to be used in core methods.
+        :param skip_validation: bool -- If True validation process will be skipped
+        :return: Union[None, AnyError]
+        """
         if not skip_validation:
             self.validate(*self.args)
 
@@ -314,6 +522,12 @@ class AbstractAgent(AgentValidator):
         self.processed = True
 
     def compress(self, to_tex=False, headers=True):
+        """
+
+        :param to_tex: bool. If True -- .tex file will be generated
+        :param headers: If True -- .tex file will contain headers
+        :return: Union[None, RenderedJinjaTemplate]
+        """
         ret = {
             "PHASES": latexify(self.phases, to_str=True),  # because we render in one line
             "CONTROLS": latexify(self.controls, to_str=True),  # same
@@ -333,6 +547,11 @@ class AbstractAgent(AgentValidator):
 
     @log(comment='Dumping agent file')
     def dump(self, destination=None):
+        """
+        Create .tex and PDF files with Agent optimal conditions.
+        :param destination: filepath or fd.
+        :return: PDF, .tex files saved in `destination`
+        """
         if not destination:
             destination = '.'
         engine = AgentTemplateEngine()
@@ -344,6 +563,24 @@ class AbstractAgent(AgentValidator):
 
 
 class LinkedAgent(AbstractAgent):
+    """
+    Methods:
+        Constructors:
+            1. __init__
+                Basic contructor
+            2. from_abstract
+                Init LinkedAgent from Agent instance
+        Private:
+            1. __merge_prepare
+                Use Agent model output to gain tagged Agent model output.
+        Public:
+            1. add_flow
+            2. delete_flow
+            3. print_flows
+
+
+
+    """
     emitent = False
 
     def __init__(self, *args):
