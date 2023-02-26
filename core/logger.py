@@ -7,7 +7,8 @@ logger = logging.getLogger()
 
 def log(comment=None):
     """
-
+    Basic logger: logger as decorator.
+    If any function needs to be decorated use @log() decorator
     :param comment: LOG message before func exec
     :return: wrapped func
     """

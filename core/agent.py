@@ -589,6 +589,10 @@ class LinkedAgent(AbstractAgent):
         self.__merge_prepare()
 
     def __merge_prepare(self):
+        """
+        Private method to tag all agent variables with agent name. All core methods are inherited from parent class.
+        :return:
+        """
         # gaining tagged system
         merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls}
         merge_map_t0 = {
@@ -627,6 +631,12 @@ class LinkedAgent(AbstractAgent):
 
 
 def create_empty_agents(names, cls=AbstractAgent):
+    """
+    Additional function to provide test cases in `scenarios/debug_scenarios.py`
+    :param names: Agent tags separated by space ` `.
+    :param cls: Default=AbstractAgent. Class for returned agents.
+    :return: List[Union[AbstractAgent, LinkedAgent]]
+    """
     names = names.split(' ')
     return [cls(name) for name in names] if len(names) != 1 else cls(names)
 

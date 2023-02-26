@@ -2,6 +2,9 @@ from sympy import Function, Symbol
 
 
 class Parameter(Symbol):  # superclass for ECOMOD params
+    """
+    Superclass for ECOMOD parameters. 1-1 with sympy.Symbol
+    """
     def __new__(cls, name, **kwargs):
         obj = Symbol.__xnew__(cls, name)
         obj.__dict__.update(kwargs)
@@ -9,6 +12,9 @@ class Parameter(Symbol):  # superclass for ECOMOD params
 
 
 class Phase(Function):
+    """
+    Superclass for ECOMOD parameters. 1-1 with sympy.Function
+    """
     def __new__(cls, name, dim, desc, *args):
         obj = Function(name)(*args)
         # TODO: add dim desc as attributes of class

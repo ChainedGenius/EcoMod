@@ -2,8 +2,10 @@ import yaml
 from core.errors.RWErrors import NonLaTeXableError, NonYAMLableError
 from core.utils import unpack, trim
 
+
 def read_tex(f):
     """
+    Read tex file and split to `yamlable` and header
     :param f: filename or fd
     :return: yaml parsable object + header
     """
@@ -19,6 +21,7 @@ def read_tex(f):
 
 def parse_yaml(stream: str):
     """
+    Simple YAML decoder, to distinguish errors.
     :param stream: string value after reducing tex-header
     :return: dict: decoded yaml
     """
@@ -31,12 +34,17 @@ def parse_yaml(stream: str):
 
 
 def read_model_from_tex(f):
+    """
+    Full blackbox model parsing from .tex file. Used as subfunction in Agent.read_from_tex
+    :param f: filename or fd
+    :return: .tex header and KV-storage (json-like) with raw model
+    """
     # step 1: extract latex headers
     content, header = read_tex(f)
     # step 2: extract yaml data
     raw_model = parse_yaml(content)
     raw_model = unpack(raw_model)
-    raw_model_ = {trim(k):v for k,v in raw_model.items()}
+    raw_model_ = {trim(k): v for k, v in raw_model.items()}
     return header, raw_model_
 
 

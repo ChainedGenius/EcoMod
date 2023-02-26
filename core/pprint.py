@@ -10,6 +10,16 @@ from core.errors.RWErrors import NotRendered
 
 
 class TexTemplateEngine(object):
+    """
+    Template engine to produce TeX and #PDF# file for Agent processed output.
+    Methods:
+        1. get_template_variables
+            Parameters which are included in Template produced from `self.template_name`
+        2. render
+            Template rendering process.
+        3. dump
+            Write rendered template into file
+    """
     template_name = 'basic.tex'
 
     def __init__(self):
@@ -31,11 +41,20 @@ class TexTemplateEngine(object):
 
     @property
     def get_template_variables(self):
+        """
+        Get reserved variables from template, class_attr template_name
+        :return: List[]
+        """
         template_source = self.latex_jinja_env.loader.get_source(self.latex_jinja_env, self.template_name)[0]
         parsed_content = self.latex_jinja_env.parse(template_source)
         return meta.find_undeclared_variables(parsed_content)
 
     def render(self, data):
+        """
+        Render .tex template with given KV-storage `data`
+        :param data: Dict[K -> Render_value]
+        :return: RenderedTemplate
+        """
         # data is kv-storage which contains data for render
         # kindly check if there are redundant keys
         data = {k: v for k, v in data.items() if k in self.get_template_variables}
@@ -43,6 +62,11 @@ class TexTemplateEngine(object):
         return self.rendered
 
     def dump(self, filename):
+        """
+        Save .tex
+        :param filename: filename or fd
+        :return: None
+        """
         if not self.rendered:
             raise NotRendered(model=filename.stem)
         if not filename.parent.exists():
@@ -52,14 +76,27 @@ class TexTemplateEngine(object):
 
 
 class AgentTemplateEngine(TexTemplateEngine):
+    """
+    Basic template for one-Agent model.
+    """
     template_name = 'LAgent.tex'
 
 
 class ModelTemplateEngine(TexTemplateEngine):
+    """
+    Template for multi-Agent model.
+    """
     template_name = 'Model.tex'
 
 
 def exec_tex(tex_filename, destination, open=False):
+    """
+    Execute .tex file and produce PDF file.
+    :param tex_filename: str -- filename of source which be compilated
+    :param destination: Path -- destination of produced PDF
+    :param open: bool -- open\not open PDF after compilation
+    :return: Union[PermissionError, RuntimeError]
+    """
     SUFFIXES = ['.pdf', '.log', '.aux']
 
     filename = Path(tex_filename).stem

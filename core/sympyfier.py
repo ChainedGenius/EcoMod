@@ -22,6 +22,11 @@ def _xsympify(raw_str):
 
 
 def sympify(raw_obj):
+    """
+    Transfer data to internal representation. see `datamodel` module.
+    :param raw_obj: str -- string representation of Value expression in YAML
+    :return:
+    """
     raw_latex = raw_obj[0]
     is_objective = find_objective_markers(raw_obj[0])
     if is_objective[0]:
@@ -55,6 +60,12 @@ def sympify(raw_obj):
 
 
 def ecomodify(raw_model, xreplace=True):
+    """
+    Transfer raw model from .tex file to input of AbstractAgent.
+    :param raw_model:
+    :param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.
+    :return: List[*AbstractAgent.args]
+    """
     def dim_dictify(_raw_model):
         # not real python dict: list of tuples
         return [(k, real_sympify(extract_dim_desc(v)[0])) if extract_dim_desc(v)[0] != "" else (k, "") for k, v in
