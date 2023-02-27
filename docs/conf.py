@@ -32,6 +32,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-latex_documents = [
-    ('index', 'yourdoc.tex', u'ECOMOD Tech', u'ECOMOD Team', 'Manual')
-]
+#latex_documents = [
+#    ('index', 'yourdoc.tex', u'ECOMOD Tech', u'ECOMOD Team', 'Manual')
+#]
