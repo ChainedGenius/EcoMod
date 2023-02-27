@@ -127,9 +127,10 @@
 <div class="viewcode-block" id="ecomodify"><a class="viewcode-back" href="../../core.html#core.sympyfier.ecomodify">[docs]</a><span class="k">def</span> <span class="nf">ecomodify</span><span class="p">(</span><span class="n">raw_model</span><span class="p">,</span> <span class="n">xreplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Transfer raw model from .tex file to input of AbstractAgent.</span>
-<span class="sd">    :param raw_model:</span>
+<span class="sd">    :param raw_model</span>
 <span class="sd">    :param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.</span>
-<span class="sd">    :return: List[*AbstractAgent.args]</span>
+
+<span class="sd">    :return: List[AbstractAgent.args]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">dim_dictify</span><span class="p">(</span><span class="n">_raw_model</span><span class="p">):</span>
         <span class="c1"># not real python dict: list of tuples</span>

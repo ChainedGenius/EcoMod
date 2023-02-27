@@ -20,19 +20,25 @@ from typing import Union, List, Dict
 class AgentValidator(object):
     """
         Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.
+
         Methods:
+
             Private:
+
                 1. __dimension_check
                     Uses KV-storage gained from input Agent model with variables -> dimensions to proceed
                     Dimension check in Agent equations and inequations (expressions).
                 2. __variable_completeness
                     Checks if there are no extra initialized Agent variables in model, which are unused in
                     model Expressions and if there are uninitialized variables in model.
+
             Open:
+
                 1. validate
                     Provides full blackbox checks + emitent check
 
         Class variables:
+
             emitent = None: bool
             Shows that this Validation process is for Simple Agents -- with objective functional.
     """
@@ -181,16 +187,26 @@ class AgentValidator(object):
 class AbstractAgent(AgentValidator):
     """
         Core methods for Agent models.
+
         Methods:
+
             Constructors:
+
                 1. __init__: Init Agent from its parts: see method args.
                 2. read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at `/models/inputs/`.
+
             Private:
+
                 1. __generate_duals: Generate dual variables and functions due to Lagrange principum.
+
             Public:
+
                 Additional:
-                    1. Support system:
+
+                    1. Support system
+
                     Methods that helps system to understand which variables are phase, which are controls etc.
+
                         1. time : extract time variable in agent model
                         2. time_horizon : extract time horizon boundaries from integral part of objective functions
                         3. transitions : extract first-order differential equations from all boundaries
@@ -205,7 +221,9 @@ class AbstractAgent(AgentValidator):
                         12. validate : provide Agent model validation from subclass
 
                     2. Misc
+
                     Basic class methods to provide comfort.
+
                         1. args : Args to re-init
                         2. kwargs : Kwargs to re-init
                         3. process : Pre-process model to be used in core methods
@@ -213,7 +231,9 @@ class AbstractAgent(AgentValidator):
                         5. dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]
 
                     3. Core
+
                     Methods that conduct Maximum Principle Conditions due to Lagrange principum.
+
                         1. Lagrangian : integral part of L
                         2. lagrangian : termination part of L
                         3. euler_equations : Euler-Lagrange equations
@@ -281,7 +301,9 @@ class AbstractAgent(AgentValidator):
         Extract time variable from:
             1. Integral in objectives
             2. Differential variable in boundaries
-        :return: Time : Union[Symbol, TimeVariableNotFound]
+
+        :return: Union[Symbol, TimeVariableNotFound]
+
         """
         # two ways: integration argument, under derivative
         from sympy import Integral
@@ -378,8 +400,10 @@ class AbstractAgent(AgentValidator):
     def boundaries(self):
         """
         Expressions with these types:
+
             1. Differential degree == 0
             2. Constant inequalities
+
         :return: List[Expr]
         """
         # Equality types (deg=0) and constant ineqs
@@ -633,7 +657,7 @@ class LinkedAgent(AbstractAgent):
 def create_empty_agents(names, cls=AbstractAgent):
     """
     Additional function to provide test cases in `scenarios/debug_scenarios.py`
-    :param names: Agent tags separated by space ` `.
+    :param names: Agent tags separated by space ' '.
     :param cls: Default=AbstractAgent. Class for returned agents.
     :return: List[Union[AbstractAgent, LinkedAgent]]
     """

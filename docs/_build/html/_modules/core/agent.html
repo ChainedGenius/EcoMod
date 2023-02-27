@@ -85,19 +85,25 @@
 <div class="viewcode-block" id="AgentValidator"><a class="viewcode-back" href="../../core.html#core.agent.AgentValidator">[docs]</a><span class="k">class</span> <span class="nc">AgentValidator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.</span>
+
 <span class="sd">        Methods:</span>
+
 <span class="sd">            Private:</span>
+
 <span class="sd">                1. __dimension_check</span>
 <span class="sd">                    Uses KV-storage gained from input Agent model with variables -&gt; dimensions to proceed</span>
 <span class="sd">                    Dimension check in Agent equations and inequations (expressions).</span>
 <span class="sd">                2. __variable_completeness</span>
 <span class="sd">                    Checks if there are no extra initialized Agent variables in model, which are unused in</span>
 <span class="sd">                    model Expressions and if there are uninitialized variables in model.</span>
+
 <span class="sd">            Open:</span>
+
 <span class="sd">                1. validate</span>
 <span class="sd">                    Provides full blackbox checks + emitent check</span>
 
 <span class="sd">        Class variables:</span>
+
 <span class="sd">            emitent = None: bool</span>
 <span class="sd">            Shows that this Validation process is for Simple Agents -- with objective functional.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -246,16 +252,26 @@
 <div class="viewcode-block" id="AbstractAgent"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent">[docs]</a><span class="k">class</span> <span class="nc">AbstractAgent</span><span class="p">(</span><span class="n">AgentValidator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Core methods for Agent models.</span>
+
 <span class="sd">        Methods:</span>
+
 <span class="sd">            Constructors:</span>
+
 <span class="sd">                1. __init__: Init Agent from its parts: see method args.</span>
 <span class="sd">                2. read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at `/models/inputs/`.</span>
+
 <span class="sd">            Private:</span>
+
 <span class="sd">                1. __generate_duals: Generate dual variables and functions due to Lagrange principum.</span>
+
 <span class="sd">            Public:</span>
+
 <span class="sd">                Additional:</span>
-<span class="sd">                    1. Support system:</span>
+
+<span class="sd">                    1. Support system</span>
+
 <span class="sd">                    Methods that helps system to understand which variables are phase, which are controls etc.</span>
+
 <span class="sd">                        1. time : extract time variable in agent model</span>
 <span class="sd">                        2. time_horizon : extract time horizon boundaries from integral part of objective functions</span>
 <span class="sd">                        3. transitions : extract first-order differential equations from all boundaries</span>
@@ -270,7 +286,9 @@
 <span class="sd">                        12. validate : provide Agent model validation from subclass</span>
 
 <span class="sd">                    2. Misc</span>
+
 <span class="sd">                    Basic class methods to provide comfort.</span>
+
 <span class="sd">                        1. args : Args to re-init</span>
 <span class="sd">                        2. kwargs : Kwargs to re-init</span>
 <span class="sd">                        3. process : Pre-process model to be used in core methods</span>
@@ -278,7 +296,9 @@
 <span class="sd">                        5. dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]</span>
 
 <span class="sd">                    3. Core</span>
+
 <span class="sd">                    Methods that conduct Maximum Principle Conditions due to Lagrange principum.</span>
+
 <span class="sd">                        1. Lagrangian : integral part of L</span>
 <span class="sd">                        2. lagrangian : termination part of L</span>
 <span class="sd">                        3. euler_equations : Euler-Lagrange equations</span>
@@ -346,7 +366,9 @@
 <span class="sd">        Extract time variable from:</span>
 <span class="sd">            1. Integral in objectives</span>
 <span class="sd">            2. Differential variable in boundaries</span>
-<span class="sd">        :return: Time : Union[Symbol, TimeVariableNotFound]</span>
+
+<span class="sd">        :return: Union[Symbol, TimeVariableNotFound]</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># two ways: integration argument, under derivative</span>
         <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Integral</span>
@@ -443,8 +465,10 @@
     <span class="k">def</span> <span class="nf">boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Expressions with these types:</span>
+
 <span class="sd">            1. Differential degree == 0</span>
 <span class="sd">            2. Constant inequalities</span>
+
 <span class="sd">        :return: List[Expr]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Equality types (deg=0) and constant ineqs</span>
@@ -698,7 +722,7 @@
 <div class="viewcode-block" id="create_empty_agents"><a class="viewcode-back" href="../../core.html#core.agent.create_empty_agents">[docs]</a><span class="k">def</span> <span class="nf">create_empty_agents</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">AbstractAgent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Additional function to provide test cases in `scenarios/debug_scenarios.py`</span>
-<span class="sd">    :param names: Agent tags separated by space ` `.</span>
+<span class="sd">    :param names: Agent tags separated by space &#39; &#39;.</span>
 <span class="sd">    :param cls: Default=AbstractAgent. Class for returned agents.</span>
 <span class="sd">    :return: List[Union[AbstractAgent, LinkedAgent]]</span>
 <span class="sd">    &quot;&quot;&quot;</span>

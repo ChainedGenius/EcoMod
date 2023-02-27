@@ -240,22 +240,30 @@
 <dt class="sig sig-object py" id="core.agent.AbstractAgent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">AbstractAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inequations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#core.agent.AgentValidator" title="core.agent.AgentValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentValidator</span></code></a></p>
-<p>Core methods for Agent models.
-Methods:</p>
+<p>Core methods for Agent models.</p>
+<p>Methods:</p>
 <blockquote>
-<div><dl>
-<dt>Constructors:</dt><dd><ol class="arabic simple">
+<div><p>Constructors:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><p>__init__: Init Agent from its parts: see method args.</p></li>
 <li><p>read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at <cite>/models/inputs/</cite>.</p></li>
 </ol>
-</dd>
-<dt>Private:</dt><dd><ol class="arabic simple">
+</div></blockquote>
+<p>Private:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><p>__generate_duals: Generate dual variables and functions due to Lagrange principum.</p></li>
 </ol>
-</dd>
-<dt>Public:</dt><dd><dl>
-<dt>Additional:</dt><dd><p>1. Support system:
-Methods that helps system to understand which variables are phase, which are controls etc.</p>
+</div></blockquote>
+<p>Public:</p>
+<blockquote>
+<div><p>Additional:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Support system</p></li>
+</ol>
+<p>Methods that helps system to understand which variables are phase, which are controls etc.</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>time : extract time variable in agent model</p></li>
@@ -272,8 +280,10 @@ Methods that helps system to understand which variables are phase, which are con
 <li><p>validate : provide Agent model validation from subclass</p></li>
 </ol>
 </div></blockquote>
-<p>2. Misc
-Basic class methods to provide comfort.</p>
+<ol class="arabic simple" start="2">
+<li><p>Misc</p></li>
+</ol>
+<p>Basic class methods to provide comfort.</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>args : Args to re-init</p></li>
@@ -283,8 +293,10 @@ Basic class methods to provide comfort.</p>
 <li><p>dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]</p></li>
 </ol>
 </div></blockquote>
-<p>3. Core
-Methods that conduct Maximum Principle Conditions due to Lagrange principum.</p>
+<ol class="arabic simple" start="3">
+<li><p>Core</p></li>
+</ol>
+<p>Methods that conduct Maximum Principle Conditions due to Lagrange principum.</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Lagrangian : integral part of L</p></li>
@@ -295,10 +307,8 @@ Methods that conduct Maximum Principle Conditions due to Lagrange principum.</p>
 <li><p>KKT: Dual-feasibility and Complementary Slackness conditions</p></li>
 </ol>
 </div></blockquote>
-</dd>
-</dl>
-</dd>
-</dl>
+</div></blockquote>
+</div></blockquote>
 </div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.agent.AbstractAgent.KKT">
@@ -324,13 +334,13 @@ Methods that conduct Maximum Principle Conditions due to Lagrange principum.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="core.agent.AbstractAgent.boundaries">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundaries</span></span><a class="headerlink" href="#core.agent.AbstractAgent.boundaries" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Expressions with these types:</dt><dd><ol class="arabic simple">
+<dd><p>Expressions with these types:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><p>Differential degree == 0</p></li>
 <li><p>Constant inequalities</p></li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>List[Expr]</p>
@@ -467,7 +477,7 @@ d/dt L_{x’} = L_{x}
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Time : Union[Symbol, TimeVariableNotFound]</p>
+<dd class="field-odd"><p>Union[Symbol, TimeVariableNotFound]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -507,11 +517,12 @@ L_{x’}(t_i) = (-1)^i l_{x(t_i)}
 <dt class="sig sig-object py" id="core.agent.AgentValidator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">AgentValidator</span></span><a class="reference internal" href="_modules/core/agent.html#AgentValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AgentValidator" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.
-Methods:</p>
+<p>Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.</p>
+<p>Methods:</p>
 <blockquote>
-<div><dl class="simple">
-<dt>Private:</dt><dd><ol class="arabic simple">
+<div><p>Private:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><dl class="simple">
 <dt>__dimension_check</dt><dd><p>Uses KV-storage gained from input Agent model with variables -&gt; dimensions to proceed
 Dimension check in Agent equations and inequations (expressions).</p>
@@ -525,22 +536,23 @@ model Expressions and if there are uninitialized variables in model.</p>
 </dl>
 </li>
 </ol>
-</dd>
-<dt>Open:</dt><dd><ol class="arabic simple">
+</div></blockquote>
+<p>Open:</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li><dl class="simple">
 <dt>validate</dt><dd><p>Provides full blackbox checks + emitent check</p>
 </dd>
 </dl>
 </li>
 </ol>
-</dd>
-</dl>
 </div></blockquote>
-<dl class="simple">
-<dt>Class variables:</dt><dd><p>emitent = None: bool
+</div></blockquote>
+<p>Class variables:</p>
+<blockquote>
+<div><p>emitent = None: bool
 Shows that this Validation process is for Simple Agents – with objective functional.</p>
-</dd>
-</dl>
+</div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.agent.AgentValidator.emitent">
 <span class="sig-name descname"><span class="pre">emitent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.agent.AgentValidator.emitent" title="Permalink to this definition"></a></dt>
@@ -628,7 +640,7 @@ Shows that this Validation process is for Simple Agents – with objective funct
 <dt class="sig sig-object py" id="core.agent.create_empty_agents">
 <span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">create_empty_agents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls=&lt;class</span> <span class="pre">'core.agent.AbstractAgent'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#create_empty_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.create_empty_agents" title="Permalink to this definition"></a></dt>
 <dd><p>Additional function to provide test cases in <cite>scenarios/debug_scenarios.py</cite>
-:param names: Agent tags separated by space ` <a href="#id1"><span class="problematic" id="id2">`</span></a>.
+:param names: Agent tags separated by space ‘ ‘.
 :param cls: Default=AbstractAgent. Class for returned agents.
 :return: List[Union[AbstractAgent, LinkedAgent]]</p>
 </dd></dl>
@@ -997,8 +1009,8 @@ agents and flows</p>
 <dt class="sig sig-object py" id="core.pprint.TexTemplateEngine">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">TexTemplateEngine</span></span><a class="reference internal" href="_modules/core/pprint.html#TexTemplateEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.TexTemplateEngine" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Template engine to produce TeX and #PDF# file for Agent processed output.
-Methods:</p>
+<p>Template engine to produce TeX and #PDF# file for Agent processed output.</p>
+<p>Methods:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><dl class="simple">
@@ -1051,18 +1063,17 @@ Methods:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="core.pprint.exec_tex">
 <span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">exec_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tex_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/pprint.html#exec_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.exec_tex" title="Permalink to this definition"></a></dt>
-<dd><blockquote>
-<div><p>Execute .tex file and produce PDF file.
-:param tex_filename: str – filename of source which be compilated
-:param destination: Path – destination of produced PDF
-:param open: bool – open</p>
-</div></blockquote>
-<dl class="simple">
-<dt>ot open PDF after compilation</dt><dd><dl class="field-list simple">
-<dt class="field-odd">return</dt>
-<dd class="field-odd"><p>Union[PermissionError, RuntimeError]</p>
+<dd><p>Execute .tex file and produce PDF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tex_filename</strong> – str – filename of source which be compilated</p></li>
+<li><p><strong>destination</strong> – Path – destination of produced PDF</p></li>
+<li><p><strong>open</strong> – bool – open|not open PDF after compilation</p></li>
+</ul>
 </dd>
-</dl>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Union[PermissionError, RuntimeError]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1074,9 +1085,13 @@ Methods:</p>
 <dt class="sig sig-object py" id="core.sympyfier.ecomodify">
 <span class="sig-prename descclassname"><span class="pre">core.sympyfier.</span></span><span class="sig-name descname"><span class="pre">ecomodify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xreplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/sympyfier.html#ecomodify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sympyfier.ecomodify" title="Permalink to this definition"></a></dt>
 <dd><p>Transfer raw model from .tex file to input of AbstractAgent.
-:param raw_model:
-:param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.
-:return: List[<a href="#id3"><span class="problematic" id="id4">*</span></a>AbstractAgent.args]</p>
+:param raw_model
+:param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List[AbstractAgent.args]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

@@ -77,7 +77,9 @@
 <div class="viewcode-block" id="TexTemplateEngine"><a class="viewcode-back" href="../../core.html#core.pprint.TexTemplateEngine">[docs]</a><span class="k">class</span> <span class="nc">TexTemplateEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Template engine to produce TeX and #PDF# file for Agent processed output.</span>
+
 <span class="sd">    Methods:</span>
+
 <span class="sd">        1. get_template_variables</span>
 <span class="sd">            Parameters which are included in Template produced from `self.template_name`</span>
 <span class="sd">        2. render</span>
@@ -157,9 +159,10 @@
 <div class="viewcode-block" id="exec_tex"><a class="viewcode-back" href="../../core.html#core.pprint.exec_tex">[docs]</a><span class="k">def</span> <span class="nf">exec_tex</span><span class="p">(</span><span class="n">tex_filename</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Execute .tex file and produce PDF file.</span>
+
 <span class="sd">    :param tex_filename: str -- filename of source which be compilated</span>
 <span class="sd">    :param destination: Path -- destination of produced PDF</span>
-<span class="sd">    :param open: bool -- open\not open PDF after compilation</span>
+<span class="sd">    :param open: bool -- open|not open PDF after compilation</span>
 <span class="sd">    :return: Union[PermissionError, RuntimeError]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SUFFIXES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.log&#39;</span><span class="p">,</span> <span class="s1">&#39;.aux&#39;</span><span class="p">]</span>

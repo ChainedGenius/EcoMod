@@ -12,7 +12,9 @@ from core.errors.RWErrors import NotRendered
 class TexTemplateEngine(object):
     """
     Template engine to produce TeX and #PDF# file for Agent processed output.
+
     Methods:
+
         1. get_template_variables
             Parameters which are included in Template produced from `self.template_name`
         2. render
@@ -92,9 +94,10 @@ class ModelTemplateEngine(TexTemplateEngine):
 def exec_tex(tex_filename, destination, open=False):
     """
     Execute .tex file and produce PDF file.
+
     :param tex_filename: str -- filename of source which be compilated
     :param destination: Path -- destination of produced PDF
-    :param open: bool -- open\not open PDF after compilation
+    :param open: bool -- open|not open PDF after compilation
     :return: Union[PermissionError, RuntimeError]
     """
     SUFFIXES = ['.pdf', '.log', '.aux']

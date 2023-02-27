@@ -62,9 +62,10 @@ def sympify(raw_obj):
 def ecomodify(raw_model, xreplace=True):
     """
     Transfer raw model from .tex file to input of AbstractAgent.
-    :param raw_model:
+    :param raw_model
     :param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.
-    :return: List[*AbstractAgent.args]
+
+    :return: List[AbstractAgent.args]
     """
     def dim_dictify(_raw_model):
         # not real python dict: list of tuples
