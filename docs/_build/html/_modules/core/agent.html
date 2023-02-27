@@ -730,27 +730,26 @@
     <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">cls</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../core.html#core.agent.main">[docs]</a><span class="nd">@timeit</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;../inputs/agent.tex&#39;</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))</span>
-    <span class="n">A</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rub&#39;</span><span class="p">))</span>
-    <span class="n">B</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;tv&#39;</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__class__</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">euler_equations</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">control_optimality</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">KKT</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">print_flows</span><span class="p">())</span></div>
-
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="nd">@timeit</span>
+    <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;../inputs/agent.tex&#39;</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rub&#39;</span><span class="p">))</span>
+        <span class="n">B</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;tv&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__class__</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">euler_equations</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">control_optimality</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">KKT</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">print_flows</span><span class="p">())</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done&#39;</span><span class="p">)</span>
 </pre></div>
 
