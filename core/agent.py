@@ -665,25 +665,24 @@ def create_empty_agents(names, cls=AbstractAgent):
     return [cls(name) for name in names] if len(names) != 1 else cls(names)
 
 
-@timeit
-def main():
-    f = '../inputs/agent.tex'
-    A = LinkedAgent.read_from_tex(f)
-    A.process()
-    B = LinkedAgent.from_abstract(create_empty_agents('B'))
-    C = LinkedAgent.from_abstract(create_empty_agents('C'))
-    A.add_flow(Flow(A, C, 3, 'rub'))
-    B.add_flow(Flow(A, B, 6, 'tv'))
-    print(A.__class__())
-    print(A.name)
-    print(A.Lagrangian)
-    print(A.lagrangian)
-    print(A.euler_equations())
-    print(A.transversality_conditions())
-    print(A.control_optimality())
-    print(A.KKT())
-    print(A.print_flows())
-
 
 if __name__ == "__main__":
+    @timeit
+    def main():
+        f = '../inputs/agent.tex'
+        A = LinkedAgent.read_from_tex(f)
+        A.process()
+        B = LinkedAgent.from_abstract(create_empty_agents('B'))
+        C = LinkedAgent.from_abstract(create_empty_agents('C'))
+        A.add_flow(Flow(A, C, 3, 'rub'))
+        B.add_flow(Flow(A, B, 6, 'tv'))
+        print(A.__class__())
+        print(A.name)
+        print(A.Lagrangian)
+        print(A.lagrangian)
+        print(A.euler_equations())
+        print(A.transversality_conditions())
+        print(A.control_optimality())
+        print(A.KKT())
+        print(A.print_flows())
     print('Done')
