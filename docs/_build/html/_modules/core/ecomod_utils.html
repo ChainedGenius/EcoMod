@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.ecomod_utils &mdash; ECOMOD 2.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> ECOMOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ECOMOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.ecomod_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.ecomod_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">sympify</span><span class="p">,</span> <span class="n">Expr</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">sinh</span><span class="p">,</span> <span class="n">cosh</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">simplify</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">Symbol</span>
+<span class="kn">from</span> <span class="nn">sympy.parsing.latex</span> <span class="kn">import</span> <span class="n">parse_latex</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">cot</span><span class="p">,</span> <span class="n">sinh</span><span class="p">,</span> <span class="n">cosh</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">coth</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">multipledispatch</span> <span class="kn">import</span> <span class="n">dispatch</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">GreaterThan</span><span class="p">,</span> <span class="n">Basic</span>
+<span class="kn">from</span> <span class="nn">sympy.printing.latex</span> <span class="kn">import</span> <span class="n">latex</span>
+
+
+<div class="viewcode-block" id="is_substricted"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.is_substricted">[docs]</a><span class="k">def</span> <span class="nf">is_substricted</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if symbol is substricted with tag.</span>
+<span class="sd">    :param symb: Union[datamodel.Parameter, datamodel.Phase]</span>
+<span class="sd">    :param tag: Union[string, None]</span>
+<span class="sd">    :return: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># simple heuristics</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;_{&quot;</span> <span class="ow">in</span> <span class="n">symb</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="se">{{</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">symb</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="remove_subscript"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.remove_subscript">[docs]</a><span class="k">def</span> <span class="nf">remove_subscript</span><span class="p">(</span><span class="n">symb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Firstly check if symbol is substricted, then if true remove !ANY! substricted.</span>
+<span class="sd">    :param symb: Union[datamodel.Parameter, datamodel.Phase]</span>
+<span class="sd">    :return: Union[datamodel.Parameter, datamodel.Phase] -- unsubscripted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_substricted</span><span class="p">(</span><span class="n">symb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">symb</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="c1"># case if function</span>
+            <span class="k">return</span> <span class="n">symbols</span><span class="p">(</span><span class="n">symb</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">)(</span><span class="o">*</span><span class="n">symb</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">symbols</span><span class="p">(</span><span class="n">symb</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Symbol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">symb</span></div>
+
+
+<div class="viewcode-block" id="add_subscript"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.add_subscript">[docs]</a><span class="k">def</span> <span class="nf">add_subscript</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add subscript `tag` to symbol</span>
+<span class="sd">    :param symb: Union[datamodel.Parameter, datamodel.Phase] - untagged</span>
+<span class="sd">    :param tag: str</span>
+<span class="sd">    :return: Union[datamodel.Parameter, datamodel.Phase] -- tagged</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_substricted</span><span class="p">(</span><span class="n">symb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">symb</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="c1"># case if function</span>
+            <span class="k">return</span> <span class="n">symbols</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">symb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="se">{{</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="se">}}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">)(</span><span class="o">*</span><span class="n">symb</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">symbols</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">symb</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="se">{{</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="se">}}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Symbol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">symb</span></div>
+
+
+<div class="viewcode-block" id="latexify"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.latexify">[docs]</a><span class="k">def</span> <span class="nf">latexify</span><span class="p">(</span><span class="n">exprs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">to_str</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide latex codesnippets to expressions. Can be returned as joined string or as List[str]</span>
+<span class="sd">    :param exprs: List[Expr]</span>
+<span class="sd">    :param to_str: bool</span>
+<span class="sd">    :return: Union[List[Expr], str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">latex</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exprs</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">to_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">return</span> <span class="s1">&#39;,~&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KKT_mask"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.KKT_mask">[docs]</a><span class="k">def</span> <span class="nf">KKT_mask</span><span class="p">(</span><span class="n">dual</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns Dual Feasibility and Complementary Slackness for dual dict</span>
+<span class="sd">    :param dual: Dict[Union[datamodel.Parameter, datamodel.Phase] --&gt; Expr]</span>
+<span class="sd">    :return: List[Expr] = [K*V]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[(</span><span class="n">GreaterThan</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Eq</span><span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dual</span><span class="o">.</span><span class="n">items</span><span class="p">()])]</span></div>
+
+
+<div class="viewcode-block" id="euler_mask"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.euler_mask">[docs]</a><span class="k">def</span> <span class="nf">euler_mask</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide Euler-Lagrange equations for passed Lagrangian and variables [phase, time]</span>
+<span class="sd">    :param L: Expr -- Lagrangian</span>
+<span class="sd">    :param x: datamodel.Phase -- Phase variables</span>
+<span class="sd">    :param t: datamodel.Parameter -- Time variable</span>
+<span class="sd">    :return: List[Expr]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">func</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Wrong time :)&#39;</span><span class="p">)</span>
+    <span class="n">x_prime</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">L_x_prime</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x_prime</span><span class="p">)</span>
+    <span class="n">L_x</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Eq</span><span class="p">(</span><span class="n">simplify</span><span class="p">(</span><span class="n">Derivative</span><span class="p">(</span><span class="n">L_x_prime</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">L_x</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transversality_mask"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.transversality_mask">[docs]</a><span class="k">def</span> <span class="nf">transversality_mask</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transveraslity condition for agent optimal control problem</span>
+<span class="sd">    :param L: Expr -- Lagrangian</span>
+<span class="sd">    :param x: datamodel.Phase -- phase variable</span>
+<span class="sd">    :param t: datamodel.Parameter -- time variable</span>
+<span class="sd">    :param l: Expr -- termination lagrangian</span>
+<span class="sd">    :param t0: datamodel.Parameter -- time horizon[0]</span>
+<span class="sd">    :param t1: datamodel.Parameter -- time horizon[1]</span>
+<span class="sd">    :return: List[Eq]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">func</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Wrong time :)&#39;</span><span class="p">)</span>
+    <span class="c1"># lhs</span>
+    <span class="n">x_prime</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">L_x_prime</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x_prime</span><span class="p">)</span>
+    <span class="c1"># rhs</span>
+    <span class="n">l_x_t_0</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">t0</span><span class="p">}))</span>
+    <span class="n">l_x_t_1</span> <span class="o">=</span> <span class="o">-</span><span class="n">l</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">t1</span><span class="p">}))</span>
+    <span class="k">return</span> <span class="n">Eq</span><span class="p">(</span><span class="n">L_x_prime</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">t0</span><span class="p">}),</span> <span class="n">l_x_t_0</span><span class="p">),</span> <span class="n">Eq</span><span class="p">(</span><span class="n">L_x_prime</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">t1</span><span class="p">}),</span> <span class="n">l_x_t_1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="generate_symbols"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.generate_symbols">[docs]</a><span class="k">def</span> <span class="nf">generate_symbols</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate symbols function. Used for dual variables and parameters generation in Agent.process</span>
+<span class="sd">    :param tag: str -- Alias for generated symbols</span>
+<span class="sd">    :param count: int -- count of symbols</span>
+<span class="sd">    :param cls: Class[Union[datamodel.Parameter, datamodel.Phase]]</span>
+<span class="sd">    :return: Iter[Symbol]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">)]</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">symbols</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[</span><span class="n">symbols</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="spec_funcs"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.spec_funcs">[docs]</a><span class="k">def</span> <span class="nf">spec_funcs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set of special analytical functions in sympy. Used to dimension check of its args.</span>
+<span class="sd">    :return: set</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">cot</span><span class="p">,</span> <span class="n">sinh</span><span class="p">,</span> <span class="n">cosh</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">coth</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">log</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="is_spec_function"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.is_spec_function">[docs]</a><span class="k">def</span> <span class="nf">is_spec_function</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Bool version of spec_funcs. Return true if func is listed in spec_funcs, otherwise else.</span>
+<span class="sd">    :param func: function to be checked</span>
+<span class="sd">    :return: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="p">{</span><span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">tan</span><span class="p">,</span> <span class="n">cot</span><span class="p">,</span> <span class="n">sinh</span><span class="p">,</span> <span class="n">cosh</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">coth</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">log</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">func</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">spec</span></div>
+
+
+<div class="viewcode-block" id="eq2func"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.eq2func">[docs]</a><span class="k">def</span> <span class="nf">eq2func</span><span class="p">(</span><span class="n">eq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return Expr:= lhs - rhs from Eq</span>
+<span class="sd">    :param eq: Eq to be transformed</span>
+<span class="sd">    :return: Expr</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">eq</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eq</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="deriv_degree"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.deriv_degree">[docs]</a><span class="k">def</span> <span class="nf">deriv_degree</span><span class="p">(</span><span class="n">bc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns maximum degree of differential operator inside `bc` expression.</span>
+<span class="sd">    :param bc: Expr</span>
+<span class="sd">    :return: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">eq2func</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Derivative&#39;</span><span class="p">:</span>  <span class="c1">## catch derivative of x eqs 0</span>
+        <span class="n">deg_</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">eq2func</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span><span class="o">.</span><span class="n">variable_count</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deg_</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eq2func</span><span class="p">(</span><span class="n">bc</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="c1"># print(c.class_key()[-1])</span>
+        <span class="n">deg_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Derivative&#39;</span><span class="p">:</span>
+            <span class="n">deg_</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">variable_count</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Mul&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Derivative&#39;</span><span class="p">:</span>
+                    <span class="n">deg_</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">variable_count</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">deg_</span> <span class="o">&gt;</span> <span class="n">deg</span><span class="p">:</span>
+            <span class="n">deg</span> <span class="o">=</span> <span class="n">deg_</span>
+
+    <span class="k">return</span> <span class="n">deg</span></div>
+
+
+<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return linear span of KV-storage. ret = sum_0^N[K[i] * V[i]]</span>
+<span class="sd">    :param d: Dict[Expr -&gt; Expr]</span>
+<span class="sd">    :return: Expr</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">sympy.core.numbers</span> <span class="kn">import</span> <span class="n">Zero</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">Zero</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span>
+<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return linear span of KV-storage. ret = sum_0^N[L_1[i] * L_2[i]]</span>
+<span class="sd">    :param coefs: List[Expr]</span>
+<span class="sd">    :param variables: List[Expr]</span>
+<span class="sd">    :return: Expr</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">j</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<div class="viewcode-block" id="pi_theorem"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.pi_theorem">[docs]</a><span class="k">def</span> <span class="nf">pi_theorem</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">eq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deprecated method for dimension checking in equations.</span>
+<span class="sd">    :param vars:</span>
+<span class="sd">    :param eq:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># bool return</span>
+
+    <span class="k">def</span> <span class="nf">_dim_subs</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">eq</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">eq_</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sympify</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">sympify</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eq_</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="n">eq</span> <span class="o">=</span> <span class="n">eq_</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coef</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+                <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sympify</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">sympify</span><span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">coef</span><span class="p">)))</span>
+
+        <span class="c1"># print(eq)</span>
+        <span class="c1"># eq = eq.subs(vars).simplify()</span>
+        <span class="k">if</span> <span class="n">eq</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Equality&#39;</span><span class="p">:</span>
+            <span class="n">lhs</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rhs</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eq</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># var correctance</span>
+    <span class="n">vars_</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">Expr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">parse_latex</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">eq2func</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+    <span class="c1"># parse functions</span>
+    <span class="n">funcs</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">expr</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Function</span><span class="p">)]</span>
+    <span class="c1"># check correctance</span>
+
+    <span class="n">actual_vars</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">expr</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">]</span>
+    <span class="n">actual_vars</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">funcs</span><span class="p">])</span>
+    <span class="c1"># if set(actual_vars) != set(vars.keys()):</span>
+    <span class="c1">#    raise Warning(&#39;check var_list isnt full&#39;, set(actual_vars)- set(vars.keys()))</span>
+
+    <span class="c1"># parse special functions</span>
+    <span class="n">special_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">sinh</span><span class="p">,</span> <span class="n">cosh</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">log</span><span class="p">]</span>
+    <span class="n">occ_funcs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">occurencies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">special_tags</span><span class="p">:</span>
+        <span class="n">occ_funcs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="o">*</span><span class="n">expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)])</span>
+        <span class="n">occurencies</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)])</span>
+
+    <span class="k">for</span> <span class="n">expr_</span> <span class="ow">in</span> <span class="n">occurencies</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">_dim_subs</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">expr_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># swap special functions</span>
+    <span class="k">for</span> <span class="n">of</span> <span class="ow">in</span> <span class="n">occ_funcs</span><span class="p">:</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">of</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># parse derivatives</span>
+    <span class="n">derivatives</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Derivative</span><span class="p">)]</span>
+
+    <span class="c1"># swap derivas</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">derivatives</span><span class="p">:</span>
+        <span class="n">var</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">var</span> <span class="o">/</span> <span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+
+    <span class="c1"># swap functions</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">funcs</span><span class="p">:</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">symbols</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">class_key</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">_dim_subs</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">eq</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ChainedGenius.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

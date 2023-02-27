@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.agent &mdash; ECOMOD 2.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> ECOMOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ECOMOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.agent</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.agent</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">prod</span>
+
+<span class="kn">from</span> <span class="nn">core.deserialiser</span> <span class="kn">import</span> <span class="n">read_model_from_tex</span>
+<span class="kn">from</span> <span class="nn">core.ecomod_utils</span> <span class="kn">import</span> <span class="n">deriv_degree</span><span class="p">,</span> <span class="n">spec_funcs</span><span class="p">,</span> <span class="n">generate_symbols</span><span class="p">,</span> <span class="n">span</span><span class="p">,</span> <span class="n">eq2func</span><span class="p">,</span> <span class="n">euler_mask</span><span class="p">,</span> \
+    <span class="n">transversality_mask</span><span class="p">,</span> <span class="n">KKT_mask</span><span class="p">,</span> <span class="n">latexify</span><span class="p">,</span> <span class="n">add_subscript</span><span class="p">,</span> <span class="n">is_substricted</span><span class="p">,</span> <span class="n">is_spec_function</span>
+<span class="kn">from</span> <span class="nn">core.errors.RWErrors</span> <span class="kn">import</span> <span class="n">TimeVariableNotFound</span><span class="p">,</span> <span class="n">AnyPropertyNotFound</span><span class="p">,</span> \
+    <span class="n">DimensionCheckingFailed</span><span class="p">,</span> <span class="n">ExtraVariableError</span><span class="p">,</span> <span class="n">ObjectiveFunctionNotFound</span><span class="p">,</span> <span class="n">NonSympyfiableError</span><span class="p">,</span> <span class="n">NoSuchFlow</span>
+<span class="kn">from</span> <span class="nn">core.logger</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">core.market</span> <span class="kn">import</span> <span class="n">Flow</span>
+<span class="kn">from</span> <span class="nn">core.pprint</span> <span class="kn">import</span> <span class="n">AgentTemplateEngine</span><span class="p">,</span> <span class="n">exec_tex</span>
+<span class="kn">from</span> <span class="nn">core.sympyfier</span> <span class="kn">import</span> <span class="n">ecomodify</span>
+<span class="kn">from</span> <span class="nn">core.utils</span> <span class="kn">import</span> <span class="n">iterable_substract</span><span class="p">,</span> <span class="n">timeit</span><span class="p">,</span> <span class="n">set_equality</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+
+<div class="viewcode-block" id="AgentValidator"><a class="viewcode-back" href="../../core.html#core.agent.AgentValidator">[docs]</a><span class="k">class</span> <span class="nc">AgentValidator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.</span>
+<span class="sd">        Methods:</span>
+<span class="sd">            Private:</span>
+<span class="sd">                1. __dimension_check</span>
+<span class="sd">                    Uses KV-storage gained from input Agent model with variables -&gt; dimensions to proceed</span>
+<span class="sd">                    Dimension check in Agent equations and inequations (expressions).</span>
+<span class="sd">                2. __variable_completeness</span>
+<span class="sd">                    Checks if there are no extra initialized Agent variables in model, which are unused in</span>
+<span class="sd">                    model Expressions and if there are uninitialized variables in model.</span>
+<span class="sd">            Open:</span>
+<span class="sd">                1. validate</span>
+<span class="sd">                    Provides full blackbox checks + emitent check</span>
+
+<span class="sd">        Class variables:</span>
+<span class="sd">            emitent = None: bool</span>
+<span class="sd">            Shows that this Validation process is for Simple Agents -- with objective functional.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">emitent</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__dimension_check</span><span class="p">(</span><span class="n">dim_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">exprs</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Algorithm:</span>
+<span class="sd">            1. for e in exprs:</span>
+<span class="sd">            2.      case when</span>
+<span class="sd">                        any Arg of Analytical Func then Arg -&gt; SpecStack</span>
+<span class="sd">            3.          e.subs(Arg, 1)</span>
+<span class="sd">            4.          -&gt; checker(e)</span>
+<span class="sd">            5.      else</span>
+<span class="sd">            6.          continue</span>
+<span class="sd">            7. for s in SpecStack:</span>
+<span class="sd">            8.      -&gt; checker(s)</span>
+
+
+<span class="sd">        :param dim_dict: Union[List, Dict] -- KV-storage: variable -&gt; dimension</span>
+<span class="sd">        :param exprs: List[Expr, Eq, ...] -- List of Agent model expressions</span>
+
+<span class="sd">        :return: None if no Errors else: Union[DimensionCheckingFailed, AnyError]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Symbol</span><span class="p">,</span> <span class="n">Integral</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">,</span> <span class="n">Eq</span>
+        <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">rand</span>
+
+        <span class="k">def</span> <span class="nf">checker</span><span class="p">(</span><span class="n">_expr</span><span class="p">,</span> <span class="n">_casted_dict</span><span class="p">,</span> <span class="n">_randomize_dict</span><span class="p">,</span> <span class="n">_spec_stack</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            RDS Algorithm:</span>
+<span class="sd">                1. Generate random coefficients for each variable: Dict(rc). -&gt; randomizeDict: variable[i] -&gt; rc[i] * variable[i]</span>
+<span class="sd">                2. Replace Integrals and Differential to product and fraction respectively</span>
+<span class="sd">                3. Substitute expr variables with help of Dict(rc)</span>
+
+
+<span class="sd">            :param _expr: [Expr, Eq, ...] -- Expression to be observed in dimension checking.</span>
+<span class="sd">            :param _casted_dict: Dict -- additional internal representation</span>
+<span class="sd">            :param _randomize_dict: Dict -- KV-storage variable -&gt; rand_coef * variable. Special heuristic to proceed dimension check.</span>
+<span class="sd">            :param _spec_stack: List[Expr] -- storage for Expr arguments inside Pure analytical functions.</span>
+
+<span class="sd">            :return: bool -- True|False -- result of RDS (Randomized Dimension Substitution)</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1"># remove spec functions</span>
+            <span class="n">specs</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">in</span> <span class="n">spec_funcs</span><span class="p">())</span>
+            <span class="n">_spec_stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">xreplace</span><span class="p">({</span><span class="n">s</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">})</span>
+            <span class="c1"># cast all to dummies</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_Function</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">is_symbol</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Symbol</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+            <span class="c1"># deal with Integrals and Derivatives</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Integral</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># subs</span>
+            <span class="c1"># randomize all</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="n">_expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_randomize_dict</span><span class="p">)</span>
+            <span class="n">_expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">_expr</span><span class="o">.</span><span class="n">lhs</span> <span class="o">/</span> <span class="n">_expr</span><span class="o">.</span><span class="n">rhs</span><span class="p">)</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">_casted_dict</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_expr</span><span class="o">.</span><span class="n">is_Number</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">spec_stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">random_coef</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_dict</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">casted_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">Symbol</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">):</span> <span class="n">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">random_coef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">kv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dim_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+        <span class="n">randomize_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">Symbol</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">):</span> <span class="n">Symbol</span><span class="p">(</span><span class="n">kv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">*</span> <span class="n">random_coef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">kv</span> <span class="ow">in</span>
+                          <span class="nb">enumerate</span><span class="p">(</span><span class="n">dim_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+        <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">exprs</span><span class="p">:</span>
+            <span class="n">expr_copy</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">rhs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">exp</span>
+                <span class="n">spec_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">lhs</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">checker</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">casted_dict</span><span class="p">,</span> <span class="n">randomize_dict</span><span class="p">,</span> <span class="n">spec_stack</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">expr_copy</span><span class="p">)</span>
+
+        <span class="c1"># spec stack check</span>
+        <span class="n">spec_stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">Eq</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">spec_stack</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">spec_stack</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">checker</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">casted_dict</span><span class="p">,</span> <span class="n">randomize_dict</span><span class="p">,</span> <span class="n">spec_stack</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="n">report_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="n">DimensionCheckingFailed</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">report_str</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__variable_completeness</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple variable existing check. ( .atoms method)</span>
+<span class="sd">        :param objectives: Agent objectives functions</span>
+<span class="sd">        :param inequations: Agent inequation boundaries</span>
+<span class="sd">        :param equations: Agent equation boundaries</span>
+<span class="sd">        :param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)</span>
+<span class="sd">        :param params: Agent not-functional variables</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Number</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Symbol</span>
+        <span class="c1"># compatibility testing</span>
+        <span class="c1"># func porting tests</span>
+        <span class="c1"># ----------- UNCOMMENT -------------------------</span>
+        <span class="n">fs_all_</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">eq</span><span class="o">.</span><span class="n">free_symbols</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">eq</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Function</span><span class="p">)])</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span>
+                              <span class="n">equations</span> <span class="o">+</span> <span class="n">inequations</span> <span class="o">+</span> <span class="n">objectives</span><span class="p">]))</span>
+        <span class="n">test1</span> <span class="o">=</span> <span class="n">iterable_substract</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">func</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fs_all_</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">func</span><span class="p">]),</span> <span class="n">spec_funcs</span><span class="p">())</span>
+        <span class="n">test2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">func</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">params</span> <span class="o">+</span> <span class="n">functions</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">func</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">set_equality</span><span class="p">(</span><span class="n">test1</span><span class="p">,</span> <span class="n">test2</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">test1</span><span class="p">,</span> <span class="n">test2</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NonSympyfiableError</span><span class="p">(</span><span class="n">err</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">test1</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s1"> vs </span><span class="si">{</span><span class="n">test2</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># args porting tests</span>
+        <span class="n">test1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span> <span class="k">if</span> <span class="n">prod</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">is_Function</span> <span class="ow">or</span> <span class="n">k</span><span class="o">.</span><span class="n">is_symbol</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">])</span> <span class="k">else</span> <span class="n">i</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fs_all_</span><span class="p">]))</span>
+        <span class="n">test2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">params</span> <span class="o">+</span> <span class="n">functions</span><span class="p">])</span>
+        <span class="n">numbersDOTtk</span> <span class="o">=</span> <span class="n">test1</span> <span class="o">-</span> <span class="n">test2</span>  <span class="c1"># cicada meme</span>
+        <span class="k">if</span> <span class="n">prod</span><span class="p">([</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numbersDOTtk</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NonSympyfiableError</span><span class="p">(</span><span class="n">err</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">test1</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s1"> vs </span><span class="si">{</span><span class="n">test2</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># completeness</span>
+        <span class="n">completion_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Function</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Symbol</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fs_all_</span><span class="p">])</span> <span class="k">if</span>
+                               <span class="ow">not</span> <span class="n">is_spec_function</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+        <span class="n">inited_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">functions</span> <span class="o">+</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">completion_names</span> <span class="o">!=</span> <span class="n">inited_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExtraVariableError</span><span class="p">(</span><span class="nb">vars</span><span class="o">=</span><span class="n">completion_names</span> <span class="o">-</span> <span class="n">inited_names</span><span class="p">)</span>
+        <span class="c1"># ---------------------UNCOMMENT-----------------</span>
+
+<div class="viewcode-block" id="AgentValidator.validate"><a class="viewcode-back" href="../../core.html#core.agent.AgentValidator.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objectives</span><span class="p">,</span> <span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">dim_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See __variable_completeness and __dimension_check docstrings.</span>
+<span class="sd">        :param objectives: Agent objectives functions</span>
+<span class="sd">        :param inequations: Agent inequation boundaries</span>
+<span class="sd">        :param equations: Agent equation boundaries</span>
+<span class="sd">        :param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)</span>
+<span class="sd">        :param params: Agent not-functional variables</span>
+<span class="sd">        :param dim_dict: Union[List, Dict] -- KV-storage: variable -&gt; dimension</span>
+<span class="sd">        :return: Union[AnyError, NonSympyfiableError, ExtraVariableError, DimensionCheckingFailed]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emitent</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">objectives</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ObjectiveFunctionNotFound</span><span class="p">()</span>
+        <span class="c1"># STEP 1: check completeness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__variable_completeness</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="c1"># STEP 2: dimension check</span>
+        <span class="k">if</span> <span class="n">dim_dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dimension_check</span><span class="p">(</span><span class="n">dim_dict</span><span class="p">,</span> <span class="n">equations</span> <span class="o">+</span> <span class="n">inequations</span> <span class="o">+</span> <span class="n">objectives</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AbstractAgent"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent">[docs]</a><span class="k">class</span> <span class="nc">AbstractAgent</span><span class="p">(</span><span class="n">AgentValidator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Core methods for Agent models.</span>
+<span class="sd">        Methods:</span>
+<span class="sd">            Constructors:</span>
+<span class="sd">                1. __init__: Init Agent from its parts: see method args.</span>
+<span class="sd">                2. read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at `/models/inputs/`.</span>
+<span class="sd">            Private:</span>
+<span class="sd">                1. __generate_duals: Generate dual variables and functions due to Lagrange principum.</span>
+<span class="sd">            Public:</span>
+<span class="sd">                Additional:</span>
+<span class="sd">                    1. Support system:</span>
+<span class="sd">                    Methods that helps system to understand which variables are phase, which are controls etc.</span>
+<span class="sd">                        1. time : extract time variable in agent model</span>
+<span class="sd">                        2. time_horizon : extract time horizon boundaries from integral part of objective functions</span>
+<span class="sd">                        3. transitions : extract first-order differential equations from all boundaries</span>
+<span class="sd">                        4. phases : extract phase variables from all functions</span>
+<span class="sd">                        5. external : extract exogenous constants from all functions</span>
+<span class="sd">                        6. controls : extract control variables from all functions</span>
+<span class="sd">                        7. variables : extract all model variable (not-functions)</span>
+<span class="sd">                        8. expr : extract all expressions (with objectives)</span>
+<span class="sd">                        9. boundaries : all equations and inequations (no differential equations)</span>
+<span class="sd">                        10. constant_ineqs : inequations with no terminal values</span>
+<span class="sd">                        11. diff_degree : Divide all expressions over differential equation degrees</span>
+<span class="sd">                        12. validate : provide Agent model validation from subclass</span>
+
+<span class="sd">                    2. Misc</span>
+<span class="sd">                    Basic class methods to provide comfort.</span>
+<span class="sd">                        1. args : Args to re-init</span>
+<span class="sd">                        2. kwargs : Kwargs to re-init</span>
+<span class="sd">                        3. process : Pre-process model to be used in core methods</span>
+<span class="sd">                        4. compress : Evaluate all Pontragin Principle conditions</span>
+<span class="sd">                        5. dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]</span>
+
+<span class="sd">                    3. Core</span>
+<span class="sd">                    Methods that conduct Maximum Principle Conditions due to Lagrange principum.</span>
+<span class="sd">                        1. Lagrangian : integral part of L</span>
+<span class="sd">                        2. lagrangian : termination part of L</span>
+<span class="sd">                        3. euler_equations : Euler-Lagrange equations</span>
+<span class="sd">                        4. transversality_conditions : Transversality conditions</span>
+<span class="sd">                        5. control_optimality : Control optimality conditions</span>
+<span class="sd">                        6. KKT: Dual-feasibility and Complementary Slackness conditions</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">emitent</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">objectives</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inequations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">equations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">functions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dim_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dim_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dim_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">objectives</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">objectives</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">inequations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inequations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">equations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">equations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">functions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">functions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="n">functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equations</span> <span class="o">=</span> <span class="n">equations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inequations</span> <span class="o">=</span> <span class="n">inequations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span> <span class="o">=</span> <span class="n">objectives</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_dict</span> <span class="o">=</span> <span class="n">dim_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="c1"># dual variables k:v where k = real phase or ineq constraint, v = dual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># for conjugate arbitrary constants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duals</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># for conjugate functions</span>
+        <span class="c1"># linking part)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@log</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Agent ready for analysis&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__generate_duals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lambdas -- dual variables, conducted by count of Len(chain(objectives, boundaries, constant_ineqs))</span>
+<span class="sd">        Alphas -- dual functions, conducted by count of Len(chain(transitions, [inequations - constant_ineqs] + boundaries))</span>
+<span class="sd">        :return: self.lambdas -- List[Symbol]</span>
+<span class="sd">                 self.alphas -- List[Function]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Symbol</span><span class="p">,</span> <span class="n">Function</span>
+        <span class="c1"># step 1: create lambdas</span>
+        <span class="n">lambda_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundaries</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_ineqs</span>
+        <span class="n">lambdas_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lambda_factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">(</span><span class="n">eq2func</span><span class="p">(</span><span class="n">lambda_factor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">if</span> <span class="n">lambda_factor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span> <span class="k">else</span> <span class="n">lambda_factor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="n">v</span> <span class="k">for</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generate_symbols</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">lambdas_count</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Symbol</span><span class="p">))}</span>
+        <span class="c1"># step 2: create conjugates funcs (duals)</span>
+        <span class="n">alpha_factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">+</span> <span class="n">iterable_substract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inequations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_ineqs</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundaries</span>
+        <span class="n">alpha_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">alpha_factors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duals</span> <span class="o">=</span> <span class="p">{</span><span class="n">eq2func</span><span class="p">(</span><span class="n">alpha_factors</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span> <span class="n">d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span>
+                      <span class="nb">enumerate</span><span class="p">(</span><span class="n">generate_symbols</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">alpha_count</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">))}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract time variable from:</span>
+<span class="sd">            1. Integral in objectives</span>
+<span class="sd">            2. Differential variable in boundaries</span>
+<span class="sd">        :return: Time : Union[Symbol, TimeVariableNotFound]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># two ways: integration argument, under derivative</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Integral</span>
+        <span class="c1"># method 1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Integral</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">ret1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># method 2</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Derivative</span>
+            <span class="n">ret2</span> <span class="o">=</span> <span class="p">[</span><span class="n">eq</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Derivative</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">eq</span><span class="p">,</span> <span class="n">deg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">diff_degree</span><span class="p">(</span><span class="n">deg</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">deg</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">ret2</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ret2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TimeVariableNotFound</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ret1</span> <span class="k">if</span> <span class="n">ret1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ret2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_horizon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If time is extracted from objective integrals then collect integral boundaries.</span>
+<span class="sd">        :return: Union[Tuple, AnyPropertyNotFound]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Integral</span>
+        <span class="c1"># method 1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Integral</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AnyPropertyNotFound</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Time Horizon&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract linear differential equations from model.</span>
+<span class="sd">        :return: List[Eq]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># linear Differential equations in model</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">eq</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">diff_degree</span><span class="p">(</span><span class="n">deg</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract phase variables from model: functions which appears as arguments in Differential operators in transitions</span>
+<span class="sd">        :return: Union[List[Symbol], AnyPropertyNotFound]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Derivative</span>
+        <span class="n">derivas</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">Derivative</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">]]))</span>
+        <span class="n">phases</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">derivas</span><span class="p">]</span>
+        <span class="n">indicator</span> <span class="o">=</span> <span class="n">prod</span><span class="p">([(</span><span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">indicator</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">missing_var</span> <span class="o">=</span> <span class="n">iterable_substract</span><span class="p">(</span><span class="n">phases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+            <span class="n">missing_transition</span> <span class="o">=</span> <span class="n">iterable_substract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">,</span> <span class="n">phases</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">missing_var</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AnyPropertyNotFound</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="n">missing_var</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">missing_transition</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AnyPropertyNotFound</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="n">missing_transition</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">phases</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">external</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract exogenous functions, they must be substricted</span>
+<span class="sd">        :return: List[Symbol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ext</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="k">if</span> <span class="p">(</span><span class="n">is_substricted</span><span class="p">(</span><span class="n">ext</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_substricted</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract all controls: controls = functions - external - phases</span>
+<span class="sd">        :return: List[Symbol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">iterable_substract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phases</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">external</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">expr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        All expressions in model</span>
+<span class="sd">        :return: List[Expr]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inequations</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        All symbols in model</span>
+<span class="sd">        :return: List[Symbol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expressions with these types:</span>
+<span class="sd">            1. Differential degree == 0</span>
+<span class="sd">            2. Constant inequalities</span>
+<span class="sd">        :return: List[Expr]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Equality types (deg=0) and constant ineqs</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">diff_degree</span><span class="p">(</span><span class="n">deg</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constant_ineqs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constant inequalities: those which contains only functions in terminant (constant) values.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inequations</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Lagrangian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intergal part of L</span>
+<span class="sd">        :return: Expr</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Integral</span>
+        <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duals</span><span class="p">)</span> <span class="o">+</span> <span class="n">span</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]})</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Integral</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lagrangian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Terminant part of L</span>
+<span class="sd">        :return: Expr</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">span</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]})</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Kwargs, to re-init</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;objectives&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">,</span>
+            <span class="s1">&#39;inequations&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inequations</span><span class="p">,</span>
+            <span class="s1">&#39;equations&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span><span class="p">,</span>
+            <span class="s1">&#39;functions&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">,</span>
+            <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+            <span class="s1">&#39;dim_dict&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_dict</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args, to re-init</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inequations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_dict</span>
+
+    <span class="c1"># ECOMOD CORE SOFT</span>
+<div class="viewcode-block" id="AbstractAgent.euler_equations"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.euler_equations">[docs]</a>    <span class="k">def</span> <span class="nf">euler_equations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Euler Equations:</span>
+<span class="sd">        d/dt L_{x&#39;} = L_{x}</span>
+<span class="sd">        :return: List[Eq]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phases</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">euler_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.transversality_conditions"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.transversality_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">transversality_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transversality conditions:</span>
+<span class="sd">        L_{x&#39;}(t_i) = (-1)^i l_{x(t_i)}</span>
+<span class="sd">        :return: List[Eq]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phases</span><span class="p">:</span>
+            <span class="c1"># for all t_0, t_1</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transversality_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.control_optimality"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.control_optimality">[docs]</a>    <span class="k">def</span> <span class="nf">control_optimality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Control optimality conditions, using smoothness of L function wrt control variables</span>
+<span class="sd">        :return: List[Eq]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Eq</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Eq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lagrangian</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.KKT"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.KKT">[docs]</a>    <span class="k">def</span> <span class="nf">KKT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dual feasibility and Complementary slackness conditions</span>
+<span class="sd">        :return: List[Expr]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_duals</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">duals</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">eq2func</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">]}</span>
+        <span class="n">_lambdas</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">rhs</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="n">KKT_mask</span><span class="p">(</span><span class="n">_duals</span><span class="p">)</span> <span class="o">+</span> <span class="n">KKT_mask</span><span class="p">(</span><span class="n">_lambdas</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.diff_degree"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.diff_degree">[docs]</a>    <span class="k">def</span> <span class="nf">diff_degree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all expr with Derivative degree == deg.</span>
+<span class="sd">        :param deg: int. Derivative degree of returning equations</span>
+<span class="sd">        :return: Dict[Expr-&gt;deg] if None else Dict[Expr-&gt;`deg`]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">eq</span><span class="p">]</span> <span class="o">=</span> <span class="n">deriv_degree</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+        <span class="c1"># casting values to int</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ret</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="n">deg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">eq</span> <span class="k">for</span> <span class="n">eq</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ret</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="n">deg</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">deg</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.read_from_tex"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.read_from_tex">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@log</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Parsing new agent file.&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_from_tex</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Contructor from .tex files. See Knowledge base to get guidelines.</span>
+<span class="sd">        :param f: filename or fd</span>
+<span class="sd">        :return: Agent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+        <span class="n">header</span><span class="p">,</span> <span class="n">raw_model</span> <span class="o">=</span> <span class="n">read_model_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ecomodify</span><span class="p">(</span><span class="n">raw_model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.process"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.process">[docs]</a>    <span class="nd">@log</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Agent ready for economic processing&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_validation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process model to be used in core methods.</span>
+<span class="sd">        :param skip_validation: bool -- If True validation process will be skipped</span>
+<span class="sd">        :return: Union[None, AnyError]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_validation</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generate_duals</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.compress"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.compress">[docs]</a>    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_tex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param to_tex: bool. If True -- .tex file will be generated</span>
+<span class="sd">        :param headers: If True -- .tex file will contain headers</span>
+<span class="sd">        :return: Union[None, RenderedJinjaTemplate]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;PHASES&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span> <span class="n">to_str</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># because we render in one line</span>
+            <span class="s2">&quot;CONTROLS&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">,</span> <span class="n">to_str</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># same</span>
+            <span class="s2">&quot;INFOS&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external</span><span class="p">,</span> <span class="n">to_str</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># same</span>
+            <span class="s2">&quot;EULERS&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">euler_equations</span><span class="p">()),</span>
+            <span class="s2">&quot;OPTIMAS&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_optimality</span><span class="p">()),</span>
+            <span class="s2">&quot;TRANSVERS&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">()),</span>
+            <span class="s2">&quot;KKT&quot;</span><span class="p">:</span> <span class="n">latexify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KKT</span><span class="p">())</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">to_tex</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">engine</span> <span class="o">=</span> <span class="n">AgentTemplateEngine</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">headers</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">engine</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">engine</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{document}</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{document}</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AbstractAgent.dump"><a class="viewcode-back" href="../../core.html#core.agent.AbstractAgent.dump">[docs]</a>    <span class="nd">@log</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Dumping agent file&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create .tex and PDF files with Agent optimal conditions.</span>
+<span class="sd">        :param destination: filepath or fd.</span>
+<span class="sd">        :return: PDF, .tex files saved in `destination`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">destination</span><span class="p">:</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">AgentTemplateEngine</span><span class="p">()</span>
+        <span class="n">engine</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">())</span>
+        <span class="n">tex_directorypath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">tex_filepath</span> <span class="o">=</span> <span class="p">(</span><span class="n">tex_directorypath</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.tex&#39;</span><span class="p">)</span>
+        <span class="n">engine</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">tex_filepath</span><span class="p">)</span>
+        <span class="n">exec_tex</span><span class="p">(</span><span class="n">tex_filepath</span><span class="p">,</span> <span class="n">tex_directorypath</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LinkedAgent"><a class="viewcode-back" href="../../core.html#core.agent.LinkedAgent">[docs]</a><span class="k">class</span> <span class="nc">LinkedAgent</span><span class="p">(</span><span class="n">AbstractAgent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Methods:</span>
+<span class="sd">        Constructors:</span>
+<span class="sd">            1. __init__</span>
+<span class="sd">                Basic contructor</span>
+<span class="sd">            2. from_abstract</span>
+<span class="sd">                Init LinkedAgent from Agent instance</span>
+<span class="sd">        Private:</span>
+<span class="sd">            1. __merge_prepare</span>
+<span class="sd">                Use Agent model output to gain tagged Agent model output.</span>
+<span class="sd">        Public:</span>
+<span class="sd">            1. add_flow</span>
+<span class="sd">            2. delete_flow</span>
+<span class="sd">            3. print_flows</span>
+
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">emitent</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__merge_prepare</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__merge_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method to tag all agent variables with agent name. All core methods are inherited from parent class.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># gaining tagged system</span>
+        <span class="n">merge_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">symb</span><span class="p">:</span> <span class="n">add_subscript</span><span class="p">(</span><span class="n">symb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">symb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phases</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">}</span>
+        <span class="n">merge_map_t0</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span> <span class="n">add_subscript</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">}</span>
+        <span class="n">merge_map_t1</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="n">add_subscript</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">}</span>
+        <span class="n">merge_map</span> <span class="o">=</span> <span class="n">merge_map</span> <span class="o">|</span> <span class="n">merge_map_t0</span> <span class="o">|</span> <span class="n">merge_map_t1</span>
+        <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span>
+                <span class="n">new_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">expr</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">merge_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinkedAgent.add_flow"><a class="viewcode-back" href="../../core.html#core.agent.LinkedAgent.add_flow">[docs]</a>    <span class="k">def</span> <span class="nf">add_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flow</span><span class="o">.</span><span class="n">receiver</span> <span class="o">!=</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">flow</span><span class="o">.</span><span class="n">producer</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This flow do not affect this agent&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinkedAgent.delete_flow"><a class="viewcode-back" href="../../core.html#core.agent.LinkedAgent.delete_flow">[docs]</a>    <span class="k">def</span> <span class="nf">delete_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoSuchFlow</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span> <span class="n">agent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinkedAgent.print_flows"><a class="viewcode-back" href="../../core.html#core.agent.LinkedAgent.print_flows">[docs]</a>    <span class="k">def</span> <span class="nf">print_flows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">flow</span><span class="si">}</span><span class="s1">]&#39;</span> <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="LinkedAgent.from_abstract"><a class="viewcode-back" href="../../core.html#core.agent.LinkedAgent.from_abstract">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_abstract</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">AbstractAgent</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">kwargs</span>
+        <span class="k">return</span> <span class="n">LinkedAgent</span><span class="p">(</span><span class="o">*</span><span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="create_empty_agents"><a class="viewcode-back" href="../../core.html#core.agent.create_empty_agents">[docs]</a><span class="k">def</span> <span class="nf">create_empty_agents</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">AbstractAgent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Additional function to provide test cases in `scenarios/debug_scenarios.py`</span>
+<span class="sd">    :param names: Agent tags separated by space ` `.</span>
+<span class="sd">    :param cls: Default=AbstractAgent. Class for returned agents.</span>
+<span class="sd">    :return: List[Union[AbstractAgent, LinkedAgent]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">cls</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../core.html#core.agent.main">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;../inputs/agent.tex&#39;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rub&#39;</span><span class="p">))</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;tv&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__class__</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">euler_equations</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">control_optimality</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">KKT</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">print_flows</span><span class="p">())</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ChainedGenius.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

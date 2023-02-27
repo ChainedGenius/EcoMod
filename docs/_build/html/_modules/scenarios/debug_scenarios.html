@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scenarios.debug_scenarios &mdash; ECOMOD 2.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> ECOMOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ECOMOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scenarios.debug_scenarios</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scenarios.debug_scenarios</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">core.agent</span> <span class="kn">import</span> <span class="n">LinkedAgent</span><span class="p">,</span> <span class="n">create_empty_agents</span>
+<span class="kn">from</span> <span class="nn">core.market</span> <span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Market</span><span class="p">,</span> <span class="n">Balances</span>
+<span class="kn">from</span> <span class="nn">core.model</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">core.utils</span> <span class="kn">import</span> <span class="n">timeit</span>
+
+
+<div class="viewcode-block" id="simple_agent"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.simple_agent">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">simple_agent</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Function</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/H.tex&#39;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">skip_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">phases</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">phases</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">time</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="simple_linked_agents"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.simple_linked_agents">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">simple_linked_agents</span><span class="p">():</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;../inputs/agent.tex&#39;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;rub&#39;</span><span class="p">))</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;tv&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__class__</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">lagrangian</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">euler_equations</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">transversality_conditions</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">control_optimality</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">KKT</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">print_flows</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="simple_model_viz"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.simple_model_viz">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">simple_model_viz</span><span class="p">():</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/agent.tex&#39;</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/agent2.tex&#39;</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;agent3&#39;</span><span class="p">))</span>
+    <span class="n">a4</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">from_abstract</span><span class="p">(</span><span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;agent4&#39;</span><span class="p">))</span>
+    <span class="n">flow1</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;rub&#39;</span><span class="p">)</span>
+    <span class="n">flow2</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;tv&#39;</span><span class="p">)</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">flow1</span><span class="p">)</span>
+    <span class="n">a2</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">flow2</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">])</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="s1">&#39;test.png&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="agent_dump"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.agent_dump">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">agent_dump</span><span class="p">():</span>
+    <span class="c1"># broken scenario</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        raise TemplateNotFound(template)</span>
+<span class="sd">        jinja2.exceptions.TemplateNotFound: LAgent.tex</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/agent.tex&#39;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;../models/outputs/Amodel&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="p_model"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.p_model">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">p_model</span><span class="p">():</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/H.tex&#39;</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">H</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">skip_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="n">f2</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/P.tex&#39;</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+    <span class="n">P</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">skip_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="p_model_dump"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.p_model_dump">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">p_model_dump</span><span class="p">():</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/H.tex&#39;</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">H</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+
+    <span class="n">f2</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/P.tex&#39;</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+    <span class="n">P</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">Balances</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="s1">&#39;../models/inputs/Pmodel/flows.tex&#39;</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="s1">&#39;Pmodel&#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">])</span>
+    <span class="n">M</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">M</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;../models/outputs/Pmodel&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="model_viz"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.model_viz">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">model_viz</span><span class="p">():</span>
+    <span class="c1"># no real ecomod models</span>
+    <span class="c1"># only viz scenario</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;A B C D E&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">LinkedAgent</span><span class="p">)</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">f3</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">f4</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">f3</span><span class="p">)</span>
+    <span class="n">D</span><span class="o">.</span><span class="n">add_flow</span><span class="p">(</span><span class="n">f4</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="s1">&#39;viz&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">])</span>
+    <span class="n">M</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="s1">&#39;../models/outputs/Pmodel&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pgmodel"><a class="viewcode-back" href="../../scenarios.html#scenarios.debug_scenarios.pgmodel">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">pgmodel</span><span class="p">():</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/H.tex&#39;</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+    <span class="n">H</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">skip_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">f2</span> <span class="o">=</span> <span class="s1">&#39;../models/inputs/Pmodel/P.tex&#39;</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">LinkedAgent</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+    <span class="n">P</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">skip_validation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">create_empty_agents</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">LinkedAgent</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">Balances</span><span class="o">.</span><span class="n">read_from_tex</span><span class="p">(</span><span class="s1">&#39;../models/inputs/Pmodel/flows.tex&#39;</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="s1">&#39;Pmodel&#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">])</span>
+    <span class="n">M</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+    <span class="n">M</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;../models/outputs/Pmodel&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">p_model_dump</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ChainedGenius.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

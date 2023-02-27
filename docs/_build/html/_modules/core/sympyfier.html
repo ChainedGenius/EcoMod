@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core.sympyfier &mdash; ECOMOD 2.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> ECOMOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ECOMOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">core.sympyfier</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for core.sympyfier</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Symbol</span><span class="p">,</span> <span class="n">Number</span><span class="p">,</span> <span class="n">sympify</span> <span class="k">as</span> <span class="n">real_sympify</span>
+<span class="kn">from</span> <span class="nn">sympy.core.relational</span> <span class="kn">import</span> <span class="n">Relational</span><span class="p">,</span> <span class="n">Eq</span>
+<span class="kn">from</span> <span class="nn">sympy.parsing.latex</span> <span class="kn">import</span> <span class="n">parse_latex</span>
+<span class="kn">from</span> <span class="nn">sympy.parsing.latex.errors</span> <span class="kn">import</span> <span class="n">LaTeXParsingError</span>
+
+<span class="kn">from</span> <span class="nn">core.datamodel</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Phase</span>
+<span class="kn">from</span> <span class="nn">core.ecomod_utils</span> <span class="kn">import</span> <span class="n">spec_funcs</span><span class="p">,</span> <span class="n">is_spec_function</span>
+<span class="kn">from</span> <span class="nn">core.errors.RWErrors</span> <span class="kn">import</span> <span class="n">NonSympyfiableError</span><span class="p">,</span> <span class="n">VariableAmbiguity</span><span class="p">,</span> <span class="n">ExtraVariableError</span><span class="p">,</span> <span class="n">DimensionInExpression</span>
+<span class="kn">from</span> <span class="nn">core.utils</span> <span class="kn">import</span> <span class="n">extract_dim_desc</span><span class="p">,</span> <span class="n">set_equality</span><span class="p">,</span> <span class="n">find_objective_markers</span><span class="p">,</span> <span class="n">iterable_substract</span>
+
+
+<span class="k">def</span> <span class="nf">_xsympify</span><span class="p">(</span><span class="n">raw_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param raw_str: raw sympy string</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">decoded</span> <span class="o">=</span> <span class="n">parse_latex</span><span class="p">(</span><span class="n">raw_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decoded</span>
+
+
+<div class="viewcode-block" id="sympify"><a class="viewcode-back" href="../../core.html#core.sympyfier.sympify">[docs]</a><span class="k">def</span> <span class="nf">sympify</span><span class="p">(</span><span class="n">raw_obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transfer data to internal representation. see `datamodel` module.</span>
+<span class="sd">    :param raw_obj: str -- string representation of Value expression in YAML</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_latex</span> <span class="o">=</span> <span class="n">raw_obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">is_objective</span> <span class="o">=</span> <span class="n">find_objective_markers</span><span class="p">(</span><span class="n">raw_obj</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">is_objective</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">raw_latex</span> <span class="o">=</span> <span class="n">is_objective</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">_xsympify</span><span class="p">(</span><span class="n">raw_latex</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">LaTeXParsingError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NonSympyfiableError</span><span class="p">(</span><span class="n">err</span><span class="o">=</span><span class="n">raw_obj</span><span class="p">)</span>
+    <span class="n">dim</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">extract_dim_desc</span><span class="p">(</span><span class="n">raw_obj</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">decoded</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="c1"># case if not Symbol</span>
+        <span class="k">if</span> <span class="n">decoded</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">==</span> <span class="n">raw_latex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="c1"># case if Function</span>
+            <span class="c1"># decoded = Phase(decoded.name, *decoded.args, dim=dim, desc=desc)</span>
+            <span class="n">decoded</span> <span class="o">=</span> <span class="n">Phase</span><span class="p">(</span><span class="n">decoded</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="o">*</span><span class="n">decoded</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="c1"># decoded.dim = dim</span>
+            <span class="c1"># decoded.desc = desc</span>
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">decoded</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Relational</span><span class="p">):</span>
+            <span class="c1"># case if Relation</span>
+            <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NonSympyfiableError</span><span class="p">(</span><span class="n">err</span><span class="o">=</span><span class="n">decoded</span><span class="o">.</span><span class="fm">__str__</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># case if Symbol</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">decoded</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">decoded</span><span class="p">,</span> <span class="n">is_objective</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ecomodify"><a class="viewcode-back" href="../../core.html#core.sympyfier.ecomodify">[docs]</a><span class="k">def</span> <span class="nf">ecomodify</span><span class="p">(</span><span class="n">raw_model</span><span class="p">,</span> <span class="n">xreplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transfer raw model from .tex file to input of AbstractAgent.</span>
+<span class="sd">    :param raw_model:</span>
+<span class="sd">    :param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.</span>
+<span class="sd">    :return: List[*AbstractAgent.args]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">dim_dictify</span><span class="p">(</span><span class="n">_raw_model</span><span class="p">):</span>
+        <span class="c1"># not real python dict: list of tuples</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">real_sympify</span><span class="p">(</span><span class="n">extract_dim_desc</span><span class="p">(</span><span class="n">v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">if</span> <span class="n">extract_dim_desc</span><span class="p">(</span><span class="n">v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+                <span class="n">_raw_model</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="k">def</span> <span class="nf">sorter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">objecti</span><span class="p">):</span>
+        <span class="nb">object</span><span class="p">,</span> <span class="n">is_objective</span> <span class="o">=</span> <span class="n">objecti</span>
+        <span class="k">if</span> <span class="n">is_objective</span><span class="p">:</span>
+            <span class="n">o</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">object</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="n">Parameter</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Function</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Eq</span><span class="p">):</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Relational</span><span class="p">):</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">o</span>
+
+    <span class="k">def</span> <span class="nf">find_analog</span><span class="p">(</span><span class="n">var1</span><span class="p">,</span> <span class="n">evars</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param var1: true sympy variables</span>
+<span class="sd">        :param evars: set of real ecomod variables</span>
+<span class="sd">        :return: analog in evars| var1.name = evars.name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">evars</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">var1</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="n">args_converted</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_analog</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">evars</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">args_converted</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">var1</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args_converted</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">var1</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">var1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="n">args_converted</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_analog</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">evars</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">args_converted</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args_converted</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">var1</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">VariableAmbiguity</span><span class="p">(</span><span class="n">var1</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">var2</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">VariableAmbiguity</span><span class="p">(</span><span class="n">var1</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">var2</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">inequations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">equations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">functions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">objectives</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dim_dict</span> <span class="o">=</span> <span class="n">dim_dictify</span><span class="p">(</span><span class="n">raw_model</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">raw_model</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">objectives</span> <span class="o">=</span> <span class="n">sorter</span><span class="p">(</span><span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span>
+                                                                       <span class="n">objectives</span><span class="p">,</span> <span class="n">sympify</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+    <span class="c1"># free_symbols soft checking</span>
+    <span class="c1"># used = []</span>
+    <span class="c1"># used_old = []</span>
+    <span class="c1"># for eq in equations:</span>
+    <span class="c1">#     used_old.extend(eq.atoms(sympy.Symbol))</span>
+    <span class="c1">#     used_old.extend(eq.atoms(sympy.Function))</span>
+    <span class="c1">#     for fs in eq.free_symbols.union(eq.find(Function)):</span>
+    <span class="c1">#         buf = find_analog(fs, functions + params)</span>
+    <span class="c1">#         eq = eq.replace(fs, buf)</span>
+    <span class="c1">#     used.extend(eq.atoms(sympy.Symbol))</span>
+    <span class="c1">#     used.extend(eq.atoms(sympy.Function))</span>
+    <span class="c1"># print(list(set(used_old)))</span>
+    <span class="c1"># print(list(set(used)))</span>
+    <span class="c1"># print(functions + params)</span>
+    <span class="k">if</span> <span class="n">xreplace</span><span class="p">:</span>
+        <span class="n">fs_all</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">eq</span><span class="o">.</span><span class="n">free_symbols</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">eq</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Function</span><span class="p">)])</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span>
+                             <span class="n">equations</span> <span class="o">+</span> <span class="n">inequations</span> <span class="o">+</span> <span class="n">objectives</span><span class="p">]))</span>
+        <span class="n">fs_all_new</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_analog</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">functions</span> <span class="o">+</span> <span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">fs_all</span><span class="p">]</span>
+        <span class="n">fs_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">fs</span><span class="p">:</span> <span class="n">find_analog</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">functions</span> <span class="o">+</span> <span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">fs</span> <span class="ow">in</span> <span class="n">fs_all</span><span class="p">}</span>
+        <span class="c1"># print(fs_all_new)</span>
+        <span class="c1"># test1 = set(chain(*[v.args for v in fs_all_new]))</span>
+        <span class="c1"># for i in test1:</span>
+        <span class="c1">#     if i.args:</span>
+        <span class="c1">#         print(i.args[0].__class__,i.__class__,i.args)</span>
+
+        <span class="c1"># xreplacing</span>
+
+        <span class="n">functions</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">fs_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">fs_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">]</span>
+        <span class="n">equations</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">fs_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">equations</span><span class="p">]</span>
+        <span class="n">inequations</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">fs_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inequations</span><span class="p">]</span>
+        <span class="n">objectives</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">fs_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">]</span>
+        <span class="c1"># v0 hack</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dim_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">fs_map</span><span class="p">[</span><span class="n">parse_latex</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])]:</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dim_dict</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DimensionInExpression</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">exc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dim_dict</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dim_dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">dim_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># functions = [f.subs(fs_map) for f in functions]</span>
+        <span class="c1"># params = [p.subs(fs_map) for p in params]</span>
+        <span class="c1"># equations = [e.subs(fs_map) for e in equations]</span>
+        <span class="c1"># inequations = [i.subs(fs_map) for i in inequations]</span>
+        <span class="c1"># objectives = [o.subs(fs_map) for o in objectives]</span>
+
+    <span class="k">return</span> <span class="n">objectives</span><span class="p">,</span> <span class="n">inequations</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">dim_dict</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ChainedGenius.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

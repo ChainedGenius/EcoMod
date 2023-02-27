@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core package &mdash; ECOMOD 2.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> ECOMOD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">core package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-core.agent">core.agent module</a><ul>
+<li><a class="reference internal" href="#core.agent.AbstractAgent"><code class="docutils literal notranslate"><span class="pre">AbstractAgent</span></code></a><ul>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.KKT"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.KKT()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.Lagrangian"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.Lagrangian</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.args"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.args</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.boundaries"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.boundaries</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.compress"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.compress()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.constant_ineqs"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.constant_ineqs</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.control_optimality"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.control_optimality()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.controls"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.controls</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.diff_degree"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.diff_degree()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.dump"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.dump()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.emitent"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.emitent</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.euler_equations"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.euler_equations()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.expr"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.expr</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.external"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.external</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.kwargs"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.kwargs</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.lagrangian"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.lagrangian</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.phases"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.phases</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.process"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.process()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.read_from_tex"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.read_from_tex()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.time"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.time</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.time_horizon"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.time_horizon</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.transitions"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.transitions</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.transversality_conditions"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.transversality_conditions()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AbstractAgent.variables"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.variables</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.agent.AgentValidator"><code class="docutils literal notranslate"><span class="pre">AgentValidator</span></code></a><ul>
+<li><a class="reference internal" href="#core.agent.AgentValidator.emitent"><code class="docutils literal notranslate"><span class="pre">AgentValidator.emitent</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.AgentValidator.validate"><code class="docutils literal notranslate"><span class="pre">AgentValidator.validate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.agent.LinkedAgent"><code class="docutils literal notranslate"><span class="pre">LinkedAgent</span></code></a><ul>
+<li><a class="reference internal" href="#core.agent.LinkedAgent.add_flow"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.add_flow()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.LinkedAgent.delete_flow"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.delete_flow()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.LinkedAgent.emitent"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.emitent</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.LinkedAgent.from_abstract"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.from_abstract()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.LinkedAgent.print_flows"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.print_flows()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.agent.create_empty_agents"><code class="docutils literal notranslate"><span class="pre">create_empty_agents()</span></code></a></li>
+<li><a class="reference internal" href="#core.agent.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.datamodel">core.datamodel module</a><ul>
+<li><a class="reference internal" href="#core.datamodel.Boundary"><code class="docutils literal notranslate"><span class="pre">Boundary</span></code></a></li>
+<li><a class="reference internal" href="#core.datamodel.Parameter"><code class="docutils literal notranslate"><span class="pre">Parameter</span></code></a><ul>
+<li><a class="reference internal" href="#core.datamodel.Parameter.default_assumptions"><code class="docutils literal notranslate"><span class="pre">Parameter.default_assumptions</span></code></a></li>
+<li><a class="reference internal" href="#core.datamodel.Parameter.name"><code class="docutils literal notranslate"><span class="pre">Parameter.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.datamodel.Phase"><code class="docutils literal notranslate"><span class="pre">Phase</span></code></a><ul>
+<li><a class="reference internal" href="#core.datamodel.Phase.default_assumptions"><code class="docutils literal notranslate"><span class="pre">Phase.default_assumptions</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.deserialiser">core.deserialiser module</a><ul>
+<li><a class="reference internal" href="#core.deserialiser.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#core.deserialiser.parse_yaml"><code class="docutils literal notranslate"><span class="pre">parse_yaml()</span></code></a></li>
+<li><a class="reference internal" href="#core.deserialiser.read_model_from_tex"><code class="docutils literal notranslate"><span class="pre">read_model_from_tex()</span></code></a></li>
+<li><a class="reference internal" href="#core.deserialiser.read_tex"><code class="docutils literal notranslate"><span class="pre">read_tex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.ecomod_utils">core.ecomod_utils module</a><ul>
+<li><a class="reference internal" href="#core.ecomod_utils.KKT_mask"><code class="docutils literal notranslate"><span class="pre">KKT_mask()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.add_subscript"><code class="docutils literal notranslate"><span class="pre">add_subscript()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.deriv_degree"><code class="docutils literal notranslate"><span class="pre">deriv_degree()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.eq2func"><code class="docutils literal notranslate"><span class="pre">eq2func()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.euler_mask"><code class="docutils literal notranslate"><span class="pre">euler_mask()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.generate_symbols"><code class="docutils literal notranslate"><span class="pre">generate_symbols()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.is_spec_function"><code class="docutils literal notranslate"><span class="pre">is_spec_function()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.is_substricted"><code class="docutils literal notranslate"><span class="pre">is_substricted()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.latexify"><code class="docutils literal notranslate"><span class="pre">latexify()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.pi_theorem"><code class="docutils literal notranslate"><span class="pre">pi_theorem()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.remove_subscript"><code class="docutils literal notranslate"><span class="pre">remove_subscript()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.spec_funcs"><code class="docutils literal notranslate"><span class="pre">spec_funcs()</span></code></a></li>
+<li><a class="reference internal" href="#core.ecomod_utils.transversality_mask"><code class="docutils literal notranslate"><span class="pre">transversality_mask()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.logger">core.logger module</a><ul>
+<li><a class="reference internal" href="#core.logger.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.market">core.market module</a><ul>
+<li><a class="reference internal" href="#core.market.Balances"><code class="docutils literal notranslate"><span class="pre">Balances</span></code></a><ul>
+<li><a class="reference internal" href="#core.market.Balances.atoms"><code class="docutils literal notranslate"><span class="pre">Balances.atoms()</span></code></a></li>
+<li><a class="reference internal" href="#core.market.Balances.compress"><code class="docutils literal notranslate"><span class="pre">Balances.compress()</span></code></a></li>
+<li><a class="reference internal" href="#core.market.Balances.process"><code class="docutils literal notranslate"><span class="pre">Balances.process()</span></code></a></li>
+<li><a class="reference internal" href="#core.market.Balances.read_from_tex"><code class="docutils literal notranslate"><span class="pre">Balances.read_from_tex()</span></code></a></li>
+<li><a class="reference internal" href="#core.market.Balances.validate"><code class="docutils literal notranslate"><span class="pre">Balances.validate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.market.Flow"><code class="docutils literal notranslate"><span class="pre">Flow</span></code></a><ul>
+<li><a class="reference internal" href="#core.market.Flow.invert"><code class="docutils literal notranslate"><span class="pre">Flow.invert()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.market.Market"><code class="docutils literal notranslate"><span class="pre">Market</span></code></a></li>
+<li><a class="reference internal" href="#core.market.MarketValidator"><code class="docutils literal notranslate"><span class="pre">MarketValidator</span></code></a><ul>
+<li><a class="reference internal" href="#core.market.MarketValidator.validate_market"><code class="docutils literal notranslate"><span class="pre">MarketValidator.validate_market()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.model">core.model module</a><ul>
+<li><a class="reference internal" href="#core.model.AgentMerger"><code class="docutils literal notranslate"><span class="pre">AgentMerger</span></code></a><ul>
+<li><a class="reference internal" href="#core.model.AgentMerger.merge"><code class="docutils literal notranslate"><span class="pre">AgentMerger.merge()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.model.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li><a class="reference internal" href="#core.model.Model.add_agent"><code class="docutils literal notranslate"><span class="pre">Model.add_agent()</span></code></a></li>
+<li><a class="reference internal" href="#core.model.Model.dump"><code class="docutils literal notranslate"><span class="pre">Model.dump()</span></code></a></li>
+<li><a class="reference internal" href="#core.model.Model.process"><code class="docutils literal notranslate"><span class="pre">Model.process()</span></code></a></li>
+<li><a class="reference internal" href="#core.model.Model.visualize"><code class="docutils literal notranslate"><span class="pre">Model.visualize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.model.ModelValidator"><code class="docutils literal notranslate"><span class="pre">ModelValidator</span></code></a><ul>
+<li><a class="reference internal" href="#core.model.ModelValidator.validate"><code class="docutils literal notranslate"><span class="pre">ModelValidator.validate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.pprint">core.pprint module</a><ul>
+<li><a class="reference internal" href="#core.pprint.AgentTemplateEngine"><code class="docutils literal notranslate"><span class="pre">AgentTemplateEngine</span></code></a><ul>
+<li><a class="reference internal" href="#core.pprint.AgentTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">AgentTemplateEngine.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.pprint.ModelTemplateEngine"><code class="docutils literal notranslate"><span class="pre">ModelTemplateEngine</span></code></a><ul>
+<li><a class="reference internal" href="#core.pprint.ModelTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">ModelTemplateEngine.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.pprint.TexTemplateEngine"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine</span></code></a><ul>
+<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.dump"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.dump()</span></code></a></li>
+<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.get_template_variables"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.get_template_variables</span></code></a></li>
+<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.render"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.render()</span></code></a></li>
+<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.pprint.exec_tex"><code class="docutils literal notranslate"><span class="pre">exec_tex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.sympyfier">core.sympyfier module</a><ul>
+<li><a class="reference internal" href="#core.sympyfier.ecomodify"><code class="docutils literal notranslate"><span class="pre">ecomodify()</span></code></a></li>
+<li><a class="reference internal" href="#core.sympyfier.sympify"><code class="docutils literal notranslate"><span class="pre">sympify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.utils">core.utils module</a><ul>
+<li><a class="reference internal" href="#core.utils.dict_substract"><code class="docutils literal notranslate"><span class="pre">dict_substract()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.embrace"><code class="docutils literal notranslate"><span class="pre">embrace()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.extract_dim_desc"><code class="docutils literal notranslate"><span class="pre">extract_dim_desc()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.find_objective_markers"><code class="docutils literal notranslate"><span class="pre">find_objective_markers()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.iterable_substract"><code class="docutils literal notranslate"><span class="pre">iterable_substract()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.set_equality"><code class="docutils literal notranslate"><span class="pre">set_equality()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.trim"><code class="docutils literal notranslate"><span class="pre">trim()</span></code></a></li>
+<li><a class="reference internal" href="#core.utils.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ECOMOD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">core package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="core-package">
+<h1>core package<a class="headerlink" href="#core-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-core.agent">
+<span id="core-agent-module"></span><h2>core.agent module<a class="headerlink" href="#module-core.agent" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">AbstractAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inequations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.agent.AgentValidator" title="core.agent.AgentValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentValidator</span></code></a></p>
+<p>Core methods for Agent models.
+Methods:</p>
+<blockquote>
+<div><dl>
+<dt>Constructors:</dt><dd><ol class="arabic simple">
+<li><p>__init__: Init Agent from its parts: see method args.</p></li>
+<li><p>read_from_tex: Parse Agent model from .tex file written in YAML (json-like) format. See examples at <cite>/models/inputs/</cite>.</p></li>
+</ol>
+</dd>
+<dt>Private:</dt><dd><ol class="arabic simple">
+<li><p>__generate_duals: Generate dual variables and functions due to Lagrange principum.</p></li>
+</ol>
+</dd>
+<dt>Public:</dt><dd><dl>
+<dt>Additional:</dt><dd><p>1. Support system:
+Methods that helps system to understand which variables are phase, which are controls etc.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>time : extract time variable in agent model</p></li>
+<li><p>time_horizon : extract time horizon boundaries from integral part of objective functions</p></li>
+<li><p>transitions : extract first-order differential equations from all boundaries</p></li>
+<li><p>phases : extract phase variables from all functions</p></li>
+<li><p>external : extract exogenous constants from all functions</p></li>
+<li><p>controls : extract control variables from all functions</p></li>
+<li><p>variables : extract all model variable (not-functions)</p></li>
+<li><p>expr : extract all expressions (with objectives)</p></li>
+<li><p>boundaries : all equations and inequations (no differential equations)</p></li>
+<li><p>constant_ineqs : inequations with no terminal values</p></li>
+<li><p>diff_degree : Divide all expressions over differential equation degrees</p></li>
+<li><p>validate : provide Agent model validation from subclass</p></li>
+</ol>
+</div></blockquote>
+<p>2. Misc
+Basic class methods to provide comfort.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>args : Args to re-init</p></li>
+<li><p>kwargs : Kwargs to re-init</p></li>
+<li><p>process : Pre-process model to be used in core methods</p></li>
+<li><p>compress : Evaluate all Pontragin Principle conditions</p></li>
+<li><p>dump : Process model to PDF file with optimal conditions (Pontryagin Principle) [compress + dump]</p></li>
+</ol>
+</div></blockquote>
+<p>3. Core
+Methods that conduct Maximum Principle Conditions due to Lagrange principum.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Lagrangian : integral part of L</p></li>
+<li><p>lagrangian : termination part of L</p></li>
+<li><p>euler_equations : Euler-Lagrange equations</p></li>
+<li><p>transversality_conditions : Transversality conditions</p></li>
+<li><p>control_optimality : Control optimality conditions</p></li>
+<li><p>KKT: Dual-feasibility and Complementary Slackness conditions</p></li>
+</ol>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.KKT">
+<span class="sig-name descname"><span class="pre">KKT</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.KKT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.KKT" title="Permalink to this definition"></a></dt>
+<dd><p>Dual feasibility and Complementary slackness conditions
+:return: List[Expr]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.Lagrangian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Lagrangian</span></span><a class="headerlink" href="#core.agent.AbstractAgent.Lagrangian" title="Permalink to this definition"></a></dt>
+<dd><p>Intergal part of L
+:return: Expr</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.args">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#core.agent.AbstractAgent.args" title="Permalink to this definition"></a></dt>
+<dd><p>Args, to re-init
+:return:</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.boundaries">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boundaries</span></span><a class="headerlink" href="#core.agent.AbstractAgent.boundaries" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Expressions with these types:</dt><dd><ol class="arabic simple">
+<li><p>Differential degree == 0</p></li>
+<li><p>Constant inequalities</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List[Expr]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.compress">
+<span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_tex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.compress" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>to_tex</strong> – bool. If True – .tex file will be generated</p></li>
+<li><p><strong>headers</strong> – If True – .tex file will contain headers</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Union[None, RenderedJinjaTemplate]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.constant_ineqs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constant_ineqs</span></span><a class="headerlink" href="#core.agent.AbstractAgent.constant_ineqs" title="Permalink to this definition"></a></dt>
+<dd><p>Constant inequalities: those which contains only functions in terminant (constant) values.
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.control_optimality">
+<span class="sig-name descname"><span class="pre">control_optimality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.control_optimality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.control_optimality" title="Permalink to this definition"></a></dt>
+<dd><p>Control optimality conditions, using smoothness of L function wrt control variables
+:return: List[Eq]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.controls">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">controls</span></span><a class="headerlink" href="#core.agent.AbstractAgent.controls" title="Permalink to this definition"></a></dt>
+<dd><p>Extract all controls: controls = functions - external - phases
+:return: List[Symbol]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.diff_degree">
+<span class="sig-name descname"><span class="pre">diff_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.diff_degree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.diff_degree" title="Permalink to this definition"></a></dt>
+<dd><p>Returns all expr with Derivative degree == deg.
+:param deg: int. Derivative degree of returning equations
+:return: Dict[Expr-&gt;deg] if None else Dict[Expr-&gt;`deg`]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.dump" title="Permalink to this definition"></a></dt>
+<dd><p>Create .tex and PDF files with Agent optimal conditions.
+:param destination: filepath or fd.
+:return: PDF, .tex files saved in <cite>destination</cite></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.emitent">
+<span class="sig-name descname"><span class="pre">emitent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#core.agent.AbstractAgent.emitent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.euler_equations">
+<span class="sig-name descname"><span class="pre">euler_equations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.euler_equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.euler_equations" title="Permalink to this definition"></a></dt>
+<dd><p>Euler Equations:
+d/dt L_{x’} = L_{x}
+:return: List[Eq]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.expr">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">expr</span></span><a class="headerlink" href="#core.agent.AbstractAgent.expr" title="Permalink to this definition"></a></dt>
+<dd><p>All expressions in model
+:return: List[Expr]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.external">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">external</span></span><a class="headerlink" href="#core.agent.AbstractAgent.external" title="Permalink to this definition"></a></dt>
+<dd><p>Extract exogenous functions, they must be substricted
+:return: List[Symbol]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.kwargs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#core.agent.AbstractAgent.kwargs" title="Permalink to this definition"></a></dt>
+<dd><p>Kwargs, to re-init
+:return:</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.lagrangian">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagrangian</span></span><a class="headerlink" href="#core.agent.AbstractAgent.lagrangian" title="Permalink to this definition"></a></dt>
+<dd><p>Terminant part of L
+:return: Expr</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.phases">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phases</span></span><a class="headerlink" href="#core.agent.AbstractAgent.phases" title="Permalink to this definition"></a></dt>
+<dd><p>Extract phase variables from model: functions which appears as arguments in Differential operators in transitions
+:return: Union[List[Symbol], AnyPropertyNotFound]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.process" title="Permalink to this definition"></a></dt>
+<dd><p>Process model to be used in core methods.
+:param skip_validation: bool – If True validation process will be skipped
+:return: Union[None, AnyError]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.read_from_tex">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_from_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.read_from_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.read_from_tex" title="Permalink to this definition"></a></dt>
+<dd><p>Contructor from .tex files. See Knowledge base to get guidelines.
+:param f: filename or fd
+:return: Agent</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.agent.AbstractAgent.time" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Extract time variable from:</dt><dd><ol class="arabic simple">
+<li><p>Integral in objectives</p></li>
+<li><p>Differential variable in boundaries</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Time : Union[Symbol, TimeVariableNotFound]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.time_horizon">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_horizon</span></span><a class="headerlink" href="#core.agent.AbstractAgent.time_horizon" title="Permalink to this definition"></a></dt>
+<dd><p>If time is extracted from objective integrals then collect integral boundaries.
+:return: Union[Tuple, AnyPropertyNotFound]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.transitions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transitions</span></span><a class="headerlink" href="#core.agent.AbstractAgent.transitions" title="Permalink to this definition"></a></dt>
+<dd><p>Extract linear differential equations from model.
+:return: List[Eq]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.transversality_conditions">
+<span class="sig-name descname"><span class="pre">transversality_conditions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AbstractAgent.transversality_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AbstractAgent.transversality_conditions" title="Permalink to this definition"></a></dt>
+<dd><p>Transversality conditions:
+L_{x’}(t_i) = (-1)^i l_{x(t_i)}
+:return: List[Eq]</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.agent.AbstractAgent.variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variables</span></span><a class="headerlink" href="#core.agent.AbstractAgent.variables" title="Permalink to this definition"></a></dt>
+<dd><p>All symbols in model
+:return: List[Symbol]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.agent.AgentValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">AgentValidator</span></span><a class="reference internal" href="_modules/core/agent.html#AgentValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AgentValidator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Validation class for Agent class. Provides Agent validation and correction to be processed by ECOMOD Core.
+Methods:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Private:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>__dimension_check</dt><dd><p>Uses KV-storage gained from input Agent model with variables -&gt; dimensions to proceed
+Dimension check in Agent equations and inequations (expressions).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>__variable_completeness</dt><dd><p>Checks if there are no extra initialized Agent variables in model, which are unused in
+model Expressions and if there are uninitialized variables in model.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Open:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>validate</dt><dd><p>Provides full blackbox checks + emitent check</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Class variables:</dt><dd><p>emitent = None: bool
+Shows that this Validation process is for Simple Agents – with objective functional.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.agent.AgentValidator.emitent">
+<span class="sig-name descname"><span class="pre">emitent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.agent.AgentValidator.emitent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.AgentValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objectives</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inequations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#AgentValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.AgentValidator.validate" title="Permalink to this definition"></a></dt>
+<dd><p>See __variable_completeness and __dimension_check docstrings.
+:param objectives: Agent objectives functions
+:param inequations: Agent inequation boundaries
+:param equations: Agent equation boundaries
+:param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)
+:param params: Agent not-functional variables
+:param dim_dict: Union[List, Dict] – KV-storage: variable -&gt; dimension
+:return: Union[AnyError, NonSympyfiableError, ExtraVariableError, DimensionCheckingFailed]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">LinkedAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#LinkedAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.LinkedAgent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.agent.AbstractAgent" title="core.agent.AbstractAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAgent</span></code></a></p>
+<dl class="simple">
+<dt>Methods:</dt><dd><dl class="simple">
+<dt>Constructors:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>__init__</dt><dd><p>Basic contructor</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>from_abstract</dt><dd><p>Init LinkedAgent from Agent instance</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Private:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>__merge_prepare</dt><dd><p>Use Agent model output to gain tagged Agent model output.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Public:</dt><dd><ol class="arabic simple">
+<li><p>add_flow</p></li>
+<li><p>delete_flow</p></li>
+<li><p>print_flows</p></li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent.add_flow">
+<span class="sig-name descname"><span class="pre">add_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#core.market.Flow" title="core.market.Flow"><span class="pre">Flow</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#LinkedAgent.add_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.LinkedAgent.add_flow" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent.delete_flow">
+<span class="sig-name descname"><span class="pre">delete_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#core.market.Flow" title="core.market.Flow"><span class="pre">Flow</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#LinkedAgent.delete_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.LinkedAgent.delete_flow" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent.emitent">
+<span class="sig-name descname"><span class="pre">emitent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#core.agent.LinkedAgent.emitent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent.from_abstract">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_abstract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#core.agent.AbstractAgent" title="core.agent.AbstractAgent"><span class="pre">AbstractAgent</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#LinkedAgent.from_abstract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.LinkedAgent.from_abstract" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.agent.LinkedAgent.print_flows">
+<span class="sig-name descname"><span class="pre">print_flows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#LinkedAgent.print_flows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.LinkedAgent.print_flows" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.agent.create_empty_agents">
+<span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">create_empty_agents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls=&lt;class</span> <span class="pre">'core.agent.AbstractAgent'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#create_empty_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.create_empty_agents" title="Permalink to this definition"></a></dt>
+<dd><p>Additional function to provide test cases in <cite>scenarios/debug_scenarios.py</cite>
+:param names: Agent tags separated by space ` <a href="#id1"><span class="problematic" id="id2">`</span></a>.
+:param cls: Default=AbstractAgent. Class for returned agents.
+:return: List[Union[AbstractAgent, LinkedAgent]]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.agent.main">
+<span class="sig-prename descclassname"><span class="pre">core.agent.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/agent.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.agent.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-core.datamodel">
+<span id="core-datamodel-module"></span><h2>core.datamodel module<a class="headerlink" href="#module-core.datamodel" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.datamodel.Boundary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.datamodel.</span></span><span class="sig-name descname"><span class="pre">Boundary</span></span><a class="reference internal" href="_modules/core/datamodel.html#Boundary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.datamodel.Boundary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.datamodel.Parameter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.datamodel.</span></span><span class="sig-name descname"><span class="pre">Parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/datamodel.html#Parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.datamodel.Parameter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code></p>
+<p>Superclass for ECOMOD parameters. 1-1 with sympy.Symbol</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.datamodel.Parameter.default_assumptions">
+<span class="sig-name descname"><span class="pre">default_assumptions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.datamodel.Parameter.default_assumptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.datamodel.Parameter.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#core.datamodel.Parameter.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.datamodel.Phase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.datamodel.</span></span><span class="sig-name descname"><span class="pre">Phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/datamodel.html#Phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.datamodel.Phase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></p>
+<p>Superclass for ECOMOD parameters. 1-1 with sympy.Function</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.datamodel.Phase.default_assumptions">
+<span class="sig-name descname"><span class="pre">default_assumptions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#core.datamodel.Phase.default_assumptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.deserialiser">
+<span id="core-deserialiser-module"></span><h2>core.deserialiser module<a class="headerlink" href="#module-core.deserialiser" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.deserialiser.main">
+<span class="sig-prename descclassname"><span class="pre">core.deserialiser.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/deserialiser.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.deserialiser.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.deserialiser.parse_yaml">
+<span class="sig-prename descclassname"><span class="pre">core.deserialiser.</span></span><span class="sig-name descname"><span class="pre">parse_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/deserialiser.html#parse_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.deserialiser.parse_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Simple YAML decoder, to distinguish errors.
+:param stream: string value after reducing tex-header
+:return: dict: decoded yaml</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.deserialiser.read_model_from_tex">
+<span class="sig-prename descclassname"><span class="pre">core.deserialiser.</span></span><span class="sig-name descname"><span class="pre">read_model_from_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/deserialiser.html#read_model_from_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.deserialiser.read_model_from_tex" title="Permalink to this definition"></a></dt>
+<dd><p>Full blackbox model parsing from .tex file. Used as subfunction in Agent.read_from_tex
+:param f: filename or fd
+:return: .tex header and KV-storage (json-like) with raw model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.deserialiser.read_tex">
+<span class="sig-prename descclassname"><span class="pre">core.deserialiser.</span></span><span class="sig-name descname"><span class="pre">read_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/deserialiser.html#read_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.deserialiser.read_tex" title="Permalink to this definition"></a></dt>
+<dd><p>Read tex file and split to <cite>yamlable</cite> and header
+:param f: filename or fd
+:return: yaml parsable object + header</p>
+</dd></dl>
+
+</section>
+<section id="module-core.ecomod_utils">
+<span id="core-ecomod-utils-module"></span><h2>core.ecomod_utils module<a class="headerlink" href="#module-core.ecomod_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.KKT_mask">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">KKT_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dual</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#KKT_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.KKT_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Returns Dual Feasibility and Complementary Slackness for dual dict
+:param dual: Dict[Union[datamodel.Parameter, datamodel.Phase] –&gt; Expr]
+:return: List[Expr] = [K*V]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.add_subscript">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">add_subscript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#add_subscript"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.add_subscript" title="Permalink to this definition"></a></dt>
+<dd><p>Add subscript <cite>tag</cite> to symbol
+:param symb: Union[datamodel.Parameter, datamodel.Phase] - untagged
+:param tag: str
+:return: Union[datamodel.Parameter, datamodel.Phase] – tagged</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.deriv_degree">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">deriv_degree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#deriv_degree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.deriv_degree" title="Permalink to this definition"></a></dt>
+<dd><p>Returns maximum degree of differential operator inside <cite>bc</cite> expression.
+:param bc: Expr
+:return: int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.eq2func">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">eq2func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#eq2func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.eq2func" title="Permalink to this definition"></a></dt>
+<dd><p>Return Expr:= lhs - rhs from Eq
+:param eq: Eq to be transformed
+:return: Expr</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.euler_mask">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">euler_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#euler_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.euler_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Provide Euler-Lagrange equations for passed Lagrangian and variables [phase, time]
+:param L: Expr – Lagrangian
+:param x: datamodel.Phase – Phase variables
+:param t: datamodel.Parameter – Time variable
+:return: List[Expr]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.generate_symbols">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">generate_symbols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#generate_symbols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.generate_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Generate symbols function. Used for dual variables and parameters generation in Agent.process
+:param tag: str – Alias for generated symbols
+:param count: int – count of symbols
+:param cls: Class[Union[datamodel.Parameter, datamodel.Phase]]
+:return: Iter[Symbol]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.is_spec_function">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">is_spec_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#is_spec_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.is_spec_function" title="Permalink to this definition"></a></dt>
+<dd><p>Bool version of spec_funcs. Return true if func is listed in spec_funcs, otherwise else.
+:param func: function to be checked
+:return: bool</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.is_substricted">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">is_substricted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#is_substricted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.is_substricted" title="Permalink to this definition"></a></dt>
+<dd><p>Check if symbol is substricted with tag.
+:param symb: Union[datamodel.Parameter, datamodel.Phase]
+:param tag: Union[string, None]
+:return: bool</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.latexify">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">latexify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exprs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#latexify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.latexify" title="Permalink to this definition"></a></dt>
+<dd><p>Provide latex codesnippets to expressions. Can be returned as joined string or as List[str]
+:param exprs: List[Expr]
+:param to_str: bool
+:return: Union[List[Expr], str]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.pi_theorem">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">pi_theorem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#pi_theorem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.pi_theorem" title="Permalink to this definition"></a></dt>
+<dd><p>Deprecated method for dimension checking in equations.
+:param vars:
+:param eq:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.remove_subscript">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">remove_subscript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#remove_subscript"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.remove_subscript" title="Permalink to this definition"></a></dt>
+<dd><p>Firstly check if symbol is substricted, then if true remove !ANY! substricted.
+:param symb: Union[datamodel.Parameter, datamodel.Phase]
+:return: Union[datamodel.Parameter, datamodel.Phase] – unsubscripted.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.spec_funcs">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">spec_funcs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#spec_funcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.spec_funcs" title="Permalink to this definition"></a></dt>
+<dd><p>Set of special analytical functions in sympy. Used to dimension check of its args.
+:return: set</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.transversality_mask">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">transversality_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#transversality_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.transversality_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Transveraslity condition for agent optimal control problem
+:param L: Expr – Lagrangian
+:param x: datamodel.Phase – phase variable
+:param t: datamodel.Parameter – time variable
+:param l: Expr – termination lagrangian
+:param t0: datamodel.Parameter – time horizon[0]
+:param t1: datamodel.Parameter – time horizon[1]
+:return: List[Eq]</p>
+</dd></dl>
+
+</section>
+<section id="module-core.logger">
+<span id="core-logger-module"></span><h2>core.logger module<a class="headerlink" href="#module-core.logger" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.logger.log">
+<span class="sig-prename descclassname"><span class="pre">core.logger.</span></span><span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/logger.html#log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.logger.log" title="Permalink to this definition"></a></dt>
+<dd><p>Basic logger: logger as decorator.
+If any function needs to be decorated use &#64;log() decorator
+:param comment: LOG message before func exec
+:return: wrapped func</p>
+</dd></dl>
+
+</section>
+<section id="module-core.market">
+<span id="core-market-module"></span><h2>core.market module<a class="headerlink" href="#module-core.market" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.market.Balances">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.market.</span></span><span class="sig-name descname"><span class="pre">Balances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Balances.atoms">
+<span class="sig-name descname"><span class="pre">atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances.atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances.atoms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Balances.compress">
+<span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances.compress" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Balances.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances.process" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Balances.read_from_tex">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_from_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances.read_from_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances.read_from_tex" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Balances.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Balances.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Balances.validate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.market.Flow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.market.</span></span><span class="sig-name descname"><span class="pre">Flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">producer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Flow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Here we will contain parsing results from flows file?</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.Flow.invert">
+<span class="sig-name descname"><span class="pre">invert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Flow.invert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Flow.invert" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.market.Market">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.market.</span></span><span class="sig-name descname"><span class="pre">Market</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#Market"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.Market" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.market.MarketValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.market.</span></span><span class="sig-name descname"><span class="pre">MarketValidator</span></span><a class="reference internal" href="_modules/core/market.html#MarketValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.MarketValidator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.market.MarketValidator.validate_market">
+<span class="sig-name descname"><span class="pre">validate_market</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">markets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/market.html#MarketValidator.validate_market"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.market.MarketValidator.validate_market" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.model">
+<span id="core-model-module"></span><h2>core.model module<a class="headerlink" href="#module-core.model" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.AgentMerger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.</span></span><span class="sig-name descname"><span class="pre">AgentMerger</span></span><a class="reference internal" href="_modules/core/model.html#AgentMerger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.AgentMerger" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.AgentMerger.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lagents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#core.agent.AbstractAgent" title="core.agent.AbstractAgent"><span class="pre">AbstractAgent</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#AgentMerger.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.AgentMerger.merge" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#core.agent.LinkedAgent" title="core.agent.LinkedAgent"><span class="pre">LinkedAgent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.Model" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.model.ModelValidator" title="core.model.ModelValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelValidator</span></code></a></p>
+<p>Merged model with several agents and markets
+or
+agents and balances
+or
+agents and flows</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.Model.add_agent">
+<span class="sig-name descname"><span class="pre">add_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lagent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#core.agent.LinkedAgent" title="core.agent.LinkedAgent"><span class="pre">LinkedAgent</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#Model.add_agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.Model.add_agent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.Model.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#Model.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.Model.dump" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.Model.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#Model.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.Model.process" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.Model.visualize">
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#Model.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.Model.visualize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.model.ModelValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.model.</span></span><span class="sig-name descname"><span class="pre">ModelValidator</span></span><a class="reference internal" href="_modules/core/model.html#ModelValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.ModelValidator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.market.MarketValidator" title="core.market.MarketValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MarketValidator</span></code></a>, <a class="reference internal" href="#core.agent.AgentValidator" title="core.agent.AgentValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentValidator</span></code></a>, <a class="reference internal" href="#core.model.AgentMerger" title="core.model.AgentMerger"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentMerger</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.model.ModelValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">markets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/model.html#ModelValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.model.ModelValidator.validate" title="Permalink to this definition"></a></dt>
+<dd><p>See __variable_completeness and __dimension_check docstrings.
+:param objectives: Agent objectives functions
+:param inequations: Agent inequation boundaries
+:param equations: Agent equation boundaries
+:param functions: Agent phase variables, controls and exogenous constants (but those are functions of time)
+:param params: Agent not-functional variables
+:param dim_dict: Union[List, Dict] – KV-storage: variable -&gt; dimension
+:return: Union[AnyError, NonSympyfiableError, ExtraVariableError, DimensionCheckingFailed]</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.pprint">
+<span id="core-pprint-module"></span><h2>core.pprint module<a class="headerlink" href="#module-core.pprint" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.pprint.AgentTemplateEngine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">AgentTemplateEngine</span></span><a class="reference internal" href="_modules/core/pprint.html#AgentTemplateEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.AgentTemplateEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.pprint.TexTemplateEngine" title="core.pprint.TexTemplateEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">TexTemplateEngine</span></code></a></p>
+<p>Basic template for one-Agent model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.pprint.AgentTemplateEngine.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LAgent.tex'</span></em><a class="headerlink" href="#core.pprint.AgentTemplateEngine.template_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.pprint.ModelTemplateEngine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">ModelTemplateEngine</span></span><a class="reference internal" href="_modules/core/pprint.html#ModelTemplateEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.ModelTemplateEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.pprint.TexTemplateEngine" title="core.pprint.TexTemplateEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">TexTemplateEngine</span></code></a></p>
+<p>Template for multi-Agent model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.pprint.ModelTemplateEngine.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Model.tex'</span></em><a class="headerlink" href="#core.pprint.ModelTemplateEngine.template_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.pprint.TexTemplateEngine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">TexTemplateEngine</span></span><a class="reference internal" href="_modules/core/pprint.html#TexTemplateEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.TexTemplateEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Template engine to produce TeX and #PDF# file for Agent processed output.
+Methods:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><dl class="simple">
+<dt>get_template_variables</dt><dd><p>Parameters which are included in Template produced from <cite>self.template_name</cite></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>render</dt><dd><p>Template rendering process.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>dump</dt><dd><p>Write rendered template into file</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.pprint.TexTemplateEngine.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/pprint.html#TexTemplateEngine.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.TexTemplateEngine.dump" title="Permalink to this definition"></a></dt>
+<dd><p>Save .tex
+:param filename: filename or fd
+:return: None</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.pprint.TexTemplateEngine.get_template_variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_template_variables</span></span><a class="headerlink" href="#core.pprint.TexTemplateEngine.get_template_variables" title="Permalink to this definition"></a></dt>
+<dd><p>Get reserved variables from template, class_attr template_name
+:return: List[]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.pprint.TexTemplateEngine.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/pprint.html#TexTemplateEngine.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.TexTemplateEngine.render" title="Permalink to this definition"></a></dt>
+<dd><p>Render .tex template with given KV-storage <cite>data</cite>
+:param data: Dict[K -&gt; Render_value]
+:return: RenderedTemplate</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.pprint.TexTemplateEngine.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'basic.tex'</span></em><a class="headerlink" href="#core.pprint.TexTemplateEngine.template_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.pprint.exec_tex">
+<span class="sig-prename descclassname"><span class="pre">core.pprint.</span></span><span class="sig-name descname"><span class="pre">exec_tex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tex_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/pprint.html#exec_tex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.pprint.exec_tex" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Execute .tex file and produce PDF file.
+:param tex_filename: str – filename of source which be compilated
+:param destination: Path – destination of produced PDF
+:param open: bool – open</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ot open PDF after compilation</dt><dd><dl class="field-list simple">
+<dt class="field-odd">return</dt>
+<dd class="field-odd"><p>Union[PermissionError, RuntimeError]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-core.sympyfier">
+<span id="core-sympyfier-module"></span><h2>core.sympyfier module<a class="headerlink" href="#module-core.sympyfier" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.sympyfier.ecomodify">
+<span class="sig-prename descclassname"><span class="pre">core.sympyfier.</span></span><span class="sig-name descname"><span class="pre">ecomodify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xreplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/sympyfier.html#ecomodify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sympyfier.ecomodify" title="Permalink to this definition"></a></dt>
+<dd><p>Transfer raw model from .tex file to input of AbstractAgent.
+:param raw_model:
+:param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.
+:return: List[<a href="#id3"><span class="problematic" id="id4">*</span></a>AbstractAgent.args]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.sympyfier.sympify">
+<span class="sig-prename descclassname"><span class="pre">core.sympyfier.</span></span><span class="sig-name descname"><span class="pre">sympify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/sympyfier.html#sympify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sympyfier.sympify" title="Permalink to this definition"></a></dt>
+<dd><p>Transfer data to internal representation. see <cite>datamodel</cite> module.
+:param raw_obj: str – string representation of Value expression in YAML
+:return:</p>
+</dd></dl>
+
+</section>
+<section id="module-core.utils">
+<span id="core-utils-module"></span><h2>core.utils module<a class="headerlink" href="#module-core.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.dict_substract">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">dict_substract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#dict_substract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.dict_substract" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.embrace">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">embrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brackets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'()'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#embrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.embrace" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.extract_dim_desc">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">extract_dim_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_desc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#extract_dim_desc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.extract_dim_desc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.find_objective_markers">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">find_objective_markers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#find_objective_markers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.find_objective_markers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.iterable_substract">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">iterable_substract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#iterable_substract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.iterable_substract" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – </p></li>
+<li><p><strong>b</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a - b</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.set_equality">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">set_equality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#set_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.set_equality" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.timeit">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">timeit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#timeit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.timeit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.trim">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.trim" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – input string</p></li>
+<li><p><strong>i</strong> – start</p></li>
+<li><p><strong>j</strong> – end</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>substring s[i:j]. by default trimming from start and end 1 symbol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.utils.unpack">
+<span class="sig-prename descclassname"><span class="pre">core.utils.</span></span><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#unpack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.utils.unpack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ChainedGenius.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
