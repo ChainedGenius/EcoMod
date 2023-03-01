@@ -5,7 +5,7 @@ from numpy import prod
 
 from core.deserialiser import read_model_from_tex
 from core.ecomod_utils import deriv_degree, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function
+    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function, span_dict
 from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed, ExtraVariableError, ObjectiveFunctionNotFound, NonSympyfiableError, NoSuchFlow
 from core.logger import log
@@ -424,7 +424,7 @@ class AbstractAgent(AgentValidator):
         :return: Expr
         """
         from sympy import Integral
-        return span(self.duals) + span(
+        return span_dict(self.duals) + span_dict(
             {k: v for k, v in self.lambdas.items() if k in [i.args[1] for i in self.objectives]}).replace(
             lambda x: isinstance(x, Integral), lambda x: x.args[0])
 
@@ -434,7 +434,7 @@ class AbstractAgent(AgentValidator):
         Terminant part of L
         :return: Expr
         """
-        return span({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
+        return span_dict({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
 
     @property
     def kwargs(self):
