@@ -36,8 +36,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">EcoMod</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -70,7 +73,7 @@
 
 <span class="kn">from</span> <span class="nn">core.deserialiser</span> <span class="kn">import</span> <span class="n">read_model_from_tex</span>
 <span class="kn">from</span> <span class="nn">core.ecomod_utils</span> <span class="kn">import</span> <span class="n">deriv_degree</span><span class="p">,</span> <span class="n">spec_funcs</span><span class="p">,</span> <span class="n">generate_symbols</span><span class="p">,</span> <span class="n">span</span><span class="p">,</span> <span class="n">eq2func</span><span class="p">,</span> <span class="n">euler_mask</span><span class="p">,</span> \
-    <span class="n">transversality_mask</span><span class="p">,</span> <span class="n">KKT_mask</span><span class="p">,</span> <span class="n">latexify</span><span class="p">,</span> <span class="n">add_subscript</span><span class="p">,</span> <span class="n">is_substricted</span><span class="p">,</span> <span class="n">is_spec_function</span>
+    <span class="n">transversality_mask</span><span class="p">,</span> <span class="n">KKT_mask</span><span class="p">,</span> <span class="n">latexify</span><span class="p">,</span> <span class="n">add_subscript</span><span class="p">,</span> <span class="n">is_substricted</span><span class="p">,</span> <span class="n">is_spec_function</span><span class="p">,</span> <span class="n">span_dict</span>
 <span class="kn">from</span> <span class="nn">core.errors.RWErrors</span> <span class="kn">import</span> <span class="n">TimeVariableNotFound</span><span class="p">,</span> <span class="n">AnyPropertyNotFound</span><span class="p">,</span> \
     <span class="n">DimensionCheckingFailed</span><span class="p">,</span> <span class="n">ExtraVariableError</span><span class="p">,</span> <span class="n">ObjectiveFunctionNotFound</span><span class="p">,</span> <span class="n">NonSympyfiableError</span><span class="p">,</span> <span class="n">NoSuchFlow</span>
 <span class="kn">from</span> <span class="nn">core.logger</span> <span class="kn">import</span> <span class="n">log</span>
@@ -489,7 +492,7 @@
 <span class="sd">        :return: Expr</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Integral</span>
-        <span class="k">return</span> <span class="n">span</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duals</span><span class="p">)</span> <span class="o">+</span> <span class="n">span</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">span_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duals</span><span class="p">)</span> <span class="o">+</span> <span class="n">span_dict</span><span class="p">(</span>
             <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]})</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Integral</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -499,7 +502,7 @@
 <span class="sd">        Terminant part of L</span>
 <span class="sd">        :return: Expr</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">span</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]})</span>
+        <span class="k">return</span> <span class="n">span_dict</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objectives</span><span class="p">]})</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

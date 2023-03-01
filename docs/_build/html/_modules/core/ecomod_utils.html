@@ -36,8 +36,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">EcoMod</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -250,8 +253,8 @@
     <span class="k">return</span> <span class="n">deg</span></div>
 
 
-<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="c1">#@dispatch(dict)</span>
+<div class="viewcode-block" id="span_dict"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.span_dict">[docs]</a><span class="k">def</span> <span class="nf">span_dict</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return linear span of KV-storage. ret = sum_0^N[K[i] * V[i]]</span>
 <span class="sd">    :param d: Dict[Expr -&gt; Expr]</span>
@@ -262,12 +265,12 @@
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">ret</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">v</span>
 
-    <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
 
 
-<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">set</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span>
-<span class="nd">@dispatch</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+<span class="c1">#@dispatch(set, set)</span>
+<span class="c1">#@dispatch(list, list)</span>
+<div class="viewcode-block" id="span"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.span">[docs]</a><span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return linear span of KV-storage. ret = sum_0^N[L_1[i] * L_2[i]]</span>
 <span class="sd">    :param coefs: List[Expr]</span>
@@ -281,7 +284,7 @@
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
         <span class="n">ret</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">j</span>
 
-    <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
 
 
 <div class="viewcode-block" id="pi_theorem"><a class="viewcode-back" href="../../core.html#core.ecomod_utils.pi_theorem">[docs]</a><span class="k">def</span> <span class="nf">pi_theorem</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">eq</span><span class="p">):</span>

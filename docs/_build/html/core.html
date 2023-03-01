@@ -19,7 +19,9 @@
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="scenarios package" href="scenarios.html" />
+    <link rel="prev" title="EcoMod" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,173 +39,98 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">core package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-core.agent">core.agent module</a><ul>
-<li><a class="reference internal" href="#core.agent.AbstractAgent"><code class="docutils literal notranslate"><span class="pre">AbstractAgent</span></code></a><ul>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.KKT"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.KKT()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.Lagrangian"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.Lagrangian</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.args"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.args</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.boundaries"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.boundaries</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.compress"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.compress()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.constant_ineqs"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.constant_ineqs</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.control_optimality"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.control_optimality()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.controls"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.controls</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.diff_degree"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.diff_degree()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.dump"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.dump()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.emitent"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.emitent</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.euler_equations"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.euler_equations()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.expr"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.expr</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.external"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.external</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.kwargs"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.kwargs</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.lagrangian"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.lagrangian</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.phases"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.phases</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.process"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.process()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.read_from_tex"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.read_from_tex()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.time"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.time</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.time_horizon"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.time_horizon</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.transitions"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.transitions</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.transversality_conditions"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.transversality_conditions()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AbstractAgent.variables"><code class="docutils literal notranslate"><span class="pre">AbstractAgent.variables</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">EcoMod</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">core package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.agent">core.agent module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.agent.AbstractAgent"><code class="docutils literal notranslate"><span class="pre">AbstractAgent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.agent.AgentValidator"><code class="docutils literal notranslate"><span class="pre">AgentValidator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.agent.LinkedAgent"><code class="docutils literal notranslate"><span class="pre">LinkedAgent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.agent.create_empty_agents"><code class="docutils literal notranslate"><span class="pre">create_empty_agents()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#core.agent.AgentValidator"><code class="docutils literal notranslate"><span class="pre">AgentValidator</span></code></a><ul>
-<li><a class="reference internal" href="#core.agent.AgentValidator.emitent"><code class="docutils literal notranslate"><span class="pre">AgentValidator.emitent</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.AgentValidator.validate"><code class="docutils literal notranslate"><span class="pre">AgentValidator.validate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.datamodel">core.datamodel module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.datamodel.Boundary"><code class="docutils literal notranslate"><span class="pre">Boundary</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.datamodel.Parameter"><code class="docutils literal notranslate"><span class="pre">Parameter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.datamodel.Phase"><code class="docutils literal notranslate"><span class="pre">Phase</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#core.agent.LinkedAgent"><code class="docutils literal notranslate"><span class="pre">LinkedAgent</span></code></a><ul>
-<li><a class="reference internal" href="#core.agent.LinkedAgent.add_flow"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.add_flow()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.LinkedAgent.delete_flow"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.delete_flow()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.LinkedAgent.emitent"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.emitent</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.LinkedAgent.from_abstract"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.from_abstract()</span></code></a></li>
-<li><a class="reference internal" href="#core.agent.LinkedAgent.print_flows"><code class="docutils literal notranslate"><span class="pre">LinkedAgent.print_flows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.deserialiser">core.deserialiser module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.deserialiser.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.deserialiser.parse_yaml"><code class="docutils literal notranslate"><span class="pre">parse_yaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.deserialiser.read_model_from_tex"><code class="docutils literal notranslate"><span class="pre">read_model_from_tex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.deserialiser.read_tex"><code class="docutils literal notranslate"><span class="pre">read_tex()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#core.agent.create_empty_agents"><code class="docutils literal notranslate"><span class="pre">create_empty_agents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.ecomod_utils">core.ecomod_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.KKT_mask"><code class="docutils literal notranslate"><span class="pre">KKT_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.add_subscript"><code class="docutils literal notranslate"><span class="pre">add_subscript()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.deriv_degree"><code class="docutils literal notranslate"><span class="pre">deriv_degree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.eq2func"><code class="docutils literal notranslate"><span class="pre">eq2func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.euler_mask"><code class="docutils literal notranslate"><span class="pre">euler_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.generate_symbols"><code class="docutils literal notranslate"><span class="pre">generate_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.is_spec_function"><code class="docutils literal notranslate"><span class="pre">is_spec_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.is_substricted"><code class="docutils literal notranslate"><span class="pre">is_substricted()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.latexify"><code class="docutils literal notranslate"><span class="pre">latexify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.pi_theorem"><code class="docutils literal notranslate"><span class="pre">pi_theorem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.remove_subscript"><code class="docutils literal notranslate"><span class="pre">remove_subscript()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.span"><code class="docutils literal notranslate"><span class="pre">span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.span_dict"><code class="docutils literal notranslate"><span class="pre">span_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.spec_funcs"><code class="docutils literal notranslate"><span class="pre">spec_funcs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.ecomod_utils.transversality_mask"><code class="docutils literal notranslate"><span class="pre">transversality_mask()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-core.datamodel">core.datamodel module</a><ul>
-<li><a class="reference internal" href="#core.datamodel.Boundary"><code class="docutils literal notranslate"><span class="pre">Boundary</span></code></a></li>
-<li><a class="reference internal" href="#core.datamodel.Parameter"><code class="docutils literal notranslate"><span class="pre">Parameter</span></code></a><ul>
-<li><a class="reference internal" href="#core.datamodel.Parameter.default_assumptions"><code class="docutils literal notranslate"><span class="pre">Parameter.default_assumptions</span></code></a></li>
-<li><a class="reference internal" href="#core.datamodel.Parameter.name"><code class="docutils literal notranslate"><span class="pre">Parameter.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.logger">core.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.logger.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#core.datamodel.Phase"><code class="docutils literal notranslate"><span class="pre">Phase</span></code></a><ul>
-<li><a class="reference internal" href="#core.datamodel.Phase.default_assumptions"><code class="docutils literal notranslate"><span class="pre">Phase.default_assumptions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.market">core.market module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.market.Balances"><code class="docutils literal notranslate"><span class="pre">Balances</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.market.Flow"><code class="docutils literal notranslate"><span class="pre">Flow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.market.Market"><code class="docutils literal notranslate"><span class="pre">Market</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.market.MarketValidator"><code class="docutils literal notranslate"><span class="pre">MarketValidator</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.model">core.model module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.model.AgentMerger"><code class="docutils literal notranslate"><span class="pre">AgentMerger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.model.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.model.ModelValidator"><code class="docutils literal notranslate"><span class="pre">ModelValidator</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-core.deserialiser">core.deserialiser module</a><ul>
-<li><a class="reference internal" href="#core.deserialiser.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li><a class="reference internal" href="#core.deserialiser.parse_yaml"><code class="docutils literal notranslate"><span class="pre">parse_yaml()</span></code></a></li>
-<li><a class="reference internal" href="#core.deserialiser.read_model_from_tex"><code class="docutils literal notranslate"><span class="pre">read_model_from_tex()</span></code></a></li>
-<li><a class="reference internal" href="#core.deserialiser.read_tex"><code class="docutils literal notranslate"><span class="pre">read_tex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.pprint">core.pprint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.pprint.AgentTemplateEngine"><code class="docutils literal notranslate"><span class="pre">AgentTemplateEngine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.pprint.ModelTemplateEngine"><code class="docutils literal notranslate"><span class="pre">ModelTemplateEngine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.pprint.TexTemplateEngine"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.pprint.exec_tex"><code class="docutils literal notranslate"><span class="pre">exec_tex()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-core.ecomod_utils">core.ecomod_utils module</a><ul>
-<li><a class="reference internal" href="#core.ecomod_utils.KKT_mask"><code class="docutils literal notranslate"><span class="pre">KKT_mask()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.add_subscript"><code class="docutils literal notranslate"><span class="pre">add_subscript()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.deriv_degree"><code class="docutils literal notranslate"><span class="pre">deriv_degree()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.eq2func"><code class="docutils literal notranslate"><span class="pre">eq2func()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.euler_mask"><code class="docutils literal notranslate"><span class="pre">euler_mask()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.generate_symbols"><code class="docutils literal notranslate"><span class="pre">generate_symbols()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.is_spec_function"><code class="docutils literal notranslate"><span class="pre">is_spec_function()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.is_substricted"><code class="docutils literal notranslate"><span class="pre">is_substricted()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.latexify"><code class="docutils literal notranslate"><span class="pre">latexify()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.pi_theorem"><code class="docutils literal notranslate"><span class="pre">pi_theorem()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.remove_subscript"><code class="docutils literal notranslate"><span class="pre">remove_subscript()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.spec_funcs"><code class="docutils literal notranslate"><span class="pre">spec_funcs()</span></code></a></li>
-<li><a class="reference internal" href="#core.ecomod_utils.transversality_mask"><code class="docutils literal notranslate"><span class="pre">transversality_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.sympyfier">core.sympyfier module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.sympyfier.ecomodify"><code class="docutils literal notranslate"><span class="pre">ecomodify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.sympyfier.sympify"><code class="docutils literal notranslate"><span class="pre">sympify()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-core.logger">core.logger module</a><ul>
-<li><a class="reference internal" href="#core.logger.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.utils">core.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.dict_substract"><code class="docutils literal notranslate"><span class="pre">dict_substract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.embrace"><code class="docutils literal notranslate"><span class="pre">embrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.extract_dim_desc"><code class="docutils literal notranslate"><span class="pre">extract_dim_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.find_objective_markers"><code class="docutils literal notranslate"><span class="pre">find_objective_markers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.iterable_substract"><code class="docutils literal notranslate"><span class="pre">iterable_substract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.set_equality"><code class="docutils literal notranslate"><span class="pre">set_equality()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.trim"><code class="docutils literal notranslate"><span class="pre">trim()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.utils.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-core.market">core.market module</a><ul>
-<li><a class="reference internal" href="#core.market.Balances"><code class="docutils literal notranslate"><span class="pre">Balances</span></code></a><ul>
-<li><a class="reference internal" href="#core.market.Balances.atoms"><code class="docutils literal notranslate"><span class="pre">Balances.atoms()</span></code></a></li>
-<li><a class="reference internal" href="#core.market.Balances.compress"><code class="docutils literal notranslate"><span class="pre">Balances.compress()</span></code></a></li>
-<li><a class="reference internal" href="#core.market.Balances.process"><code class="docutils literal notranslate"><span class="pre">Balances.process()</span></code></a></li>
-<li><a class="reference internal" href="#core.market.Balances.read_from_tex"><code class="docutils literal notranslate"><span class="pre">Balances.read_from_tex()</span></code></a></li>
-<li><a class="reference internal" href="#core.market.Balances.validate"><code class="docutils literal notranslate"><span class="pre">Balances.validate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core">Module contents</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#core.market.Flow"><code class="docutils literal notranslate"><span class="pre">Flow</span></code></a><ul>
-<li><a class="reference internal" href="#core.market.Flow.invert"><code class="docutils literal notranslate"><span class="pre">Flow.invert()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.market.Market"><code class="docutils literal notranslate"><span class="pre">Market</span></code></a></li>
-<li><a class="reference internal" href="#core.market.MarketValidator"><code class="docutils literal notranslate"><span class="pre">MarketValidator</span></code></a><ul>
-<li><a class="reference internal" href="#core.market.MarketValidator.validate_market"><code class="docutils literal notranslate"><span class="pre">MarketValidator.validate_market()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenarios.html">scenarios package</a></li>
 </ul>
 </li>
 </ul>
-</li>
-<li><a class="reference internal" href="#module-core.model">core.model module</a><ul>
-<li><a class="reference internal" href="#core.model.AgentMerger"><code class="docutils literal notranslate"><span class="pre">AgentMerger</span></code></a><ul>
-<li><a class="reference internal" href="#core.model.AgentMerger.merge"><code class="docutils literal notranslate"><span class="pre">AgentMerger.merge()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.model.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
-<li><a class="reference internal" href="#core.model.Model.add_agent"><code class="docutils literal notranslate"><span class="pre">Model.add_agent()</span></code></a></li>
-<li><a class="reference internal" href="#core.model.Model.dump"><code class="docutils literal notranslate"><span class="pre">Model.dump()</span></code></a></li>
-<li><a class="reference internal" href="#core.model.Model.process"><code class="docutils literal notranslate"><span class="pre">Model.process()</span></code></a></li>
-<li><a class="reference internal" href="#core.model.Model.visualize"><code class="docutils literal notranslate"><span class="pre">Model.visualize()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.model.ModelValidator"><code class="docutils literal notranslate"><span class="pre">ModelValidator</span></code></a><ul>
-<li><a class="reference internal" href="#core.model.ModelValidator.validate"><code class="docutils literal notranslate"><span class="pre">ModelValidator.validate()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-core.pprint">core.pprint module</a><ul>
-<li><a class="reference internal" href="#core.pprint.AgentTemplateEngine"><code class="docutils literal notranslate"><span class="pre">AgentTemplateEngine</span></code></a><ul>
-<li><a class="reference internal" href="#core.pprint.AgentTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">AgentTemplateEngine.template_name</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.pprint.ModelTemplateEngine"><code class="docutils literal notranslate"><span class="pre">ModelTemplateEngine</span></code></a><ul>
-<li><a class="reference internal" href="#core.pprint.ModelTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">ModelTemplateEngine.template_name</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.pprint.TexTemplateEngine"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine</span></code></a><ul>
-<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.dump"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.dump()</span></code></a></li>
-<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.get_template_variables"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.get_template_variables</span></code></a></li>
-<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.render"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.render()</span></code></a></li>
-<li><a class="reference internal" href="#core.pprint.TexTemplateEngine.template_name"><code class="docutils literal notranslate"><span class="pre">TexTemplateEngine.template_name</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#core.pprint.exec_tex"><code class="docutils literal notranslate"><span class="pre">exec_tex()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-core.sympyfier">core.sympyfier module</a><ul>
-<li><a class="reference internal" href="#core.sympyfier.ecomodify"><code class="docutils literal notranslate"><span class="pre">ecomodify()</span></code></a></li>
-<li><a class="reference internal" href="#core.sympyfier.sympify"><code class="docutils literal notranslate"><span class="pre">sympify()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-core.utils">core.utils module</a><ul>
-<li><a class="reference internal" href="#core.utils.dict_substract"><code class="docutils literal notranslate"><span class="pre">dict_substract()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.embrace"><code class="docutils literal notranslate"><span class="pre">embrace()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.extract_dim_desc"><code class="docutils literal notranslate"><span class="pre">extract_dim_desc()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.find_objective_markers"><code class="docutils literal notranslate"><span class="pre">find_objective_markers()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.iterable_substract"><code class="docutils literal notranslate"><span class="pre">iterable_substract()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.set_equality"><code class="docutils literal notranslate"><span class="pre">set_equality()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.trim"><code class="docutils literal notranslate"><span class="pre">trim()</span></code></a></li>
-<li><a class="reference internal" href="#core.utils.unpack"><code class="docutils literal notranslate"><span class="pre">unpack()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-core">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -218,6 +145,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">EcoMod</a></li>
       <li class="breadcrumb-item active">core package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
@@ -814,6 +742,23 @@ Shows that this Validation process is for Simple Agents – with objective funct
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.span">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">span</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.span" title="Permalink to this definition"></a></dt>
+<dd><p>Return linear span of KV-storage. ret = sum_0^N[L_1[i] * L_2[i]]
+:param coefs: List[Expr]
+:param variables: List[Expr]
+:return: Expr</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.ecomod_utils.span_dict">
+<span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">span_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#span_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.span_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Return linear span of KV-storage. ret = sum_0^N[K[i] * V[i]]
+:param d: Dict[Expr -&gt; Expr]
+:return: Expr</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="core.ecomod_utils.spec_funcs">
 <span class="sig-prename descclassname"><span class="pre">core.ecomod_utils.</span></span><span class="sig-name descname"><span class="pre">spec_funcs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/ecomod_utils.html#spec_funcs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ecomod_utils.spec_funcs" title="Permalink to this definition"></a></dt>
 <dd><p>Set of special analytical functions in sympy. Used to dimension check of its args.
@@ -1176,7 +1121,10 @@ agents and flows</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="EcoMod" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scenarios.html" class="btn btn-neutral float-right" title="scenarios package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

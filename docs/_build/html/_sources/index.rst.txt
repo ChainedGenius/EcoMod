@@ -7,12 +7,43 @@ Welcome to ECOMOD's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
+   modules
 
 
-Indices and tables
+Project information
+==================
+
+
+Current state
+-------------
+
+Goals
+-----
+
+
+Team
+----
+
+
+System overview
+---------------
+
+Support system
+--------------
+
+Core
+----
+
+
+Integrated interfaces
+---------------------
+
+
+
+Quickstart
 ==================
 
 * :ref:`genindex`
