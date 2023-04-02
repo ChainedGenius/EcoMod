@@ -8,3 +8,4 @@ app/run.sh
 app/widget.py
 app/templates/index.html
 app/run.sh
+/model/
