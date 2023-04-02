@@ -85,12 +85,12 @@ def euler_mask(L, x, t):
     :return: List[Expr]
     """
     if x.args and t in x.args:
-        x = x.func
+        x = x.func(*x.args)
     else:
         raise TypeError('Wrong time :)')
-    x_prime = x(t).diff(t)
+    x_prime = x.diff(t)
     L_x_prime = L.diff(x_prime)
-    L_x = L.diff(x(t))
+    L_x = L.diff(x)
     return Eq(simplify(Derivative(L_x_prime, t) - L_x), 0)
 
 
@@ -106,15 +106,15 @@ def transversality_mask(L, x, t, l, t0, t1):
     :return: List[Eq]
     """
     if x.args and t in x.args:
-        x = x.func
+        x = x.func(*x.args)
     else:
         raise TypeError('Wrong time :)')
     # lhs
-    x_prime = x(t).diff(t)
+    x_prime = x.diff(t)
     L_x_prime = L.diff(x_prime)
     # rhs
-    l_x_t_0 = l.diff(x(t).subs({t: t0}))
-    l_x_t_1 = -l.diff(x(t).subs({t: t1}))
+    l_x_t_0 = l.diff(x.subs({t: t0}))
+    l_x_t_1 = -l.diff(x.subs({t: t1}))
     return Eq(L_x_prime.simplify().subs({t: t0}), l_x_t_0), Eq(L_x_prime.simplify().subs({t: t1}), l_x_t_1)
 
 

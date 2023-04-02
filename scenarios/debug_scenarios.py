@@ -1,4 +1,4 @@
-from core.agent import LinkedAgent, create_empty_agents
+from core.agent import LinkedAgent, create_empty_agents, AbstractAgent
 from core.market import Flow, Market, Balances
 from core.model import Model
 from core.utils import timeit
@@ -134,5 +134,26 @@ def pgmodel():
     M.dump('../models/outputs/Pmodel')
 
 
+@timeit
+def p2model():
+    from sympy.printing.latex import latex
+    f1 = '../models/inputs/Pmodel_2products/H.tex'
+    H = AbstractAgent.read_from_tex(f1)
+    H.process(skip_validation=True)
+
+    f2 = '../models/inputs/Pmodel_2products/P.tex'
+    P = AbstractAgent.read_from_tex(f2)
+    P.process(skip_validation=True)
+    B = Balances.read_from_tex('../models/inputs/Pmodel_2products/flows.tex')
+
+    M = Model('Pmodel', B, [H, P])
+    M.process()
+    M.dump('../models/outputs/Pmodel_2products')
+
+
+
+
+
 if __name__ == "__main__":
-    p_model_dump()
+    p2model()
+    # xrepalce error: something wrong with objective functions and xreplace=False in agent parsing

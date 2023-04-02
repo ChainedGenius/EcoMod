@@ -529,7 +529,7 @@ class AbstractAgent(AgentValidator):
         from pathlib import Path
         name = Path(f).stem
         header, raw_model = read_model_from_tex(f)
-        model = ecomodify(raw_model)
+        model = ecomodify(raw_model, xreplace=False)
         return cls(name, *model)
 
     @log(comment='Agent ready for economic processing')
@@ -628,7 +628,7 @@ class LinkedAgent(AbstractAgent):
         merge_map = merge_map | merge_map_t0 | merge_map_t1
         new_kwargs = {}
         for k, v in self.kwargs.items():
-            if k != 'name':
+            if k != 'name' and k != 'dim_dict':
                 new_kwargs[k] = [expr.xreplace(merge_map) for expr in v]
 
         self.__dict__.update(new_kwargs)
