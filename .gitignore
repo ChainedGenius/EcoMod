@@ -1,11 +1,5 @@
 /venv/
-text.txt
-venv/*
 /models/outputs/
-/app
-app/run.py
-app/run.sh
-app/widget.py
-app/templates/index.html
-app/run.sh
-/model/
+/app/
+*/__pycache__
+*\__pycache__
