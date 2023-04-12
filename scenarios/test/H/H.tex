@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage[english,russian]{babel}
+\begin{document}
+
+\subsection{Variables}
+
+
+Phase variables: $N_{H}{\left(t \right)},~S_{H}{\left(t \right)}$
+\newline
+Control parameters: $C_{H}{\left(t \right)}$
+\newline
+Exogenous parameters: $r_{l}{\left(t \right)},~p_{y}{\left(t \right)},~\operatorname{pi}_{o}{\left(t \right)},~a_{S}{\left(t \right)}$
+
+\subsection{Optimality conditions}
+
+\subsubsection{Euler equations}
+\begin{itemize}
+    \item $- \alpha_{1}{\left(t \right)} + \frac{d}{d t} \alpha_{0}{\left(t \right)} = 0$
+    \item $\alpha_{0}{\left(t \right)} r_{l}{\left(t \right)} + \frac{d}{d t} \alpha_{0}{\left(t \right)} = 0$
+\end{itemize}
+
+\subsubsection{Control optimality conditions}
+\begin{itemize}
+    \item $\frac{\lambda_{0} C_{H}^{1 - \beta}{\left(t \right)} e^{- \delta t}}{C_{H}{\left(t \right)}} + \alpha_{0}{\left(t \right)} p_{y}{\left(t \right)} = 0$
+\end{itemize}
+
+\subsubsection{Transversality conditions}
+\begin{itemize}
+    \item $\alpha_{0}{\left(0 \right)} = - \gamma \lambda_{1}$
+    \item $\alpha_{0}{\left(T \right)} = - \lambda_{1}$
+    \item $\alpha_{0}{\left(0 \right)} = - \gamma \lambda_{1} a_{S}{\left(0 \right)}$
+    \item $\alpha_{0}{\left(T \right)} = - \lambda_{1} a_{S}{\left(T \right)}$
+\end{itemize}
+
+\subsubsection{Dual feasibility and Complementary slackness conditions}
+\begin{itemize}
+    \item $\alpha_{1}{\left(t \right)} \geq 0$
+    \item $N_{H}{\left(t \right)} \alpha_{1}{\left(t \right)} = 0$
+    \item $\lambda_{1} \geq 0$
+    \item $\lambda_{1} \left(- \gamma \left(N_{H}{\left(0 \right)} + S_{H}{\left(0 \right)} a_{S}{\left(0 \right)}\right) + N_{H}{\left(T \right)} + S_{H}{\left(T \right)} a_{S}{\left(T \right)}\right) = 0$
+\end{itemize}
+
+\end{document}

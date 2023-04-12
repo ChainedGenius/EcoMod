@@ -16,7 +16,8 @@ class Phase(Function):
     Superclass for ECOMOD parameters. 1-1 with sympy.Function
     """
     def __new__(cls, name, dim, desc, *args):
-        obj = Function(name)(*args)
+        obj = Function(name)
+        obj.__dict__.update(dim=dim, desc=desc)
         # TODO: add dim desc as attributes of class
         return obj
 
@@ -80,8 +81,12 @@ class Boundary:
 
 
 if __name__ == "__main__":
-    t = Parameter('t', dim=1, desc=2)
-    c = Parameter('c', dim=2, desc=3)
-    a = Phase('b', t, c, dim=1, desc=2)
+    t = Symbol('t', dim=1, desc=2)
+    c = Symbol('c', dim=2, desc=3)
+    a = Function('b', dim=1, desc=2)
+    a =a(t,c)
     print(type(a.name))
     print(a.dim)
+    print(a.args)
+    # print(t.dim)
+

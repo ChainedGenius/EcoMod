@@ -11,7 +11,7 @@ from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
 from core.logger import log
 from core.market import Flow
 from core.pprint import AgentTemplateEngine, exec_tex
-from core.sympyfier import ecomodify
+from core.sympyfier import ecomodify, ecomodify_
 from core.utils import iterable_substract, timeit, set_equality
 
 from typing import Union, List, Dict
@@ -529,7 +529,7 @@ class AbstractAgent(AgentValidator):
         from pathlib import Path
         name = Path(f).stem
         header, raw_model = read_model_from_tex(f)
-        model = ecomodify(raw_model, xreplace=False)
+        model = ecomodify_(raw_model)
         return cls(name, *model)
 
     @log(comment='Agent ready for economic processing')
