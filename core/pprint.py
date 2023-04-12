@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from jinja2 import Environment, FileSystemLoader, meta
 
 from core.errors.RWErrors import NotRendered
-
+from core.utils import global_path
 
 class TexTemplateEngine(object):
     """
@@ -36,7 +36,7 @@ class TexTemplateEngine(object):
             line_comment_prefix='%#',
             trim_blocks=True,
             autoescape=False,
-            loader=FileSystemLoader(Path('../templates'))
+            loader=FileSystemLoader('templates')
         )
         self.template = self.latex_jinja_env.get_template(self.template_name)
         self.rendered = ""

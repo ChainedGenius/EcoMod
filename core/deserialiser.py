@@ -1,7 +1,6 @@
 import yaml
 from core.errors.RWErrors import NonLaTeXableError, NonYAMLableError
-from core.utils import unpack, trim
-
+from core.utils import unpack, trim, global_path
 
 def read_tex(f):
     """
@@ -9,7 +8,7 @@ def read_tex(f):
     :param f: filename or fd
     :return: yaml parsable object + header
     """
-    with open(f, 'r', encoding='utf-8') as stream:
+    with open(global_path(f), 'r', encoding='utf-8') as stream:
         content = stream.read()
         splitted = content.split(r'\begin{document}')
         if len(splitted) == 1:

@@ -1,9 +1,16 @@
 import re
+import os
 from itertools import chain
 from functools import wraps
 from time import perf_counter
 from logging import Logger
 
+
+def global_path(f):
+    """
+    f: abspath linux-type
+    """
+    return os.getcwd() + os.path.splitdrive(os.path.abspath(f))[1]
 
 def timeit(func):
 

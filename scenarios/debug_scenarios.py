@@ -8,7 +8,7 @@ from core.utils import timeit
 def simple_agent():
     from sympy import Function
     from itertools import chain
-    f = '../models/inputs/Pmodel/H.tex'
+    f = '/models/inputs/Pmodel/H.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process(skip_validation=True)
     print(A.lagrangian)
@@ -154,4 +154,3 @@ def p2model():
 
 if __name__ == "__main__":
     simple_agent()
-    # xrepalce error: something wrong with objective functions and xreplace=False in agent parsing
