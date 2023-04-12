@@ -15,7 +15,7 @@ def simple_agent():
     print(A.Lagrangian)
     print(A.phases)
     print(A.transversality_conditions())
-    A.dump('test/')
+    #A.dump('test/')
 
 
 @timeit
