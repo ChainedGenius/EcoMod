@@ -15,9 +15,7 @@ def simple_agent():
     print(A.Lagrangian)
     print(A.phases)
     print(A.transversality_conditions())
-    print('*' * 17)
-    for x in A.phases:
-        print(A.Lagrangian.diff(x.diff(A.time)))
+    A.dump('test/')
 
 
 @timeit
@@ -155,5 +153,5 @@ def p2model():
 
 
 if __name__ == "__main__":
-    p2model()
+    simple_agent()
     # xrepalce error: something wrong with objective functions and xreplace=False in agent parsing

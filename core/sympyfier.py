@@ -59,14 +59,58 @@ def sympify(raw_obj):
     return decoded, is_objective[0]
 
 
+def ecomodify_(raw_model):
+    def globe_sorter(_raw_model):
+        i, e, p, f, o = [], [], [], [], []
+        dim_dict_ = {}
+        for obj, txt in raw_model.items():
+            is_objective = find_objective_markers(obj)
+            if is_objective[0]:
+                o.append(_xsympify(is_objective[1]))
+                dim_dict_[_xsympify(is_objective[1])] = extract_dim_desc(txt)[0]
+                continue
+
+            elif isinstance(_xsympify(obj), Symbol):
+                obj = _xsympify(obj)
+                dim, desc = extract_dim_desc(txt)
+                dim_dict_[obj] = dim
+                p.append(obj)
+
+            elif isinstance(_xsympify(obj), Function):
+                obj = _xsympify(obj)
+                dim, desc = extract_dim_desc(txt)
+                dim_dict_[obj] = dim
+                f.append(obj)
+
+            elif isinstance(_xsympify(obj), Eq):
+                obj = _xsympify(obj)
+                e.append(obj)
+                dim_dict_[obj] = extract_dim_desc(txt)[0]
+
+            elif issubclass(_xsympify(obj).__class__, Relational):
+                obj = _xsympify(obj)
+                i.append(obj)
+                dim_dict_[obj] = extract_dim_desc(txt)[0]
+
+            else:
+                raise TypeError('Found unreachable expression')
+
+        return i, e, f, p, o, dim_dict_
+
+    inequations, equations, functions, params, objectives, dim_dict = globe_sorter(raw_model)
+    return objectives, inequations, equations, functions, params, dim_dict
+
+
 def ecomodify(raw_model, xreplace=True):
     """
+    DEPRECATED
     Transfer raw model from .tex file to input of AbstractAgent.
     :param raw_model
     :param xreplace: bool, always True. False will convert model to Sympy Expr representations. For dev purposes only.
 
     :return: List[AbstractAgent.args]
     """
+
     def dim_dictify(_raw_model):
         # not real python dict: list of tuples
         return [(k, real_sympify(extract_dim_desc(v)[0])) if extract_dim_desc(v)[0] != "" else (k, "") for k, v in
