@@ -582,6 +582,9 @@ class AbstractAgent(AgentValidator):
         engine.render(self.compress())
         tex_directorypath = Path(destination) / self.name
         tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')
+        # Due to bug with .absolute() method in Pathlib
+        tex_directorypath = Path(str(tex_directorypath.cwd()) + str(tex_directorypath))
+        tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
         engine.dump(tex_filepath)
         exec_tex(tex_filepath, tex_directorypath)
 

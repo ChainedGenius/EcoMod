@@ -135,22 +135,25 @@ def pgmodel():
 @timeit
 def p2model():
     from sympy.printing.latex import latex
-    f1 = '../models/inputs/Pmodel_2products/H.tex'
+    f1 = '/models/inputs/Pmodel_2products/H.tex'
     H = AbstractAgent.read_from_tex(f1)
     H.process(skip_validation=True)
+    H.dump('/models/outputs/Pmodel_2products')
 
-    f2 = '../models/inputs/Pmodel_2products/P.tex'
+    f2 = '/models/inputs/Pmodel_2products/P.tex'
     P = AbstractAgent.read_from_tex(f2)
     P.process(skip_validation=True)
-    B = Balances.read_from_tex('../models/inputs/Pmodel_2products/flows.tex')
+    P.dump('/models/outputs/Pmodel_2products')
+
+    B = Balances.read_from_tex('/models/inputs/Pmodel_2products/flows.tex')
 
     M = Model('Pmodel', B, [H, P])
     M.process()
-    M.dump('../models/outputs/Pmodel_2products')
+    M.dump('/models/outputs/Pmodel_2products')
 
 
 
 
 
 if __name__ == "__main__":
-    simple_agent()
+    p2model()
