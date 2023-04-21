@@ -1,6 +1,6 @@
 core package
 ============
-
+:math:  `\overline{s} = g\left(\overline{m}, \overline{s}, \overline{x}, \overline{m} \right)`
 Submodules
 ----------
 
