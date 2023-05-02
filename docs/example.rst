@@ -1,6 +1,6 @@
 Example
 -------
-.. math:: \documentclass[12pt]{article}
+.. math:: '\documentclass[12pt]{article}
 \title{Агентская задача домохозяйства}
 \date{19.04.2022}
 \ProcessOptions
@@ -17,4 +17,4 @@ Example
     $N_{P}(t) + N_{H}(t) = 0$: Условие на объем денежных остатков
     $\pi_{P}(t) = \pi(t)$: правило передачи информации
 
-\end{document}
+\end{document}'
