@@ -6,3 +6,4 @@ EcoMod
 
    core
    scenarios
+   models
