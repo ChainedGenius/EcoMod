@@ -1,4 +1,4 @@
-EcoMod
+modules
 ======
 
 .. toctree::
