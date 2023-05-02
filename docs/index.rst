@@ -11,7 +11,7 @@ Welcome to ECOMOD's documentation!
    :caption: Contents:
 
    modules
-   test
+   example
 
 Project information
 ==================
