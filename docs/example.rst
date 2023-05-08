@@ -1,6 +1,7 @@
 Example
 -------
-.. code::  \documentclass[12pt]{article}
+.. math::
+\documentclass[12pt]{article}
 \title{Агентская задача домохозяйства}
 \date{19.04.2022}
 \ProcessOptions

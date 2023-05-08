@@ -1,8 +1,10 @@
----------
+===========
 Discription
-_________
+===========
 
-
+-------------
+AbstractAgent
+-------------
 .. code:: python
     class AbstractAgent(AgentValidator):
     """
@@ -407,4 +409,73 @@ _________
         tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
         engine.dump(tex_filepath)
         exec_tex(tex_filepath, tex_directorypath)
+
+
+.. code:: python
+        class LinkedAgent(AbstractAgent):
+    """
+    Methods:
+        Constructors:
+            1. __init__
+                Basic contructor
+            2. from_abstract
+                Init LinkedAgent from Agent instance
+        Private:
+            1. __merge_prepare
+                Use Agent model output to gain tagged Agent model output.
+        Public:
+            1. add_flow
+            2. delete_flow
+            3. print_flows
+
+
+
+    """
+    emitent = False
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.flows = []
+        self.__merge_prepare()
+
+    def __merge_prepare(self):
+        """
+        Private method to tag all agent variables with agent name. All core methods are inherited from parent class.
+        :return:
+        """
+        # gaining tagged system
+        merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls}
+        merge_map_t0 = {
+            f.subs(self.time, self.time_horizon[0]): add_subscript(f.subs(self.time, self.time_horizon[0]), self.name)
+            for f in self.functions}
+        merge_map_t1 = {
+            f.subs(self.time, self.time_horizon[1]): add_subscript(f.subs(self.time, self.time_horizon[1]), self.name)
+            for f in self.functions}
+        merge_map = merge_map | merge_map_t0 | merge_map_t1
+        new_kwargs = {}
+        for k, v in self.kwargs.items():
+            if k != 'name' and k != 'dim_dict':
+                new_kwargs[k] = [expr.xreplace(merge_map) for expr in v]
+
+        self.__dict__.update(new_kwargs)
+
+    def add_flow(self, flow: Flow):
+        if flow.receiver != self and flow.producer != self:
+            print('This flow do not affect this agent')
+        else:
+            self.flows.append(flow)
+
+    def delete_flow(self, flow: Flow):
+        try:
+            self.flows.remove(flow)
+        except ValueError:
+            raise NoSuchFlow(flow=flow.__str__(), agent=self.name)
+
+    def print_flows(self):
+        return "\n".join([f'[{flow}]' for flow in self.flows])
+
+    @staticmethod
+    def from_abstract(a: AbstractAgent):
+        kwargs = a.kwargs
+        return LinkedAgent(*kwargs.values())
 
