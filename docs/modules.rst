@@ -5,6 +5,6 @@ EcoMod
    :maxdepth: 4
 
    core
-   discription core
+   discription_core
    scenarios
    models
