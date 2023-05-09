@@ -12,7 +12,6 @@ Welcome to ECOMOD's documentation!
 
    modules
    example
-   discription_core
 
 Project information
 ==================

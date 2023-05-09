@@ -19,7 +19,13 @@ release = '2.0.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.todo",
+extensions = ['sphinx.ext.autosummary',
+                'sphinx.ext.mathjax',
+                'sphinx.ext.graphviz',
+                'recommonmark',
+                # 'sphinx.ext.napoleon']
+                'numpydoc'
+              "sphinx.ext.todo",
               "sphinx.ext.viewcode",
               "sphinx.ext.autodoc"]
 
