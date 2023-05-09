@@ -23,8 +23,8 @@ extensions = ['sphinx.ext.autosummary',
                 'sphinx.ext.mathjax',
                 'sphinx.ext.graphviz',
                 'recommonmark',
-                # 'sphinx.ext.napoleon']
-                'numpydoc'
+                # 'sphinx.ext.napoleon'
+                'numpydoc',
               "sphinx.ext.todo",
               "sphinx.ext.viewcode",
               "sphinx.ext.autodoc"]
