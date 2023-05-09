@@ -84,3 +84,4 @@ Werkzeug
 widgetsnbextension
 zipp
 setuptools
+numpydoc
