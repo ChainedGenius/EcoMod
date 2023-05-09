@@ -19,4 +19,4 @@ Examples
             $\pi_{P}(t) = \pi(t)$: правило передачи информации
 
         \end{document}
-rebgwibbigewjgejngnjjngejnegjk
+
