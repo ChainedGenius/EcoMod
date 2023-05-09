@@ -83,3 +83,4 @@ wcwidth
 Werkzeug
 widgetsnbextension
 zipp
+setuptools
