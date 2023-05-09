@@ -104,7 +104,9 @@ under development
 ---------
 Hypernetx
 ---------
+
 Model visualization
+
 .. code:: python
         def visualize(self, f):
         from hypernetx import Hypergraph
