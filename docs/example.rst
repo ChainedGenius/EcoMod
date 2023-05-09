@@ -1,4 +1,4 @@
-Example
+Examples
 -------
 .. math::
 \documentclass[12pt]{article}

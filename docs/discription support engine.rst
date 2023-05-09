@@ -10,27 +10,7 @@ Validation
 AgentMerger
 -----------
 
-.. code:: python
-    class AgentMerger(object):
-
-    def __find_ambiguity(self, lagents: List[AbstractAgent]):
-        """
-        Ambiguity == same variable name, but wrong dimension
-        :return: True if found ambiguity, else False
-        """
-        pass
-
-    def __rename_agent_local_variables(self, lagents: List[AbstractAgent]):
-        pass
-
-    def __other_merge_routine(self):
-        "other merge routine"
-        pass
-
-    def merge(self, lagents: List[AbstractAgent]):
-        self.__find_ambiguity(lagents)
-        self.__other_merge_routine()
-        self.__rename_agent_local_variables(lagents)
+.. autofunction:: core.model.AgentMerger
 
 --------------
 ModelValidator
