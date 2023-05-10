@@ -5,6 +5,13 @@ from core.utils import timeit
 
 
 @timeit
+def ramsay():
+    f = '/models/inputs/agent.tex'
+    A = LinkedAgent.read_from_tex(f)
+    A.process(skip_validation=True)
+    A.dump('/models/outputs/ramsay')
+
+@timeit
 def simple_agent():
     from sympy import Function
     from itertools import chain
@@ -20,7 +27,7 @@ def simple_agent():
 
 @timeit
 def simple_linked_agents():
-    f = '../inputs/agent.tex'
+    f = '/inputs/agent.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process()
     B = LinkedAgent.from_abstract(create_empty_agents('B'))
@@ -40,8 +47,8 @@ def simple_linked_agents():
 
 @timeit
 def simple_model_viz():
-    f1 = '../models/inputs/agent.tex'
-    f2 = '../models/inputs/agent2.tex'
+    f1 = '/models/inputs/agent.tex'
+    f2 = '/models/inputs/agent2.tex'
     a1 = LinkedAgent.read_from_tex(f1)
     a1.process()
     a2 = LinkedAgent.read_from_tex(f2)
@@ -63,20 +70,20 @@ def agent_dump():
         jinja2.exceptions.TemplateNotFound: LAgent.tex
 
     """
-    f1 = '../models/inputs/agent.tex'
+    f1 = '/models/inputs/agent.tex'
     A = LinkedAgent.read_from_tex(f1)
     A.process()
-    A.dump('../models/outputs/Amodel')
+    A.dump('/models/outputs/Amodel')
 
 
 @timeit
 def p_model():
-    f1 = '../models/inputs/Pmodel/H.tex'
+    f1 = '/models/inputs/Pmodel/H.tex'
     H = LinkedAgent.read_from_tex(f1)
     H.process(skip_validation=True)
     print(H.__dict__)
 
-    f2 = '../models/inputs/Pmodel/P.tex'
+    f2 = '/models/inputs/Pmodel/P.tex'
     P = LinkedAgent.read_from_tex(f2)
     P.process(skip_validation=True)
     print(P.__dict__)
@@ -84,18 +91,18 @@ def p_model():
 
 @timeit
 def p_model_dump():
-    f1 = '../models/inputs/Pmodel/H.tex'
+    f1 = '/models/inputs/Pmodel/H.tex'
     H = LinkedAgent.read_from_tex(f1)
-    H.process()
+    H.process(skip_validation=True)
 
-    f2 = '../models/inputs/Pmodel/P.tex'
+    f2 = '/models/inputs/Pmodel/P.tex'
     P = LinkedAgent.read_from_tex(f2)
-    P.process()
+    P.process(skip_validation=True)
 
-    B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
+    B = Balances.read_from_tex('/models/inputs/Pmodel/flows.tex')
     M = Model('Pmodel', B, [H, P])
     M.process()
-    M.dump('../models/outputs/Pmodel')
+    M.dump('/models/outputs/Pmodel')
 
 
 @timeit
@@ -112,24 +119,24 @@ def model_viz():
     C.add_flow(f3)
     D.add_flow(f4)
     M = Model('viz', [], [A, B, C, D, E])
-    M.visualize('../models/outputs/Pmodel')
+    M.visualize('/models/outputs/Pmodel')
 
 
 @timeit
 def pgmodel():
-    f1 = '../models/inputs/Pmodel/H.tex'
+    f1 = '/models/inputs/Pmodel/H.tex'
     H = LinkedAgent.read_from_tex(f1)
     H.process(skip_validation=True)
 
-    f2 = '../models/inputs/Pmodel/P.tex'
+    f2 = '/models/inputs/Pmodel/P.tex'
     P = LinkedAgent.read_from_tex(f2)
     P.process(skip_validation=True)
     G = create_empty_agents('G', cls=LinkedAgent)
 
-    B = Balances.read_from_tex('../models/inputs/Pmodel/flows.tex')
+    B = Balances.read_from_tex('/models/inputs/Pmodel/flows.tex')
     M = Model('Pmodel', B, [H, P])
     M.process()
-    M.dump('../models/outputs/Pmodel')
+    M.dump('/models/outputs/Pmodel')
 
 
 @timeit
@@ -156,4 +163,6 @@ def p2model():
 
 
 if __name__ == "__main__":
-    p2model()
+    ramsay()
+    #p_model_dump()
+    #p2model()
