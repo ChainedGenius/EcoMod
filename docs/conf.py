@@ -8,7 +8,8 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(".."))
-
+sys.path.insert(0, os.path.abspath("../core"))
+sys.path.insert(0, os.path.abspath("../scenarios"))
 
 project = 'ECOMOD'
 copyright = '2023, ChainedGenius'
@@ -18,9 +19,14 @@ release = '2.0.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.todo",
-              "sphinx.ext.viewcode",
-              "sphinx.ext.autodoc"]
+extensions = [
+    "sphinx.ext.autosummary",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autodoc"
+]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

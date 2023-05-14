@@ -3,43 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ECOMOD's documentation!
+ECOMOD modeling system
 ==================================
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
+   :caption: General information:
 
-   modules
-
-
-Project information
-==================
-
-
-Current state
--------------
-
-Goals
------
-
-
-Team
-----
-
-
-System overview
----------------
-
-Support system
---------------
-
-Core
-----
-
-
-Integrated interfaces
----------------------
+   src/general
 
 
 
