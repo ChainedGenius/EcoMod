@@ -29,15 +29,8 @@ ECOMOD modeling system
 
 .. toctree::
    :maxdepth: 3
-   :caption: Integrations:
-
-   src/integrations
-
-
-.. toctree::
-   :maxdepth: 3
    :caption: Advanced usage:
-
+   src/integrations
    src/advanced_usage
 
 Codebase

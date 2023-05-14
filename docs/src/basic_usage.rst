@@ -1,6 +1,6 @@
 One-agent (isolated) models
 ============================
-.. autoclass:: core.agent.AbstractAgent
+
 
 .. code:: python
 
@@ -101,3 +101,17 @@ Multi-agent models
     M.process()
     print(M.lagents[0].Lagrangian)
     print(M.lagents[1].Lagrangian)
+
+
+Class references
+============================
+
+
+.. autoclass:: core.agent.AbstractAgent
+
+.. autoclass:: core.agent.LinkedAgent
+
+.. autoclass:: core.market.Balances
+
+.. autoclass:: core.model.Model
+
