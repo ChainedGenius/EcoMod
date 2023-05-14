@@ -7,14 +7,40 @@ ECOMOD modeling system
 ==================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: General information:
 
    src/general
 
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Installation
 
-Quickstart
+   src/installation
+
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Basic usage:
+
+   src/basic_usage
+
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Integrations:
+
+   src/integrations
+
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Advanced usage:
+
+   src/advanced_usage
+
+Codebase
 ==================
 
 * :ref:`genindex`
