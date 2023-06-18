@@ -5,6 +5,14 @@ from core.utils import timeit
 
 
 @timeit
+def kamenev():
+    f = '/models/inputs/Kamenev_model/C1.tex'
+    A = AbstractAgent.read_from_tex(f)
+    A.process(skip_validation=True)
+    A.dump('/models/outputs/Kamenev_model')
+
+
+@timeit
 def ramsay():
     f = '/models/inputs/agent.tex'
     A = LinkedAgent.read_from_tex(f)
@@ -163,6 +171,7 @@ def p2model():
 
 
 if __name__ == "__main__":
-    ramsay()
+    kamenev()
+    #ramsay()
     #p_model_dump()
     #p2model()
