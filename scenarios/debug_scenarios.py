@@ -6,10 +6,46 @@ from core.utils import timeit
 
 @timeit
 def kamenev():
-    f = '/models/inputs/Kamenev_model/C1.tex'
+    f = '/models/inputs/Kamenev_model/C2.tex'
     A = AbstractAgent.read_from_tex(f)
     A.process(skip_validation=True)
     A.dump('/models/outputs/Kamenev_model')
+
+
+@timeit
+def kamenev2():
+    f1 = '/models/inputs/Kamenev_model/v2/Blim.tex'
+    f1_ = '/models/inputs/Kamenev_model/v2/Bfull.tex'
+    f1__ = '/models/inputs/Kamenev_model/v2/Bmanual.tex'
+
+
+    f2 = '/models/inputs/Kamenev_model/v2/Clim.tex'
+    f2_ = '/models/inputs/Kamenev_model/v2/Cfull.tex'
+    f2__ = '/models/inputs/Kamenev_model/v2/Cmanual.tex'
+
+    # B = LinkedAgent.read_from_tex(f1)
+    # B.process(skip_validation=True)
+    # B.dump('/models/outputs/Kamenev_model/v2')
+
+    # B_ = LinkedAgent.read_from_tex(f1_)
+    # B_.process(skip_validation=True)
+    # B_.dump('/models/outputs/Kamenev_model/v2')
+
+    B__ = LinkedAgent.read_from_tex(f1__)
+    B__.process(skip_validation=True)
+    B__.dump('/models/outputs/Kamenev_model/v2')
+
+    # C = LinkedAgent.read_from_tex(f2)
+    # C.process(skip_validation=True)
+    # C.dump('/models/outputs/Kamenev_model/v2')
+
+    # C_ = LinkedAgent.read_from_tex(f2_)
+    # C_.process(skip_validation=True)
+    # C_.dump('/models/outputs/Kamenev_model/v2')
+
+    C__ = LinkedAgent.read_from_tex(f2__)
+    C__.process(skip_validation=True)
+    C__.dump('/models/outputs/Kamenev_model/v2')
 
 
 @timeit
@@ -171,7 +207,7 @@ def p2model():
 
 
 if __name__ == "__main__":
-    kamenev()
+    kamenev2()
     #ramsay()
     #p_model_dump()
     #p2model()

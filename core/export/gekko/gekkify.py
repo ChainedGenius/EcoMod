@@ -83,19 +83,43 @@ class Gekkifier(object):
             self.model.Var(value=v or base_guess, name=k)
 
 
+def model():
+    from sympy import Symbol, Function, symbols, Integral, ln, Eq, LessThan, GreaterThan, Derivative, exp
+    from core.agent import AbstractAgent
+    t = Symbol('t')
+    x = Function('x')
+    c = Function('c')
+    r, delta, T, sigma, J = symbols(r'r \delta T \sigma J')
+
+    objective = Eq(J, 1 / T * Integral(exp(-delta * t) * ln(c(t)), (t, 0, T)))
+
+    d1 = Eq(Derivative(x(t), t), r * (x(t) - c(t)))
+
+    ineq1 = LessThan(sigma * c(t), x(t))
+    ineq2 = GreaterThan(c(t), 0)
+
+    a = AbstractAgent(
+        name='Ramsay',
+        objectives=[objective],
+        equations=[d1],
+        inequations=[ineq1, ineq2],
+        params=[t, r, delta, T, sigma, J],
+        functions=[x(t), c(t)]
+    )
+    a.process(skip_validation=True)
+    return a
+
+def model2():
+    from sympy import Symbol, Function, symbols, Integral, ln, Eq, LessThan, GreaterThan, Derivative, exp
+    from core.agent import AbstractAgent
+    t, J = symbols('t J')
+    u, x = Function('u x', t)
+    objective = Eq(J, 1/2 * Integral(x(t)**2, (t, 0, 2)))
+
+
 if __name__ == '__main__':
     m = GEKKO()
     c = Gekkifier()
-    f = '../../../models/inputs/agent.tex'
-    a = LinkedAgent.read_from_tex(f)
-    a.process(skip_validation=True)
+    a = model()
     print(c.cast_emodel_params(a))
     print(a.objectives)
-
-
-
-
-
-
-
-    pass
