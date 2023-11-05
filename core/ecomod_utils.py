@@ -2,6 +2,7 @@ import random
 from itertools import chain
 
 from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq, Symbol
+from sympy.core.relational import Relational
 from sympy.parsing.latex import parse_latex
 from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
 from multipledispatch import dispatch
@@ -210,13 +211,19 @@ def span(coefs, variables):
     :return: Expr
     """
     if len(coefs) != len(variables):
-        raise TypeError
+        raise TypeError(f'Not equal number of arguments: {len(coefs)} != {len(variables)}')
 
     ret = 0
     for i, j in zip(coefs, variables):
         ret += i * j
 
     return ret
+
+
+def gradient(expr, varss):
+    if issubclass(type(expr), Relational):
+        expr = eq2func(expr)
+    return [expr.diff(i) for i in varss]
 
 
 def pi_theorem(vars, eq):

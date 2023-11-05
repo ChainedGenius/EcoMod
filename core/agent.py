@@ -2,10 +2,11 @@ from itertools import chain
 from pathlib import Path
 
 from numpy import prod
+from sympy import Eq
 
 from core.deserialiser import read_model_from_tex
 from core.ecomod_utils import deriv_degree, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function, span_dict
+    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function, span_dict, gradient
 from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed, ExtraVariableError, ObjectiveFunctionNotFound, NonSympyfiableError, NoSuchFlow
 from core.logger import log
@@ -502,6 +503,28 @@ class AbstractAgent(AgentValidator):
         _lambdas = {k: v for k, v in self.lambdas.items() if k not in [o.rhs for o in self.objectives]}
         return KKT_mask(_duals) + KKT_mask(_lambdas)
 
+    def control_boundaries(self):
+        from sympy.core.numbers import Zero
+        from sympy import Derivative
+        return [i for i in self.equations + self.inequations
+                if sum([issubclass(type(eq2func(i).diff(j)), Zero) for j in self.controls]) == 0
+                and not i.find(Derivative)]
+
+    def phase_boundaries(self):
+        from sympy.core.numbers import Zero
+        from sympy import Derivative
+        return [i for i in self.equations + self.inequations
+                if sum([issubclass(type(eq2func(i).diff(j)), Zero) for j in self.phases]) == 0
+                and not i.find(Derivative)]
+
+    def regularity_conditions(self):
+        if len(self.phase_boundaries()) != 1:
+            return AnyPropertyNotFound(attr='More than one phase boundary. Not supported.')
+        return Eq(
+            span(gradient(self.phase_boundaries()[0], self.phases),
+                 [i.rhs for i in self.transitions]), 0
+        )
+
     def diff_degree(self, deg=None):
         """
         Returns all expr with Derivative degree == deg.
@@ -668,7 +691,6 @@ def create_empty_agents(names, cls=AbstractAgent):
     return [cls(name) for name in names] if len(names) != 1 else cls(names)
 
 
-
 if __name__ == "__main__":
     @timeit
     def main():
@@ -688,4 +710,6 @@ if __name__ == "__main__":
         print(A.control_optimality())
         print(A.KKT())
         print(A.print_flows())
+
+
     print('Done')

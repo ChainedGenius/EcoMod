@@ -96,5 +96,64 @@ def example2():
     print(M.lagents[1].Lagrangian)
 
 
+def example3():
+    # Parameters
+    t, rho, delta, eps1, eps2, T = symbols(r't \rho \delta \epsilon_1 \epsilon_2 T')
+    B, B1, R, R_s, R_l, M, eta, L0, S0, W0 = symbols(r'B B_1 R R_s R_l M \eta L_0 S_0 W_0')
+    C1, C2, C3 = symbols(r'C_1 C_2 C_3')
+    J = symbols('J')
+    # Functions
+    x1, x2, x3, u1, u2, u3 = symbols('x_1 x_2 x_3 u_1 u_2 u_3', cls=Function)
+
+    # Functional
+    obj = Eq(J, Integral(
+        -(u3(t)) ** (1 - rho) * exp(-delta * t) - eps1 * (u2(t)) ** 2 - eps2 * (u1(t)) ** 2,
+        (t, 0, T)))
+
+    # Diffeq
+    diffeq1 = Eq(
+        x1(t).diff(t),
+        B1 * (x1(t) * u1(t) + x2(t) * u2(t) + x3(t) * u3(t)) + B * x1(t) + R
+    )
+    diffeq2 = Eq(
+        x2(t).diff(t),
+        B1 * (x1(t) * u1(t) + x2(t) * u2(t) + x3(t) * u3(t)) + B * x2(t) + R
+    )
+    diffeq3 = Eq(
+        x3(t).diff(t),
+        B1 * (x1(t) * u1(t) + x2(t) * u2(t) + x3(t) * u3(t)) + B * x3(t) + R
+    )
+
+    bd1 = LessThan(C1 * x1(t) + C2 * x2(t) + C3 * x3(t), 0)
+    bd2s = [
+        GreaterThan(u1(t), 0), LessThan(u1(t), R_s),
+        GreaterThan(u2(t), 0), LessThan(u2(t), R_l),
+        GreaterThan(u3(t), 0), LessThan(u3(t), M),
+        GreaterThan(eta * x3(0) - x3(T), 0)
+    ]
+    bd3s = [
+        Eq(x1(0), S0),
+        Eq(x2(0), L0),
+        Eq(x3(0), W0)  # ,
+        # Eq(T, 3)
+    ]
+
+    P = AbstractAgent(
+        name='A',
+        objectives=[obj],
+        equations=[diffeq1, diffeq2, diffeq3, *bd3s],
+        inequations=[bd1, *bd2s],
+        params=[
+            rho, delta, eps1, eps2, T,
+            B, B1, R, R_s, R_l, M, eta,
+            L0, S0, W0, C1, C2, C3, J
+        ],
+        functions=[x1(t), x2(t), x3(t), u1(t), u2(t), u3(t)]
+    )
+    P = LinkedAgent.from_abstract(P)
+    P.process(skip_validation=True)
+    P.dump('/models/outputs/CZF/')
+
+
 if __name__ == '__main__':
-    example2()
+    example3()
