@@ -585,7 +585,9 @@ class AbstractAgent(AgentValidator):
             "OPTIMAS": latexify(self.control_optimality()),
             "TRANSVERS": latexify(self.transversality_conditions()),
             "KKT": latexify(self.KKT()),
-            "GRC": latexify(self.regularity_conditions())
+            "GRC": latexify(self.regularity_conditions()),
+            "DUALS": latexify([*self.duals.keys()], to_str=True),
+            "DUALS_MAP": latexify([*self.duals.values()], to_str=True)
         }
         if not to_tex:
             return ret
