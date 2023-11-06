@@ -522,10 +522,10 @@ class AbstractAgent(AgentValidator):
     def regularity_conditions(self):
         if len(self.phase_boundaries()) != 1:
             return AnyPropertyNotFound(attr='More than one phase boundary. Not supported.')
-        return Eq(
+        return [Eq(
             span(gradient(self.phase_boundaries()[0], self.phases),
                  [i.rhs for i in self.transitions]), 0
-        )
+        )]
 
     def diff_degree(self, deg=None):
         """
@@ -584,7 +584,8 @@ class AbstractAgent(AgentValidator):
             "EULERS": latexify(self.euler_equations()),
             "OPTIMAS": latexify(self.control_optimality()),
             "TRANSVERS": latexify(self.transversality_conditions()),
-            "KKT": latexify(self.KKT())
+            "KKT": latexify(self.KKT()),
+            "GRC": latexify(self.regularity_conditions())
         }
         if not to_tex:
             return ret
