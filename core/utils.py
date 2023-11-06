@@ -5,6 +5,17 @@ from functools import wraps
 from time import perf_counter
 from logging import Logger
 
+from functools import lru_cache
+from pathlib import Path
+
+
+@lru_cache()
+def get_root_dir() -> str:
+    path = Path().cwd()
+    while not Path(path, "LICENCE.MD").exists():
+        path = path.parent
+    return str(path)
+
 
 def global_path(f):
     """
@@ -12,14 +23,14 @@ def global_path(f):
     """
     return os.getcwd() + os.path.splitdrive(os.path.abspath(f))[1]
 
-def timeit(func):
 
+def timeit(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         st = perf_counter()
         func(*args, **kwargs)
         et = perf_counter()
-        #logger.info(msg=f'Elapsed time: {et - st}')
+        # logger.info(msg=f'Elapsed time: {et - st}')
         print(f'Elapsed time: {et - st}')
 
     return wrapper

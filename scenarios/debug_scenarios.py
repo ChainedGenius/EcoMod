@@ -18,7 +18,6 @@ def kamenev2():
     f1_ = '/models/inputs/Kamenev_model/v2/Bfull.tex'
     f1__ = '/models/inputs/Kamenev_model/v2/Bmanual.tex'
 
-
     f2 = '/models/inputs/Kamenev_model/v2/Clim.tex'
     f2_ = '/models/inputs/Kamenev_model/v2/Cfull.tex'
     f2__ = '/models/inputs/Kamenev_model/v2/Cmanual.tex'
@@ -55,6 +54,7 @@ def ramsay():
     A.process(skip_validation=True)
     A.dump('/models/outputs/ramsay')
 
+
 @timeit
 def simple_agent():
     from sympy import Function
@@ -66,7 +66,7 @@ def simple_agent():
     print(A.Lagrangian)
     print(A.phases)
     print(A.transversality_conditions())
-    #A.dump('test/')
+    # A.dump('test/')
 
 
 @timeit
@@ -203,11 +203,8 @@ def p2model():
     M.dump('/models/outputs/Pmodel_2products')
 
 
-
-
-
 if __name__ == "__main__":
     kamenev2()
-    #ramsay()
-    #p_model_dump()
-    #p2model()
+    # ramsay()
+    # p_model_dump()
+    # p2model()

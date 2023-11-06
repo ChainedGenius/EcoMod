@@ -1,4 +1,4 @@
-#from os import startfile
+# from os import startfile
 from os.path import exists
 from pathlib import Path, PosixPath
 from shutil import rmtree, move
@@ -7,7 +7,10 @@ from tempfile import mkdtemp
 from jinja2 import Environment, FileSystemLoader, meta
 
 from core.errors.RWErrors import NotRendered
-from core.utils import global_path
+from core.utils import get_root_dir
+
+project_path = get_root_dir()
+
 
 class TexTemplateEngine(object):
     """
@@ -36,7 +39,7 @@ class TexTemplateEngine(object):
             line_comment_prefix='%#',
             trim_blocks=True,
             autoescape=False,
-            loader=FileSystemLoader('templates')
+            loader=FileSystemLoader(project_path + '/templates')
         )
         self.template = self.latex_jinja_env.get_template(self.template_name)
         self.rendered = ""

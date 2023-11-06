@@ -4,7 +4,7 @@ from typing import List
 from core.logger import log
 from core.market import MarketValidator, Flow
 from core.agent import AbstractAgent, AgentValidator, LinkedAgent, create_empty_agents
-from core.pprint import ModelTemplateEngine, exec_tex
+from templates.pprint import ModelTemplateEngine, exec_tex
 from core.utils import timeit
 
 

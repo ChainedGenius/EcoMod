@@ -11,11 +11,13 @@ from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
     DimensionCheckingFailed, ExtraVariableError, ObjectiveFunctionNotFound, NonSympyfiableError, NoSuchFlow
 from core.logger import log
 from core.market import Flow
-from core.pprint import AgentTemplateEngine, exec_tex
+from templates.pprint import AgentTemplateEngine, exec_tex
 from core.sympyfier import ecomodify, ecomodify_
-from core.utils import iterable_substract, timeit, set_equality
+from core.utils import iterable_substract, timeit, set_equality, get_root_dir
 
 from typing import Union, List, Dict
+
+project_path = get_root_dir()
 
 
 class AgentValidator(object):
@@ -593,7 +595,7 @@ class AbstractAgent(AgentValidator):
             return engine.render(ret).split(r'\begin{document}')[1].split(r'\end{document}')[0]
 
     @log(comment='Dumping agent file')
-    def dump(self, destination=None):
+    def dump(self, destination=None, is_absolute=False):
         """
         Create .tex and PDF files with Agent optimal conditions.
         :param destination: filepath or fd.
@@ -603,11 +605,14 @@ class AbstractAgent(AgentValidator):
             destination = '.'
         engine = AgentTemplateEngine()
         engine.render(self.compress())
-        tex_directorypath = Path(destination) / self.name
+        if is_absolute:
+            tex_directorypath = Path(project_path) / destination / self.name
+        else:
+            tex_directorypath = Path(destination) / self.name
         tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')
         # Due to bug with .absolute() method in Pathlib
-        tex_directorypath = Path(str(tex_directorypath.cwd()) + str(tex_directorypath))
-        tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
+        # tex_directorypath = Path(str(tex_directorypath.cwd()) + str(tex_directorypath))
+        # tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
         engine.dump(tex_filepath)
         exec_tex(tex_filepath, tex_directorypath)
 

@@ -5,6 +5,9 @@ from core.market import Balances
 from sympy import Eq, Function, Symbol, symbols, Expr, Integral, Derivative, exp, ln, \
     GreaterThan, LessThan
 
+from utils import get_root_dir
+
+project_path = get_root_dir()
 
 def example1():
     t = Symbol('t')
@@ -152,7 +155,7 @@ def example3():
     )
     P = LinkedAgent.from_abstract(P)
     P.process(skip_validation=True)
-    P.dump('/models/outputs/CZF/')
+    P.dump(project_path + '/models/outputs/CZF/', is_absolute=True)
 
 
 if __name__ == '__main__':
