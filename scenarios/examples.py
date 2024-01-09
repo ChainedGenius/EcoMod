@@ -2,12 +2,15 @@ from core.agent import AbstractAgent, LinkedAgent
 from core.model import Model
 from core.market import Balances
 
+from sympy import *
+
 from sympy import Eq, Function, Symbol, symbols, Expr, Integral, Derivative, exp, ln, \
     GreaterThan, LessThan
 
 from utils import get_root_dir
 
 project_path = get_root_dir()
+
 
 def example1():
     t = Symbol('t')
@@ -158,5 +161,33 @@ def example3():
     P.dump(project_path + '/models/outputs/CZF/', is_absolute=True)
 
 
+def example3_matrix_form():
+    # Parameters
+    t, rho, delta, eps1, eps2, T = symbols(r't \rho \delta \epsilon_1 \epsilon_2 T')
+    B, B1, R, R_s, R_l, M, eta, L0, S0, W0 = symbols(r'B B_1 R R_s R_l M \eta L_0 S_0 W_0')
+    C1, C2, C3 = symbols(r'C_1 C_2 C_3')
+    B11, B12, B13 = symbols(r'B_{11} B_{12} B_{13}')
+    J = symbols('J')
+    # Functions
+    x1, x2, x3, u1, u2, u3 = symbols('x_1 x_2 x_3 u_1 u_2 u_3', cls=Function)
+
+    # Vectors and Matrices
+    X = Matrix([[x1(t), x2(t), x3(t)]]).T
+    U = Matrix([[u1(t), u2(t), u3(t)]]).T
+    C = MatrixSymbol('C', 2, 3).T
+    B1_m = MatrixSymbol('B_1', 3, 3)
+    B = MatrixSymbol('B', 3, 3)
+    R = MatrixSymbol('R', 3, 1)
+    # Objective
+    obj = Eq(J, Integral(
+        -(u3(t)) ** (1 - rho) * exp(-delta * t) - eps1 * (u2(t)) ** 2 - eps2 * (u1(t)) ** 2,
+        (t, 0, T)))
+
+    #diffeq <vector mode>
+
+    diffeq = Eq(X.diff(t), B1_m * X)# * U + B * X + R)
+
+    pprint(diffeq)
+
 if __name__ == '__main__':
-    example3()
+    example3_matrix_form()
