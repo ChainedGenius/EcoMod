@@ -1,7 +1,7 @@
 from core.deserialiser import read_tex, read_model_from_tex
 from core.ecomod_utils import is_substricted, remove_subscript, latexify
 from core.errors.RWErrors import NotSubscriptedBalance
-from core.sympyfier import ecomodify
+from core.sympyfier import ecomodify, ecomodify_
 
 
 class Flow(object):
@@ -88,7 +88,7 @@ class Balances(object):
     @classmethod
     def read_from_tex(cls, f):
         header, content = read_model_from_tex(f)
-        _, _, equations, _, params, _ = ecomodify(content, xreplace=False)
+        _, _, equations, _, params, _ = ecomodify_(content)
         agents_tags = [p.name for p in params]
         balances = equations
         return cls(agents_tags, balances)

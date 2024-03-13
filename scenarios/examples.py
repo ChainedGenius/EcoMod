@@ -253,4 +253,4 @@ def example3_matrix_form():
 
 
 if __name__ == '__main__':
-    example_3_star()
+    example3()
