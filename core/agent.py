@@ -440,6 +440,14 @@ class AbstractAgent(AgentValidator):
         return span_dict({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
 
     @property
+    def Hamiltonian_Gamkrelidze(self):
+        """not tested yet"""
+        from sympy import Symbol
+        mu = Symbol('\mu')
+        # return span_dict(self.duals) - mu * gradient(self.inequations)
+        raise NotImplementedError('Not implemented yet')
+
+    @property
     def kwargs(self):
         """
         Kwargs, to re-init
@@ -585,7 +593,7 @@ class AbstractAgent(AgentValidator):
             "OPTIMAS": latexify(self.control_optimality()),
             "TRANSVERS": latexify(self.transversality_conditions()),
             "KKT": latexify(self.KKT()),
-            "GRC": latexify(self.regularity_conditions()),
+            # "GRC": latexify(self.regularity_conditions()),
             "DUALS": latexify([*self.duals.keys()], to_str=True),
             "DUALS_MAP": latexify([*self.duals.values()], to_str=True)
         }

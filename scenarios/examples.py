@@ -161,6 +161,68 @@ def example3():
     P.dump(project_path + '/models/outputs/CZF/', is_absolute=True)
 
 
+def example_3_star():
+    t, T, rho, delta, eps1, eps2, \
+        alpha_l, gamma_l, beta_l, \
+        alpha_s, gamma_s, beta_s, \
+        OC, n_s = symbols(r't T \rho \delta \epsilon_1 \epsilon_2 \alpha_l \gamma_l \beta_l \alpha_s \gamma_s '
+                          r'\beta_s OC n_s')
+
+    R_l, R_s, M, tau_s, tau_l, w_l, K_A = \
+        symbols(r'R_l R_s M \tau_s \tau_l w_l K_A')
+
+    L_0, S_0, A_0, eta, J = symbols(r'L_0 S_0 A_0 \eta J')
+
+    Z, r_l, r_s, L, S, A = symbols('Z r_l r_s L S A' , cls=Function)
+
+    objective = Eq(J, Integral(Z(t) ** (1-rho) * exp(-delta * t) - eps1 * (r_l(t))**2 - eps2 * (r_s(t))**2, (t, 0, T)))
+    diffeq1 = Eq(diff(L(t), t), L(t) * (alpha_l - gamma_l * r_l(t) - beta_l))
+    diffeq2 = Eq(diff(S(t), t), S(t) * (alpha_s + gamma_s * r_l(t) - beta_s))
+    diffeq3 = Eq(
+        diff(A(t), t),
+        -OC - Z(t) +
+        L(t) * ((gamma_l + 1) * r_l(t) + beta_l - alpha_l) +
+        S(t) * ((-1 + (1 - n_s) * gamma_s) * r_s(t) + (1 - n_s) * (alpha_s * beta_s))
+    )
+
+    eqs = [
+        Eq(L(0), L_0),
+        Eq(A(0), A_0),
+        Eq(S(0), S_0),
+    ]
+
+    ineqs = [
+        GreaterThan(r_l(t), 0),
+        LessThan(r_l(t), R_l),
+        GreaterThan(r_s(t), 0),
+        LessThan(r_s(t), R_s),
+        GreaterThan(Z(t), 0),
+        LessThan(Z(t), M),
+        GreaterThan(A(t) - tau_s * S(t) - tau_l * L(t), 0),
+        GreaterThan(L(t) * (1 * K_A * w_l) + (1 - K_A) * A(t) - S(t)*(1 - n_s), 0),
+        LessThan(A(0) + L(0) - (1 - n_s) * S(0), eta * (A(T) + L(T) - (1 - n_s) * S(T)))
+    ]
+
+    P = AbstractAgent(
+        name='A',
+        objectives=[objective],
+        equations=[diffeq1, diffeq2, diffeq3, *eqs],
+        inequations=ineqs,
+        params=[
+            T, rho, delta, eps1, eps2,
+            alpha_l, gamma_l, beta_l,
+            alpha_s, gamma_s, beta_s,
+            OC, n_s, R_l, R_s, M, tau_s,
+            tau_l, w_l, K_A, L_0, S_0, A_0, eta
+        ],
+        functions=[Z(t), r_l(t), r_s(t), L(t), S(t), A(t)]
+    )
+    P = LinkedAgent.from_abstract(P)
+    P.process(skip_validation=True)
+    # P.dump(project_path + '/models/outputs/AL_bank/', is_absolute=True)
+    print(P.regularity_conditions())
+
+
 def example3_matrix_form():
     # Parameters
     t, rho, delta, eps1, eps2, T = symbols(r't \rho \delta \epsilon_1 \epsilon_2 T')
@@ -183,11 +245,12 @@ def example3_matrix_form():
         -(u3(t)) ** (1 - rho) * exp(-delta * t) - eps1 * (u2(t)) ** 2 - eps2 * (u1(t)) ** 2,
         (t, 0, T)))
 
-    #diffeq <vector mode>
+    # diffeq <vector mode>
 
-    diffeq = Eq(X.diff(t), B1_m * X)# * U + B * X + R)
+    diffeq = Eq(X.diff(t), B1_m * X)  # * U + B * X + R)
 
     pprint(diffeq)
 
+
 if __name__ == '__main__':
-    example3_matrix_form()
+    example_3_star()
