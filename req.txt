@@ -1,7 +1,7 @@
 sympy
 numpy
 scipy
-antlr4-python3-runtime==4.10
+antlr4-python3-runtime==4.11
 pyyaml
 multipledispatch==0.6.0
 hypernetx

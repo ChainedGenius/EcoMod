@@ -24,6 +24,26 @@ class FunctionWrapper:
                 values.append(Function(element_name, **assumptions)())
         self._matrix = Matrix(m, n, values)
 
+    @classmethod
+    def from_symbol(cls, symbol, **kwargs):
+        obj = FunctionWrapper(symbol.name, **kwargs)
+        obj._scalar = symbol
+        return obj
+
+    @classmethod
+    def from_function(cls, function, **kwargs):
+        obj = FunctionWrapper(function.name, **kwargs)
+        obj._scalar = function.func.__call__(*function.args)
+
+    @classmethod
+    def from_matrix(cls, matrix, *args, **kwargs):
+        obj = FunctionWrapper(*args, **kwargs)
+        obj._matrix = matrix
+        return obj
+
+    def reshape(self, m, n):
+        self.__construct_matrix_form(self.name, m, n)
+
     def __call__(self, *args, scalar=True):
         values = []
         for i in range(self.m):

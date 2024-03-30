@@ -1,3 +1,6 @@
+import pickle
+
+
 class BaseSerializer:
     def __init__(self, file):
         self.file = file
@@ -8,5 +11,5 @@ class BaseSerializer:
             return cls._serialize(stream)
 
     @classmethod
-    def _serialize(cls, f):
-        pass
+    def _serialize(cls, stream):
+        return pickle.loads(stream)
