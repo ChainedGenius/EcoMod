@@ -5,25 +5,25 @@
 \usepackage[english,russian]{babel}
 \begin{document}
 
-Активы агента:
-    $x(t)$: текущий баланс [rub]
-    $c(t)$: траты [rub]
-    $r$: процентная ставка [1/year]
-    $r= 0.5$: rate
-    $x(0) = 1000$: начальный капитал
-    $\sigma$: ограничение трат [1]
-    $\sigma = 1$: bound
-    $\frac{dx(t)}{dt} = r*(x(t)-c(t))$: динамика капитала
-    $T$: горизонт планирования [year]
-    $T = 1$: horizon
-    $\delta$: дисконтирование [1/year]
-    $\delta = 0.5$: discount
-    $\sigma*c(t)\leq x(t)$: Уменьшение трат
+Agent description:
+    $x(t)$: current capital [rub]
+    $c(t)$: spendings [rub]
+    $r$: effective rate [1/year]
+    $r= 0.5$: rate value
+    $x(0) = 1000$: initial capital
+    $\sigma$: spendings boundary coefficient [1]
+    $\sigma = 1$: bound value
+    $\frac{dx(t)}{dt} = r*(x(t)-c(t))$: capital dynamics
+    $T$: planning horizon [year]
+    $T = 1$: horizon value
+    $\delta$: discount  [1/year]
+    $\delta = 0.5$: discount value
+    $\sigma*c(t)\leq x(t)$: spendings boundary
     $t$: time [year]
-    $c(t) \geq 0$: без овердрафта
+    $c(t) \geq 0$: no-overdraft conditions
 
-Задача агента:
-    $\MAX = 1/T * \int_0^T (\exp{-\delta*t} \ln(q*c(t)))dt$: целевой функционал
+Agent functional:
+    $\MAX = 1/T * \int_0^T (\exp{-\delta*t} \ln(q*c(t)))dt$: functional
 
 
 \end{document}

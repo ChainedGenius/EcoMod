@@ -1,31 +1,30 @@
 \documentclass[12pt]{article}
-\title{Агентская задача домохозяйства}
+\title{Household problem}
 \date{19.04.2022}
 \ProcessOptions
 \usepackage[english,russian]{babel}
 \begin{document}
 
-Задача потребителя:
-    $J = \int_0^T (\frac{1}{1-\beta} * (a_h * C(t, 1)^{\rho_h} + ((1-a_h)*C(t, 2)^{\rho_h})^{\frac{1}{\rho_h}})^{1-\beta} * \exp{-\delta_h*t})dt -> max$: полезность
-    $J$: CRRA от CES-свертки двух продуктов
+Optim problem:
+    $\MAX = \int_0^T (\frac{1}{1-\beta} * (a_h * C(t, 1)^{\rho_h} + ((1-a_h)*C(t, 2)^{\rho_h})^{\frac{1}{\rho_h}})^{1-\beta} * \exp{-\delta_h*t})dt$: functional
 
-Активы потребителя:
-    $C(t, 1)$: траектория потребления продукта 1
-    $C(t, 2)$: траектория потребления продукта 2
-    $N(t)$: остаток денежных средств
-    $\pi(t)$: прибыль
-    $\frac{dN(t)}{dt} = \pi(t) - p_{1}(t)*C(t,1) - p_{2}(t)*C(t,2)$: уравнение финансового баланса
-    $N(T) \geq 0$: неотрицательность остатков
+Actives:
+    $C(t, 1)$: consume function of goods 1
+    $C(t, 2)$: consume function of goods 1
+    $N(t)$: current cash
+    $\pi(t)$: profit
+    $\frac{dN(t)}{dt} = \pi(t) - p_{1}(t)*C(t,1) - p_{2}(t)*C(t,2)$: financial balance
+    $N(T) \geq 0$: cash non-negativeness
 
-Информационные переменные:
-    $p_{1}(t)$: цена на продукт1
-    $p_{2}(t)$: цена на продукт2
-    $\delta_h$: дисконт
-    $\rho_h$: пп
+External:
+    $p_{1}(t)$: price of goods 1
+    $p_{2}(t)$: price of goods 2
+    $\delta_h$: discount
+    $\rho_h$: param
 
-Параметры системы:
-    $T$: горизонт планирования
-    $t$: Время
+Parameters:
+    $T$: Horizon
+    $t$: time
     $\beta$: beta
 
 
