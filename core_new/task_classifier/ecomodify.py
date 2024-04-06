@@ -3,27 +3,12 @@ from itertools import chain
 from sympy import Integral
 from sympy.core.function import AppliedUndef, Derivative
 
+from math_tasks.abstract import AnyProblem
+from math_tasks.optimization import AnyOptimizationProblem, VariationalProblem, OptimalControlProblem
 from utils import set_equality
 
 
-class AnyProblem:
-    def __init__(self, **kwargs):
-        pass
 
-
-class AnyOptimizationProblem(AnyProblem):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class VariationalProblem(AnyOptimizationProblem):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class OptimalControlProblem(VariationalProblem):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 def classify_task(**kwargs):

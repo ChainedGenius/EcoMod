@@ -1,6 +1,6 @@
 from sympy import symbols, Function, Integral, Eq
 
-from datamodel.ecomodify import classify_task
+from task_classifier.ecomodify import classify_task
 from serializers.latex import LaTeXSerializer
 
 from task_classifier.classifier import TaskSanitizer
@@ -26,4 +26,4 @@ def opt_control1_from_latex():
     print(classify_task(**a.kwargs).__class__)
 
 if __name__ == '__main__':
-    variational()
+    opt_control1_from_latex()
