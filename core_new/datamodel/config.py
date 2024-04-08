@@ -1,26 +1,16 @@
-from sympy import sympify
-from sympy.core._print_helpers import Printable
-from sympy.core.function import AppliedUndef
+from sympy import sympify, Number, Symbol
+from sympy.core.function import AppliedUndef, FunctionClass
 from types import FunctionType
+
 
 class Config(dict):
     def __init__(self, **kwargs):
-        # self.__validate_keys(kwargs)
         kwargs = self.__sympify_values(kwargs)
         super().__init__(kwargs.items())
-        self.unfilled = self.__find_unfilled()
 
-
-    # def __validate_keys(self, kwargs):
-    #     has_bad_keys = any(not issubclass(k.__class__, Printable) for k in kwargs)
-    #     if has_bad_keys:
-    #         raise TypeError('Not all keys are Sympy objects, but have to!')
     @staticmethod
     def __sympify_values(kwargs):
         return {sympify(k): sympify(v) for k, v in kwargs.items()}
-
-    def __find_unfilled(self):
-        pass
 
     @classmethod
     def unfilled_from_list(cls, keys):
@@ -30,15 +20,21 @@ class Config(dict):
         return super().__getitem__(sympify(key))
 
     def __setitem__(self, key, value):
-        if (issubclass(sympify(key).__class__, Symbol)
+        if value is None and key is not None:
+            super().__setitem__(sympify(key), sympify(key))
+
+        elif (issubclass(sympify(key).__class__, Symbol)
                 and issubclass(sympify(value).__class__, Symbol)):
             super().__setitem__(sympify(key), sympify(value))
-        if (issubclass(sympify(key).__class__, Symbol)
-                and issubclass(sympify(value).__class__, Number)):
+
+        elif (issubclass(sympify(key).__class__, Symbol)
+              and issubclass(sympify(value).__class__, Number)):
             super().__setitem__(sympify(key), sympify(value))
+
         elif (issubclass(sympify(key).__class__, AppliedUndef)
               and issubclass(value.__class__, FunctionType)):
             super().__setitem__(sympify(key), value)
+
         elif (issubclass(sympify(key).__class__, AppliedUndef)
               and issubclass(sympify(value).__class__, (AppliedUndef, FunctionClass))):
             super().__setitem__(sympify(key), sympify(value))
@@ -46,18 +42,46 @@ class Config(dict):
         else:
             raise TypeError(f'Incompatible key and value {sympify(key).__class__} and {sympify(value).__class__}')
 
+    def is_filled(self):
+        return False if self.unfilled_keys() else True
+
+    def is_numeric(self):
+        return True if all(issubclass(v.__class__, (Number, FunctionType)) for v in self.values()) else False
+
+    def as_dict(self):
+        return self.copy()
+
+    def unfilled_keys(self):
+        unfilled_keys = []
+        for k, v in self.items():
+            if k == v:
+                unfilled_keys.append(k)
+        return unfilled_keys
 
 
-
-if __name__ == '__main__':
-    from sympy import *
-    t = Symbol('t')
-    x = Function('x')
-    a = Config(k='k', m=2)
-    print(a)
-
-    j,b,c = symbols('a b c')
-    func = lambdify([j,b,c], j+b+c)
-    a['k(t)'] = func
-
-    print(a)
+# if __name__ == '__main__':
+#     from sympy import *
+#
+#     t = Symbol('t')
+#     x = Function('x')
+#     a = Config(k='k', m=2)
+#     # print(a)
+#
+#     j, b, c = symbols('a b c')
+#     func = lambdify([j, b, c], j + b + c)
+#     a['k(t)'] = func
+#     a['k'] = 'c'
+#     print(a)
+#     print(a.unfilled_keys())
+#     print(a.is_filled())
+#     a['q'] = None
+#     print(a)
+#     print(a.unfilled_keys())
+#     print(a.is_filled())
+#
+#     print(a.is_numeric())
+#     a['k'] = 3
+#     a['q'] = 5
+#     print(a.is_filled())
+#     print(a.is_numeric())
+#     print(a.as_dict())

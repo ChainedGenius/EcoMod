@@ -1,17 +1,26 @@
 from sympy import Integral, simplify
 
-from math_tasks.abstract import AnyProblem
+from math_tasks.abstract import SystemProblem
+from task_classifier.validator import ExpressionDimensionValidator, CompletenessValidator
 
 
-class AnyOptimizationProblem(AnyProblem):
+class OptimizationProblem(SystemProblem):
     def __init__(self, **kwargs):
         pass
 
 
+class GlobalOptimizationProblem(OptimizationProblem):
+    def __init__(self):
+        pass
+
+
+class DomainOptimizationProblem(OptimizationProblem):
+    def __init__(self):
+        pass
+
+
 class VariationalProblem:
-    def __init__(self, objective, eq_boundaries, config=None, config_template=None, diffeq_boundaries=None, ineq_boundaries=None):
-        if config_template is None:
-            config_template = {}
+    def __init__(self, objective, eq_boundaries, config=None, diffeq_boundaries=None, ineq_boundaries=None):
         if config is None:
             config = {}
         if diffeq_boundaries is None:
@@ -28,11 +37,13 @@ class VariationalProblem:
         self.diffeq_boundaries = diffeq_boundaries
         self.ineq_boundaries = ineq_boundaries
 
-        self.config_template = config_template
         self.config = config
 
 
-
 class OptimalControlProblem:
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, validators=None, **kwargs):
+        if validators is None:
+            validators = [ExpressionDimensionValidator, CompletenessValidator]
+
+        for v in validators:
+            v(kwargs['equations'] + kwargs['inequations'] + kwargs['maximizations'], kwargs['variable_info'])

@@ -6,7 +6,7 @@
 \begin{document}
 
 Optim problem:
-    $\MAX = \int_0^T (\frac{1}{1-\beta} * (a_h * C(t, 1)^{\rho_h} + ((1-a_h)*C(t, 2)^{\rho_h})^{\frac{1}{\rho_h}})^{1-\beta} * \exp{-\delta_h*t})dt$: functional
+    $\MAX = \int_0^T (\frac{1}{1-\beta} * (a_{h} * C(t, 1)^{\rho_{h}} + ((1-a_{h})*C(t, 2)^{\rho_{h}})^{\frac{1}{\rho_{h}}})^{1-\beta} * \exp{-\delta_{h}*t})dt$: functional
 
 Actives:
     $C(t, 1)$: consume function of goods 1
@@ -15,17 +15,22 @@ Actives:
     $\pi(t)$: profit
     $\frac{dN(t)}{dt} = \pi(t) - p_{1}(t)*C(t,1) - p_{2}(t)*C(t,2)$: financial balance
     $N(T) \geq 0$: cash non-negativeness
+    $N(T)$: Terminal value of cash
 
 External:
     $p_{1}(t)$: price of goods 1
     $p_{2}(t)$: price of goods 2
-    $\delta_h$: discount
-    $\rho_h$: param
+    $\delta_{h}$: discount
+    $\rho_{h}$: param
+    $a_{h}$: macroparam
 
 Parameters:
     $T$: Horizon
     $t$: time
     $\beta$: beta
+
+Config:
+    $T=1$: Horizon value
 
 
 

@@ -12,8 +12,8 @@ from core_new.utils import extract_dim_desc, set_equality, MAX, MIN
 
 @dataclass
 class ScalarInfo:
-    value: typing.Union[int, Number, None] = None
-    range: typing.Union[Set, Interval, ProductSet, None] = Interval(-oo, oo)
+    # value: typing.Union[int, Number, None] = None
+    # range: typing.Union[Set, Interval, ProductSet, None] = Interval(-oo, oo)
     dim: typing.Union[Symbol, Number, None] = One()
     desc: typing.Union[str, None] = ''
 
@@ -60,7 +60,7 @@ class TaskSanitizer:
         self.maximizations = maximizations
 
         # will be filled during process and sanitize
-        self.scalar_info = {}  # old dimdict
+        self.variable_info = {}  # old dimdict
         self.config_template = {}  # symbolic
         self.config = {}  # numeric ?
 
@@ -77,6 +77,7 @@ class TaskSanitizer:
 
     def __extract_config(self):
         external_functions = [e for e in self.functions if '_' in e.name]
+        self.external_functions = external_functions
         for s in self.symbols + external_functions:
             self.config_template[s] = s
 
@@ -97,12 +98,12 @@ class TaskSanitizer:
         self.equations = sanitized_equations
 
     def __extract_scalar_info(self):
-        for s in self.symbols + self.fargs:
+        for s in self.symbols + self.fargs + self.external_functions:
             dim, desc = extract_dim_desc(self.raw_dict[s])
-            self.scalar_info[s] = ScalarInfo(value=self.config.get(s), dim=sympify(dim) if dim else One(), desc=desc)
+            self.variable_info[s] = ScalarInfo(dim=sympify(dim) if dim else One(), desc=desc)
         for f in self.functions:
             dim, desc = extract_dim_desc(self.raw_dict[f])
-            self.scalar_info[f] = ScalarInfo(range=Interval(-oo, oo), dim=sympify(dim) if dim else One(), desc=desc)
+            self.variable_info[f] = ScalarInfo(dim=sympify(dim) if dim else One(), desc=desc)
 
     def __sanitize(self):
         self.__find_function_args()

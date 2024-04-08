@@ -4,7 +4,7 @@ from task_classifier.ecomodify import classify_task
 from serializers.latex import LaTeXSerializer
 
 from task_classifier.classifier import TaskSanitizer
-from utils import MAX, make_raw_dict
+from utils import MAX, make_raw_dict, iterable_substract
 
 
 def variational():
@@ -22,8 +22,11 @@ def variational():
 def opt_control1_from_latex():
     a = LaTeXSerializer.serialize(r'C:\Users\BaTe\Documents\GitHub\EcoMod\models\inputs\Pmodel_2products\H.tex')
     a = TaskSanitizer(a)
-    print(a.kwargs)
-    print(classify_task(**a.kwargs).__class__)
+    # print(k:=[*a.kwargs.get('config').keys()])
+    # print(m:=[*a.kwargs.get('variable_info').keys()])
+    # print(iterable_substract(k, m))
+    # print(iterable_substract(m,k))
+    classify_task(**a.kwargs)
 
 if __name__ == '__main__':
     opt_control1_from_latex()
