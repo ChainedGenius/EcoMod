@@ -1,4 +1,4 @@
-from math_tasks.abstract import SystemProblem
+from EcoMod.math_tasks.abstract import SystemProblem
 
 
 class AlgebraicSystem(SystemProblem):

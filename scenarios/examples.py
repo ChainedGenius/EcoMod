@@ -1,13 +1,13 @@
-from core.agent import AbstractAgent, LinkedAgent
-from core.model import Model
+from core import AbstractAgent, LinkedAgent
+from core import Model
 from core.market import Balances
 
 from sympy import *
 
-from sympy import Eq, Function, Symbol, symbols, Expr, Integral, Derivative, exp, ln, \
+from sympy import Eq, Function, Symbol, symbols, Integral, Derivative, exp, ln, \
     GreaterThan, LessThan
 
-from utils import get_root_dir
+from core.utils import get_root_dir
 
 project_path = get_root_dir()
 

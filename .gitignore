@@ -2,7 +2,7 @@
 /models/outputs/
 /app/
 /core/__pycache__
-/core/errors/__pycache__
+/core/core/errors/__pycache__
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

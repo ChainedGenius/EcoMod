@@ -1,9 +1,9 @@
 import yaml
 from sympy.parsing.latex import parse_latex
 
-from core_new.serializers.base_serializer import BaseSerializer
-from errors.RWErrors import NonYAMLableError
-from core_new.utils import trim, unpack
+from EcoMod.serializers.base_serializer import BaseSerializer
+from core.errors.RWErrors import NonYAMLableError
+from EcoMod.utils import trim, unpack
 
 
 class LaTeXSerializer(BaseSerializer):

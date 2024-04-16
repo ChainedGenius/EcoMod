@@ -1,6 +1,6 @@
 from sympy import Symbol, Matrix
 
-from sympy_printer import print_str, print_latex
+from EcoMod.sympy_printer import print_latex
 
 
 class SymbolWrapper:

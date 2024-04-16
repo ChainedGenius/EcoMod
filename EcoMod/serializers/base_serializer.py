@@ -1,5 +1,8 @@
 import pickle
 
+from EcoMod.utils import global_path, get_root_dir
+
+root_dir = get_root_dir()
 
 class BaseSerializer:
     def __init__(self, file):
@@ -9,7 +12,9 @@ class BaseSerializer:
     def serialize(cls, f):
         from pathlib import Path
         name = Path(f).stem
-        with open(f, 'r') as stream:
+        f_ = root_dir + f
+
+        with open(f_, 'r') as stream:
             return cls._serialize(stream), name
 
     @classmethod

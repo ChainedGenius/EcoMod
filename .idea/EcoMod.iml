@@ -5,9 +5,11 @@
       <sourceFolder url="file://$MODULE_DIR$/core" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/scenarios" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/core_new" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/EcoMod" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/venv2" />
+      <excludeFolder url="file://$MODULE_DIR$/core" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -4,18 +4,18 @@ from pathlib import Path
 from numpy import prod
 from sympy import Eq
 
-from core.deserialiser import read_model_from_tex
-from core.ecomod_utils import deriv_degree, spec_funcs, generate_symbols, span, eq2func, euler_mask, \
-    transversality_mask, KKT_mask, latexify, add_subscript, is_substricted, is_spec_function, span_dict, gradient
-from core.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
-    DimensionCheckingFailed, ExtraVariableError, ObjectiveFunctionNotFound, NonSympyfiableError, NoSuchFlow
-from core.logger import log
-from core.market import Flow
+from EcoMod.deserialiser import read_model_from_tex
+from EcoMod.ecomod_utils import deriv_degree, generate_symbols, span, eq2func, euler_mask, \
+    transversality_mask, KKT_mask, latexify, add_subscript, span_dict, gradient
+from EcoMod.errors.RWErrors import TimeVariableNotFound, AnyPropertyNotFound, \
+    NoSuchFlow
+from EcoMod.logger import log
+from EcoMod.market import Flow
+from EcoMod.serializers.latex import LaTeXSerializer
+from EcoMod.task_classifier.classifier import TaskSanitizer, classify_task
 from templates.pprint import AgentTemplateEngine, exec_tex
-from core.sympyfier import ecomodify, ecomodify_
-from core.utils import iterable_substract, timeit, set_equality, get_root_dir
-
-from typing import Union, List, Dict
+from EcoMod.sympyfier import ecomodify_
+from EcoMod.utils import iterable_substract, get_root_dir
 
 project_path = get_root_dir()
 
@@ -79,10 +79,11 @@ class OptimalControlProblem:
 
 
     """
-    emitent = False
 
-    def __init__(self, name='', objectives=None, inequations=None, equations=None, functions=None, params=None,
-                 dim_dict=None):
+    def __init__(self, name, objectives=None, inequations=None, equations=None, functions=None, config=None,
+                 dim_dict=None, **kwargs):
+        if config is None:
+            config = {}
         if dim_dict is None:
             dim_dict = {}
         if objectives is None:
@@ -93,16 +94,16 @@ class OptimalControlProblem:
             equations = []
         if functions is None:
             functions = []
-        if params is None:
-            params = []
-        self.params = params
         self.functions = functions
         self.equations = equations
         self.inequations = inequations
         self.objectives = objectives
         self.dim_dict = dim_dict
         self.name = name
+        self.config = config
+
         # dual variables k:v where k = real phase or ineq constraint, v = dual
+
         self.lambdas = {}  # for conjugate arbitrary constants
         self.duals = {}  # for conjugate functions
         # linking part)
@@ -123,7 +124,7 @@ class OptimalControlProblem:
         lambda_factor = self.objectives + self.boundaries + self.constant_ineqs
         lambdas_count = len(lambda_factor)
         self.lambdas = {
-            (eq2func(lambda_factor[i]) if lambda_factor[i] not in self.objectives else lambda_factor[i].args[1]): v for
+            (eq2func(lambda_factor[i]) if lambda_factor[i] not in self.objectives else lambda_factor[i]): v for
             i, v in enumerate(generate_symbols(tag='lambda', count=lambdas_count, cls=Symbol))}
         # step 2: create conjugates funcs (duals)
         alpha_factors = self.transitions + iterable_substract(self.inequations, self.constant_ineqs) + self.boundaries
@@ -201,12 +202,17 @@ class OptimalControlProblem:
         return phases
 
     @property
+    def params(self):
+        return [i for i in self.config.keys() if i not in self.external]
+
+    @property
     def external(self):
         """
         Extract exogenous functions, they must be substricted
         :return: List[Symbol]
         """
-        return [ext for ext in self.functions if (is_substricted(ext) and not is_substricted(ext, tag=self.name))]
+        # return [ext for ext in self.functions if (is_substricted(ext) and not is_substricted(ext, tag=self.name))]
+        return [ext for ext in self.config if ext.is_Function]
 
     @property
     def controls(self):
@@ -261,7 +267,7 @@ class OptimalControlProblem:
         """
         from sympy import Integral
         return span_dict(self.duals) + span_dict(
-            {k: v for k, v in self.lambdas.items() if k in [i.args[1] for i in self.objectives]}).replace(
+            {k: v for k, v in self.lambdas.items() if k in [i for i in self.objectives]}).replace(
             lambda x: isinstance(x, Integral), lambda x: x.args[0])
 
     @property
@@ -270,7 +276,7 @@ class OptimalControlProblem:
         Terminant part of L
         :return: Expr
         """
-        return span_dict({k: v for k, v in self.lambdas.items() if k not in [i.args[1] for i in self.objectives]})
+        return span_dict({k: v for k, v in self.lambdas.items() if k not in [i for i in self.objectives]})
 
     @property
     def Hamiltonian_Gamkrelidze(self):
@@ -343,7 +349,7 @@ class OptimalControlProblem:
         :return: List[Expr]
         """
         _duals = {k: v for k, v in self.duals.items() if k not in [eq2func(e) for e in self.transitions]}
-        _lambdas = {k: v for k, v in self.lambdas.items() if k not in [o.rhs for o in self.objectives]}
+        _lambdas = {k: v for k, v in self.lambdas.items() if k not in [o for o in self.objectives]}
         return KKT_mask(_duals) + KKT_mask(_lambdas)
 
     def control_boundaries(self):
@@ -386,17 +392,25 @@ class OptimalControlProblem:
 
     @classmethod
     @log(comment='\nParsing new agent file.')
-    def read_from_tex(cls, f):
+    def read_from_tex(cls, f, new=False):
         """
         Contructor from .tex files. See Knowledge base to get guidelines.
         :param f: filename or fd
+        :param new: Parse with constructing config
         :return: Agent
         """
         from pathlib import Path
         name = Path(f).stem
-        header, raw_model = read_model_from_tex(f)
-        model = ecomodify_(raw_model)
-        return cls(name, *model)
+        if new:
+            serialized, name = LaTeXSerializer.serialize(f)
+            raw = TaskSanitizer(serialized, name)
+            task, type = classify_task(**raw.kwargs)
+            if type == 4:  # optimal control task
+                return cls(**task)
+        else:
+            header, raw_model = read_model_from_tex(f)
+            model = ecomodify_(raw_model)
+            return cls(name, *model)
 
     @log(comment='Agent ready for economic processing')
     def process(self, skip_validation=False):
@@ -461,6 +475,9 @@ class OptimalControlProblem:
         exec_tex(tex_filepath, tex_directorypath)
 
 
+AbstractAgent = OptimalControlProblem
+
+
 class LinkedAgent(OptimalControlProblem):
     """
     Methods:
@@ -480,7 +497,6 @@ class LinkedAgent(OptimalControlProblem):
 
 
     """
-    emitent = False
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -538,27 +554,3 @@ def create_empty_agents(names, cls=OptimalControlProblem):
     """
     names = names.split(' ')
     return [cls(name) for name in names] if len(names) != 1 else cls(names)
-
-
-if __name__ == "__main__":
-    @timeit
-    def main():
-        f = '../inputs/agent.tex'
-        A = LinkedAgent.read_from_tex(f)
-        A.process()
-        B = LinkedAgent.from_abstract(create_empty_agents('B'))
-        C = LinkedAgent.from_abstract(create_empty_agents('C'))
-        A.add_flow(Flow(A, C, 3, 'rub'))
-        B.add_flow(Flow(A, B, 6, 'tv'))
-        print(A.__class__())
-        print(A.name)
-        print(A.Lagrangian)
-        print(A.lagrangian)
-        print(A.euler_equations())
-        print(A.transversality_conditions())
-        print(A.control_optimality())
-        print(A.KKT())
-        print(A.print_flows())
-
-
-    print('Done')

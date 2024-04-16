@@ -1,7 +1,12 @@
-from core.agent import LinkedAgent, create_empty_agents, AbstractAgent
-from core.market import Flow, Market, Balances
-from core.model import Model
-from core.utils import timeit
+from sympy import symbols, Function, Integral, Eq
+
+from EcoMod.math_tasks.agent import LinkedAgent, create_empty_agents, AbstractAgent
+from EcoMod.market import Flow, Balances
+from EcoMod.model import Model
+from EcoMod.utils import timeit
+from EcoMod.math_tasks.agent import OptimalControlProblem
+from EcoMod.task_classifier.classifier import TaskSanitizer, classify_task
+from EcoMod.utils import MAX, make_raw_dict
 
 
 @timeit
@@ -57,8 +62,6 @@ def ramsay():
 
 @timeit
 def simple_agent():
-    from sympy import Function
-    from itertools import chain
     f = '/models/inputs/Pmodel/H.tex'
     A = LinkedAgent.read_from_tex(f)
     A.process(skip_validation=True)
@@ -185,7 +188,6 @@ def pgmodel():
 
 @timeit
 def p2model():
-    from sympy.printing.latex import latex
     f1 = '/models/inputs/Pmodel_2products/H.tex'
     H = AbstractAgent.read_from_tex(f1)
     H.process(skip_validation=True)
@@ -200,11 +202,40 @@ def p2model():
 
     M = Model('Pmodel', B, [H, P])
     M.process()
-    M.dump('/models/outputs/Pmodel_2products')
+    M.dump('/models/outputs/Pmodel_2products')\
 
+def variational():
+    t, A, B = symbols('t A B')
+    x = Function('x')
+    eqs = [Eq(MAX, Integral(A * (x(t).diff(t)) ** 2 + B * t * x(t), (t, 0, 1))),
+           Eq(x(0), 0),
+           Eq(x(1), 0)]
+
+    raw_dict = TaskSanitizer(make_raw_dict(eqs + [x(t), t, A, B]), 'A')
+    print(classify_task(**raw_dict.kwargs).__class__)
+
+
+def opt_control1_from_latex():
+    # a, name = LaTeXSerializer.serialize(r'C:\Users\BaTe\Documents\GitHub\EcoMod\models\inputs\Pmodel_2products\H.tex')
+    # a = TaskSanitizer(a, name)
+    # # print(a.kwargs)
+    # # print(a.functions)
+    # # print(a.symbols)
+    # # print(a.config_template)
+    # # print(a.config)
+    task = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\H.tex', new=True)
+    task.process()
+    print(task.Lagrangian)
+    print(task.lagrangian)
+    print(task.variables)
+    print(task.params)
+    print(task.external)
+    print(task.functions)
+    print(task.config)
 
 if __name__ == "__main__":
-    kamenev2()
+    opt_control1_from_latex()
+    # kamenev2()
     # ramsay()
     # p_model_dump()
     # p2model()

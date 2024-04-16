@@ -1,13 +1,13 @@
 # from os import startfile
 from os.path import exists
-from pathlib import Path, PosixPath
+from pathlib import Path
 from shutil import rmtree, move
 from subprocess import run
 from tempfile import mkdtemp
 from jinja2 import Environment, FileSystemLoader, meta
 
-from core.errors.RWErrors import NotRendered
-from core.utils import get_root_dir
+from EcoMod.errors.RWErrors import NotRendered
+from EcoMod.utils import get_root_dir
 
 project_path = get_root_dir()
 

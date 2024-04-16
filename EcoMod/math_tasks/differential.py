@@ -1,5 +1,5 @@
-from math_tasks.abstract import SystemProblem
-from math_tasks.algebraic import AlgebraicSystem
+from EcoMod.math_tasks.abstract import SystemProblem
+from EcoMod.math_tasks.algebraic import AlgebraicSystem
 
 
 class DifferentialSystem(SystemProblem):

@@ -2,12 +2,16 @@ import typing
 from dataclasses import dataclass
 from itertools import chain
 
-from sympy import Number, Set, Interval, ProductSet, oo, Symbol, sympify, Integral
+from sympy import Number, Symbol, sympify, Integral
 from sympy.core.function import AppliedUndef, Derivative
 from sympy.core.numbers import One
 from sympy.core.relational import Relational
 
-from core_new.utils import extract_dim_desc, set_equality, MAX, MIN
+from EcoMod.utils import extract_dim_desc, set_equality, MAX, MIN
+from EcoMod.math_tasks.abstract import SystemProblem
+from EcoMod.math_tasks.optimization import OptimizationProblem, VariationalProblem
+from EcoMod.task_classifier.validator import OptimalControlProblemValidator
+from core.utils import set_equality
 
 
 @dataclass
@@ -16,7 +20,6 @@ class ScalarInfo:
     # range: typing.Union[Set, Interval, ProductSet, None] = Interval(-oo, oo)
     dim: typing.Union[Symbol, Number, None] = One()
     desc: typing.Union[str, None] = ''
-
 
 
 def object_classifier(raw_dict):
@@ -68,51 +71,49 @@ class TaskSanitizer:
         self.__sanitize()
         self.__dedup()
 
+    def __sanitize(self):
+        self.__extract_external_functions()
+        self.__sanitize_equations()
+        self.__find_function_args()
+        self.__sanitize_symbols()
+        self.__extract_config()
+        self.__extract_scalar_info()
+        self.__sanitize_functions()
+        self.config = self.config_template | self.config
+        del self.config_template
+        del self.raw_dict
+
+    def __extract_external_functions(self):
+        self.external_functions = [e for e in self.functions if '_' in e.name]
+        self.functions = [f for f in self.functions if f not in self.external_functions]
+
+    def __sanitize_equations(self):
+        sanitized_equations = self.equations.copy()
+        for e in self.equations:
+            if e.args[0] in self.symbols and (e.args[1].is_constant() or e.args[1] in self.external_functions):
+                self.config.update({e.args[0]: e.args[1]})
+                sanitized_equations.remove(e)
+        self.equations = sanitized_equations
+
     def __find_function_args(self):
         unsanitized_fargs = [*chain(*[f.args for f in self.functions])] + [
             *chain(*[[iv.args[1][0] for iv in ov.find(Integral)] for ov in self.maximizations])]
-        self.fargs = [i for i in unsanitized_fargs if not i.is_Number]
+        self.fargs = [*{*[i for i in unsanitized_fargs if not i.is_Number and i not in self.config]}]
 
     def __sanitize_symbols(self):
         self.symbols = [s for s in self.symbols if s not in self.fargs]
 
     def __extract_config(self):
-        external_functions = [e for e in self.functions if '_' in e.name]
-        self.external_functions = external_functions
-        for s in self.symbols + external_functions:
+        for s in self.symbols + self.external_functions:
             self.config_template[s] = s
 
-    def __sanitize_functions(self):
-        sanitized_functions = self.functions.copy()
-        external_functions = [e for e in self.functions if '_' in e.name]
-        for ex in external_functions:
-            sanitized_functions.remove(ex)
-        self.functions = sanitized_functions
-
-    def __sanitize_equations(self):
-        self.config = self.config_template.copy()
-        sanitized_equations = self.equations.copy()
-        for e in self.equations:
-            if e.args[0] in self.symbols and e.args[1].is_constant():
-                self.config.update({e.args[0]: e.args[1]})
-                sanitized_equations.remove(e)
-        self.equations = sanitized_equations
-
     def __extract_scalar_info(self):
-        for s in self.symbols + self.fargs + self.external_functions:
+        for s in self.symbols + self.fargs + self.external_functions + self.functions:
             dim, desc = extract_dim_desc(self.raw_dict[s])
             self.variable_info[s] = ScalarInfo(dim=sympify(dim) if dim else One(), desc=desc)
-        for f in self.functions:
-            dim, desc = extract_dim_desc(self.raw_dict[f])
-            self.variable_info[f] = ScalarInfo(dim=sympify(dim) if dim else One(), desc=desc)
 
-    def __sanitize(self):
-        self.__find_function_args()
-        self.__sanitize_symbols()
-        self.__extract_config()
-        self.__sanitize_functions()
-        self.__sanitize_equations()
-        self.__extract_scalar_info()
+    def __sanitize_functions(self):
+        self.functions = [f for f in self.functions if any(i not in self.config for i in f.args)]
 
     def __dedup(self):
         attr_copy = self.__dict__.copy()
@@ -121,6 +122,26 @@ class TaskSanitizer:
     @property
     def kwargs(self):
         ret = self.__dict__.copy()
-        ret.pop('raw_dict')
         return ret
 
+
+def classify_task(**kwargs):
+    if not kwargs.get('maximizations', []):
+        return SystemProblem(**kwargs), 1
+
+    if len(kwargs['maximizations']) > 1:
+        raise NotImplementedError('Two optimization functionals')
+    integral_sample = kwargs['maximizations'][0].find(Integral).pop()
+    functions = kwargs.get('functions', [])
+    if not integral_sample or (
+            integral_sample and set_equality(integral_sample.find(AppliedUndef) - set(functions),
+                                             integral_sample.find(AppliedUndef))):
+        return OptimizationProblem(**kwargs), 2
+
+    # find control variables ? aka classify functions
+    phase_variables = [*chain(*[[d.args[0] for d in e.find(Derivative)] for e in kwargs.get('equations', [])])]
+    control_variables = [c for c in functions if c not in phase_variables]
+    if not control_variables or (not phase_variables and control_variables):
+        return VariationalProblem(**kwargs), 3
+
+    return OptimalControlProblemValidator(**kwargs), 4

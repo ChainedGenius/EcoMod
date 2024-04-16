@@ -1,0 +1,30 @@
+\documentclass{a_model}
+\title{Агентская задача домохозяйства}
+\date{19.04.2022}
+\ProcessOptions
+\usepackage[english,russian]{babel}
+\begin{document}
+
+Активы агента:
+    $x(t)$: текущий баланс [rub]
+    $c(t)$: траты [rub]
+    $r$: процентная ставка [1/year]
+    $r= 0.5$: rate
+    $x(0) = 1000$: начальный капитал
+    $\sigma$: ограничение трат [1]
+    $\sigma = 1$: bound
+    $\frac{dx(t)}{dt} = r*(x(t)-c(t))$: динамика капитала
+    $T$: горизонт планирования [year]
+    $T = 1$: horizon
+    $\delta$: дисконтирование [1/year]
+    $\delta = 0.5$: discount
+    $\sigma*c(t)\leq x(t)$: Уменьшение трат
+    $t$: time [year]
+    $c(t) \geq 0$: без овердрафта
+
+Задача агента:
+    $J = 1/T * \int_0^T (\exp{-\delta*t} \ln(q*c(t)))dt -> max$: целевой функционал
+    $J$: Целевой функционал [1]
+
+
+\end{document}
