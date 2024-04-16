@@ -7,8 +7,10 @@ class BaseSerializer:
 
     @classmethod
     def serialize(cls, f):
+        from pathlib import Path
+        name = Path(f).stem
         with open(f, 'r') as stream:
-            return cls._serialize(stream)
+            return cls._serialize(stream), name
 
     @classmethod
     def _serialize(cls, stream):

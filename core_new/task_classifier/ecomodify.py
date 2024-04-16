@@ -4,7 +4,8 @@ from sympy import Integral
 from sympy.core.function import AppliedUndef, Derivative
 
 from math_tasks.abstract import SystemProblem
-from math_tasks.optimization import OptimizationProblem, VariationalProblem, OptimalControlProblem
+from math_tasks.agent import OptimalControlProblem
+from math_tasks.optimization import OptimizationProblem, VariationalProblem, OptimalControlProblemValidator
 from utils import set_equality
 
 
@@ -30,7 +31,5 @@ def classify_task(**kwargs):
     if not control_variables or (not phase_variables and control_variables):
         return VariationalProblem(**kwargs)
 
-    # print(phase_variables)
-    # print(control_variables)
+    return OptimalControlProblem(**OptimalControlProblemValidator(**kwargs))
 
-    return OptimalControlProblem(**kwargs)

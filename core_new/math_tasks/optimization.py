@@ -40,10 +40,31 @@ class VariationalProblem:
         self.config = config
 
 
-class OptimalControlProblem:
-    def __init__(self, validators=None, **kwargs):
+class OptimalControlProblemValidator:
+    def __new__(cls, validators=None, **kwargs):
         if validators is None:
             validators = [ExpressionDimensionValidator, CompletenessValidator]
 
+        print('validation started')
         for v in validators:
             v(kwargs['equations'] + kwargs['inequations'] + kwargs['maximizations'], kwargs['variable_info'])
+
+        print('validation ended')
+
+        name = kwargs.get('name', '')
+        objectives = kwargs.get('maximizations', [])
+        inequations = kwargs.get('inequations', [])
+        equations = kwargs.get('equations', [])
+        functions = kwargs.get('functions', [])
+        params = [*kwargs.get('variable_info', {}).keys()]
+        dim_dict = kwargs.get('variable_info', {})
+        return {
+            'name': name,
+            'objectives': objectives,
+            'inequations': inequations,
+            'equations': equations,
+            'functions': functions,
+            'params': params,
+            'dim_dict': dim_dict
+        }
+

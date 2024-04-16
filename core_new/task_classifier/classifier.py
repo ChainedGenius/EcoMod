@@ -50,7 +50,8 @@ def object_classifier(raw_dict):
 
 
 class TaskSanitizer:
-    def __init__(self, raw_dict):
+    def __init__(self, raw_dict, name):
+        self.name = name
         self.raw_dict = raw_dict
         symbols, functions, equations, inequations, maximizations = object_classifier(raw_dict)
         self.symbols = symbols

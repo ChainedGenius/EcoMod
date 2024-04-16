@@ -82,7 +82,15 @@ if __name__ == '__main__':
     a, b, c, d, t = symbols('a b c d t')
     x, y, z = symbols('x y z', cls=Function)
     # test
-    CompletenessValidator([sin(a) + b + gamma(c) + x(t) + y(t), y(t) + x(t)], [a, b, c, x(t), y(t), t])
+    CompletenessValidator([sin(a) + b + gamma(c) + x(t) + y(t), y(t) + x(t)], {
+                                     a: ScalarInfo(dim=sympify(1), desc=''),
+                                     b: ScalarInfo(dim=sympify(1), desc=''),
+                                     c: ScalarInfo(dim=sympify('rub*year'), desc=''),
+                                     #d: ScalarInfo(dim=sympify('rub'), desc=''),
+                                     x(t): ScalarInfo(dim=sympify('rub*year'), desc=''),
+                                     y(t): ScalarInfo(dim=sympify('rub'), desc=''),
+                                     t: ScalarInfo(dim=sympify('year'), desc=''),
+                                 })
     ExpressionDimensionValidator([Eq(d * (sin(sin(a)) + gamma(b)), x(t).diff(t)), Eq(Integral(y(t), (t, 0, 1)), c)],
                                  {
                                      a: ScalarInfo(dim=sympify(1), desc=''),
