@@ -6,9 +6,9 @@ from sympy.core.relational import Relational, Eq
 from sympy.parsing.latex import parse_latex
 from sympy.parsing.latex.errors import LaTeXParsingError
 
-from core.ecomod_utils import spec_funcs, is_spec_function
-from core.errors.RWErrors import NonSympyfiableError, VariableAmbiguity, ExtraVariableError, DimensionInExpression
-from core.utils import extract_dim_desc, set_equality, find_objective_markers, iterable_substract
+from EcoMod.ecomod_utils import spec_funcs, is_spec_function
+from EcoMod.errors.RWErrors import NonSympyfiableError, VariableAmbiguity, ExtraVariableError, DimensionInExpression
+from EcoMod.utils import extract_dim_desc, set_equality, find_objective_markers, iterable_substract
 
 
 def _xsympify(raw_str):

@@ -4,19 +4,18 @@ from EcoMod.utils import global_path, get_root_dir
 
 root_dir = get_root_dir()
 
+
 class BaseSerializer:
     def __init__(self, file):
         self.file = file
 
-    @classmethod
-    def serialize(cls, f):
+    def serialize(self):
         from pathlib import Path
-        name = Path(f).stem
-        f_ = root_dir + f
+        name = Path(self.file).stem
+        f_ = root_dir + self.file
 
         with open(f_, 'r') as stream:
-            return cls._serialize(stream), name
+            return self._serialize(stream), name
 
-    @classmethod
-    def _serialize(cls, stream):
+    def _serialize(self, stream):
         return pickle.loads(stream)

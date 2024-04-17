@@ -57,31 +57,3 @@ class Config(dict):
             if k == v:
                 unfilled_keys.append(k)
         return unfilled_keys
-
-
-# if __name__ == '__main__':
-#     from sympy import *
-#
-#     t = Symbol('t')
-#     x = Function('x')
-#     a = Config(k='k', m=2)
-#     # print(a)
-#
-#     j, b, c = symbols('a b c')
-#     func = lambdify([j, b, c], j + b + c)
-#     a['k(t)'] = func
-#     a['k'] = 'c'
-#     print(a)
-#     print(a.unfilled_keys())
-#     print(a.is_filled())
-#     a['q'] = None
-#     print(a)
-#     print(a.unfilled_keys())
-#     print(a.is_filled())
-#
-#     print(a.is_numeric())
-#     a['k'] = 3
-#     a['q'] = 5
-#     print(a.is_filled())
-#     print(a.is_numeric())
-#     print(a.as_dict())

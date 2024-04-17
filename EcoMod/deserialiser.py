@@ -1,6 +1,8 @@
 import yaml
-from core.errors.RWErrors import NonLaTeXableError, NonYAMLableError
-from core.utils import unpack, trim, global_path
+from EcoMod.errors.RWErrors import NonLaTeXableError, NonYAMLableError
+from EcoMod.utils import unpack, trim, global_path, get_root_dir
+
+root_dir = get_root_dir()
 
 def read_tex(f):
     """
@@ -8,7 +10,8 @@ def read_tex(f):
     :param f: filename or fd
     :return: yaml parsable object + header
     """
-    with open(global_path(f), 'r', encoding='utf-8') as stream:
+    f_ = root_dir + f
+    with open(f_, 'r', encoding='utf-8') as stream:
         content = stream.read()
         splitted = content.split(r'\begin{document}')
         if len(splitted) == 1:

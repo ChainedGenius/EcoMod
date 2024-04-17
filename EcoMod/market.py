@@ -1,7 +1,7 @@
-from core.deserialiser import read_tex, read_model_from_tex
-from core.ecomod_utils import is_substricted, remove_subscript, latexify
-from core.errors.RWErrors import NotSubscriptedBalance
-from core.sympyfier import ecomodify, ecomodify_
+from EcoMod.deserialiser import read_tex, read_model_from_tex
+from EcoMod.ecomod_utils import is_substricted, remove_subscript, latexify
+from EcoMod.errors.RWErrors import NotSubscriptedBalance
+from EcoMod.sympyfier import ecomodify, ecomodify_
 
 
 class Flow(object):

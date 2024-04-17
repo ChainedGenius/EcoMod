@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import List
 
-from core.logger import log
-from core.market import MarketValidator, Flow
-from core.agent import AbstractAgent, AgentValidator, LinkedAgent, create_empty_agents
+from EcoMod.logger import log
+from EcoMod.market import MarketValidator, Flow
+from EcoMod.math_tasks.agent import AbstractAgent, LinkedAgent, create_empty_agents
 from templates.pprint import ModelTemplateEngine, exec_tex
-from core.utils import timeit
+from EcoMod.utils import timeit
 
 
 class AgentMerger(object):
@@ -30,9 +30,11 @@ class AgentMerger(object):
         self.__rename_agent_local_variables(lagents)
 
 
-class ModelValidator(MarketValidator, AgentValidator, AgentMerger):
+class ModelValidator(MarketValidator,
+                     # AgentValidator,
+                     AgentMerger):
     def validate(self, markets, lagents):
-        self.validate_agents(lagents)
+        # self.validate_agents(lagents)
         self.validate_market(markets)
         self.merge(lagents)
 
@@ -71,8 +73,8 @@ class Model(ModelValidator):
         engine.render(template_data)
         tex_directorypath = Path(destination) / self.name
         tex_filepath = (tex_directorypath / self.name).with_suffix('.tex')
-        tex_directorypath = Path(str(tex_directorypath.cwd()) + str(tex_directorypath))
-        tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
+        # tex_directorypath = Path(str(tex_directorypath.cwd()) + str(tex_directorypath))
+        # tex_filepath = Path(str(tex_filepath.cwd()) + str(tex_filepath))
         engine.dump(tex_filepath)
         exec_tex(tex_filepath, tex_directorypath)
 

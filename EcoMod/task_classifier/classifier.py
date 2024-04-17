@@ -11,7 +11,7 @@ from EcoMod.utils import extract_dim_desc, set_equality, MAX, MIN
 from EcoMod.math_tasks.abstract import SystemProblem
 from EcoMod.math_tasks.optimization import OptimizationProblem, VariationalProblem
 from EcoMod.task_classifier.validator import OptimalControlProblemValidator
-from core.utils import set_equality
+from EcoMod.utils import set_equality
 
 
 @dataclass

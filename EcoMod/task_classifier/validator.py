@@ -3,7 +3,7 @@ from sympy import Symbol, Integral, Derivative, Expr
 from sympy import sympify, evaluate, Mul
 from sympy.core.function import AppliedUndef, Function
 
-from core.utils import iterable_substract
+from EcoMod.utils import iterable_substract
 
 
 class CompletenessValidator:
@@ -30,7 +30,7 @@ class ExpressionDimensionValidator:
     def __init__(self, relations, variables_info, deep=False):
 
         random_coef = rand(len(variables_info, ))
-        var2dim = {kv[0]: kv[1].dim * random_coef[i] for i, kv in enumerate(variables_info.items())}
+        var2dim = {kv[0] if isinstance(kv[0], Symbol) else Symbol(kv[0].func.name): kv[1].dim * random_coef[i] for i, kv in enumerate(variables_info.items())}
 
         errors = []
         spec_stack = set()
@@ -50,8 +50,10 @@ class ExpressionDimensionValidator:
                     {i: i.args[0] / Mul(*[der[0] * der[1] for der in i.args[1:]]) for i in buf_rel.find(Derivative)})
 
                 # substitute randomized dictionary
-                dim_rel = buf_rel.subs(var2dim)
-
+                dim_rel = buf_rel.subs({k: Symbol(k.func.name) for k in buf_rel.find(AppliedUndef)})
+                dim_rel = dim_rel.subs(var2dim)
+                # print(dim_rel)
+                # print('\n')
             if not (dim_rel.rhs / dim_rel.lhs).simplify().is_constant():
                 errors.append(rel)
         if deep:
@@ -81,7 +83,7 @@ class ExpressionDimensionValidator:
 class OptimalControlProblemValidator:
     def __new__(cls, validators=None, **kwargs):
         if validators is None:
-            validators = [ExpressionDimensionValidator, CompletenessValidator]
+            validators = [CompletenessValidator, ExpressionDimensionValidator]
 
         for v in validators:
             v(kwargs['equations'] + kwargs['inequations'] + kwargs['maximizations'], kwargs['variable_info'])
@@ -106,29 +108,3 @@ class OptimalControlProblemValidator:
             'external_functions': external_functions,
             'config': config
         }
-
-
-# if __name__ == '__main__':
-#     # input
-#     a, b, c, d, t = symbols('a b c d t')
-#     x, y, z = symbols('x y z', cls=Function)
-#     # test
-#     CompletenessValidator([sin(a) + b + gamma(c) + x(t) + y(t), y(t) + x(t)], {
-#         a: ScalarInfo(dim=sympify(1), desc=''),
-#         b: ScalarInfo(dim=sympify(1), desc=''),
-#         c: ScalarInfo(dim=sympify('rub*year'), desc=''),
-#         # d: ScalarInfo(dim=sympify('rub'), desc=''),
-#         x(t): ScalarInfo(dim=sympify('rub*year'), desc=''),
-#         y(t): ScalarInfo(dim=sympify('rub'), desc=''),
-#         t: ScalarInfo(dim=sympify('year'), desc=''),
-#     })
-#     ExpressionDimensionValidator([Eq(d * (sin(sin(a)) + gamma(b)), x(t).diff(t)), Eq(Integral(y(t), (t, 0, 1)), c)],
-#                                  {
-#                                      a: ScalarInfo(dim=sympify(1), desc=''),
-#                                      b: ScalarInfo(dim=sympify(1), desc=''),
-#                                      c: ScalarInfo(dim=sympify('rub*year'), desc=''),
-#                                      d: ScalarInfo(dim=sympify('rub'), desc=''),
-#                                      x(t): ScalarInfo(dim=sympify('rub*year'), desc=''),
-#                                      y(t): ScalarInfo(dim=sympify('rub'), desc=''),
-#                                      t: ScalarInfo(dim=sympify('year'), desc=''),
-#                                  }, deep=True)

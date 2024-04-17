@@ -1,41 +1,56 @@
 \documentclass[12pt]{article}
-\title{Агентская задача домохозяйства}
+\title{P}
 \date{19.04.2022}
 \ProcessOptions
 \usepackage[english,russian]{babel}
 \begin{document}
 
-Задача потребителя:
-    $J = \int_0^T (\frac{1}{1-\beta_p} * (\frac{\pi_p(t)}{p(t)})^{1-\beta_p} * \exp{-\delta_p * t})dt -> max$: полезность
-    $J$: CRRA от CES-свертки двух продуктов
+Task:
+    $\MAX = \int_0^T (\frac{1}{1-\beta_p} * (\frac{\pi(t)}{p(t)})^{1-\beta_p} * \exp{-\delta_p * t})dt$: functional
 
-Активы потребителя:
-    $K(t, 1)$: капитал продукта 1
-    $K(t, 2)$: капитал продукта 2
-    $J(t, 1, 1)$: a
-    $J(t, 1, 2)$: b
-    $J(t, 2, 1)$: c
-    $J(t, 2, 2)$: d
-    $N(t)$: остаток денежных средств
-    $\pi_{P}(t)$: выбор траектории дивидентов
-    $\frac{\partial K(t,1)}{\partial t} = (a_{1} * J(t, 1, 1)^{\rho_{1}}+(1-a_{1}) * J(t,2,1)^{\rho_{1}})^{1 / \rho_{1}}$: траектория капитала 1
-    $\frac{\partial K(t,2)}{\partial t} = (a_{2} * J(t, 1, 2)^{\rho_{2}}+(1-a_{2}) * J(t,2,2)^{\rho_{2}})^{1 / \rho_{2}}$: траектория капитала 2
-    $\frac{dN(t)}{dt} = - \pi_{P}(t) + p_{1}(t)*K(t,1)/b_{1} + p_{2}(t)*K(t,2)/b_{2} - p_{1}(t)(J(t,1,1) + J(t,1,2)) - p_{2}(t)(J(t,2,1) + J(t,2,2)$: уравнение финансового баланса
-    $N(T) \geq 0$: неотрицательность остатков
-    $K(0,1) > 0$ : начальное условие 1
-    $K(0,2) > 0$ : начальное условие 2
-    $N(T) + p_{1}(T)*K(T, 1) + p_{2}(T)*K(T,2) \geq 0 $: терминальное условие
 
-Информационные переменные:
-    $p_{1}(t)$: цена на продукт1
-    $p_{2}(t)$: цена на продукт2
-    $\delta_p$: дисконт
-    $\rho_h$: пп
+actives:
+    $K(t,1)$: Capital p 1
+    $K(t,2)$: capital p 2
+    $J(t,1,1)$: a
+    $J(t,1,2)$: b
+    $J(t,2,1)$: c
+    $J(t,2,2)$: d
+    $N(t)$: ostatok
+    $\pi(t)$: dividents
+    $\frac{\partial K(t,1)}{\partial t} = (a_{1} * J(t,1,1)^{\rho_{1}}+(1-a_{1}) * J(t,2,1)^{\rho_{1}})^{1 / \rho_{1}}$: cap dif 1
+    $\frac{\partial K(t,2)}{\partial t} = (a_{2} * J(t,1,2)^{\rho_{2}}+(1-a_{2}) * J(t,2,2)^{\rho_{2}})^{1 / \rho_{2}}$: cap dif 2
+    $\frac{dN(t)}{dt} = - \pi_{P}(t) + p_{1}(t)*K(t,1)/b_{1} + p_{2}(t)*K(t,2)/b_{2} - p_{1}(t)(J(t,1,1) + J(t,1,2)) - p_{2}(t)(J(t,2,1) + J(t,2,2)$: balance
+    $N(T) \geq 0$: noneg
+    $K(0,1) > 0$ : init 1
+    $K(0,2) > 0$ : init 2
+    $N(T) + p_{1}(T)*K(T,1) + p_{2}(T)*K(T,2) \geq 0 $: term
 
-Параметры системы:
-    $T$: горизонт планирования
-    $t$: Время
+ext:
+    $p_{1}(t)$: prioce 1
+    $p_{2}(t)$: price 2
+    $p(t)$: ppp
+    $\pi_{P}(t)$: pip
+    $\delta_p$: disc
+    $\rho_{2}$: rho2
+    $\rho_{1}$: rho1
+    $p_{1}(T)$: w
+    $K(0, 2)$: w
+    $K(T, 2)$: w
+    $N(T)$: w
+    $p_{2}(T)$: w
+    $K(T, 1)$: w
+    $K(0, 1)$: w
+
+par:
+    $T$: hory
+    $t$: time
     $\beta_p$: beta
+    $T=1$: hory2
+    $b_{2}$: b2
+    $b_{1}$: b1
+    $a_{1}$: a1
+    $a_{2}$: a2
 
 
 \end{document}

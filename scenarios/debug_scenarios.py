@@ -3,7 +3,7 @@ from sympy import symbols, Function, Integral, Eq
 from EcoMod.math_tasks.agent import LinkedAgent, create_empty_agents, AbstractAgent
 from EcoMod.market import Flow, Balances
 from EcoMod.model import Model
-from EcoMod.utils import timeit
+from EcoMod.utils import timeit, get_root_dir
 from EcoMod.math_tasks.agent import OptimalControlProblem
 from EcoMod.task_classifier.classifier import TaskSanitizer, classify_task
 from EcoMod.utils import MAX, make_raw_dict
@@ -202,7 +202,7 @@ def p2model():
 
     M = Model('Pmodel', B, [H, P])
     M.process()
-    M.dump('/models/outputs/Pmodel_2products')\
+    M.dump('/models/outputs/Pmodel_2products')
 
 def variational():
     t, A, B = symbols('t A B')
@@ -223,15 +223,16 @@ def opt_control1_from_latex():
     # # print(a.symbols)
     # # print(a.config_template)
     # # print(a.config)
-    task = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\H.tex', new=True)
-    task.process()
-    print(task.Lagrangian)
-    print(task.lagrangian)
-    print(task.variables)
-    print(task.params)
-    print(task.external)
-    print(task.functions)
-    print(task.config)
+    H = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\H.tex', new=True)
+    H.process()
+    P = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\P.tex', new=True)
+    P.process()
+    B = Balances.read_from_tex(r'\models\inputs\Pmodel_2products\flows.tex')
+
+    M = Model('Pmodel', B, [H, P])
+    M.process()
+    # print(get_root_dir() + r'\models\outputs\Pmodel_2products')
+    M.dump(get_root_dir() + r'\models\outputs\Pmodel_2products')
 
 if __name__ == "__main__":
     opt_control1_from_latex()

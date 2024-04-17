@@ -2,15 +2,14 @@ import yaml
 from sympy.parsing.latex import parse_latex
 
 from EcoMod.serializers.base_serializer import BaseSerializer
-from core.errors.RWErrors import NonYAMLableError
+from EcoMod.errors.RWErrors import NonYAMLableError
 from EcoMod.utils import trim, unpack
 
 
 class LaTeXSerializer(BaseSerializer):
-    @classmethod
-    def _serialize(cls, stream):
-        content, header = cls.__split_header_content(stream)
-        decoded = cls.__yamlable_content(content)
+    def _serialize(self, stream):
+        content, header = self.__split_header_content(stream)
+        decoded = self.__yamlable_content(content)
         return {parse_latex(trim(k)): v for k, v in unpack(decoded).items()}
 
     @staticmethod

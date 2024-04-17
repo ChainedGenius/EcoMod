@@ -402,7 +402,7 @@ class OptimalControlProblem:
         from pathlib import Path
         name = Path(f).stem
         if new:
-            serialized, name = LaTeXSerializer.serialize(f)
+            serialized, name = LaTeXSerializer(f).serialize()
             raw = TaskSanitizer(serialized, name)
             task, type = classify_task(**raw.kwargs)
             if type == 4:  # optimal control task
