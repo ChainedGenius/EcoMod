@@ -1,3 +1,5 @@
+from types import FunctionType
+
 from numpy.random import rand
 from sympy import Symbol, Integral, Derivative, Expr
 from sympy import sympify, evaluate, Mul
@@ -6,8 +8,68 @@ from sympy.core.function import AppliedUndef, Function
 from EcoMod.utils import iterable_substract
 
 
-class CompletenessValidator:
+class Validator:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+
+class NumericConfigValidator(Validator):
+    def __init__(self, config):
+        super().__init__(config=config)
+        errlist = []
+        for k, v in config.items():
+            if issubclass(sympify(k).__class__, Symbol):
+                if not v.is_constant():
+                    errlist.append((k, v))
+
+            elif issubclass(sympify(k).__class__, AppliedUndef):
+                if not issubclass(v.__class__, FunctionType):
+                    errlist.append((k, v))
+            else:
+                errlist.append((k, v))
+
+        if errlist:
+            raise TypeError(f'Some of values are not computable expressions {errlist}')
+
+class DifferentialAlgebraicValidator(Validator):
+    def __init__(self, exprs):
+        super().__init__(exprs=exprs)
+        errlist = []
+        for e in exprs:
+            if e.find(Integral):
+                errlist.append(e)
+
+        if errlist:
+            raise AssertionError(f'There are some integral operators or algebraic equations here {errlist}')
+
+
+class DifferentialValidator(Validator):
+    def __init__(self, exprs):
+        super().__init__(exprs=exprs)
+        errlist = []
+        for e in exprs:
+            if e.find(Integral) or not e.find(Derivative):
+                errlist.append(e)
+
+        if errlist:
+            raise AssertionError(f'There are some integral operators or algebraic equations here {errlist}')
+
+
+class AlgebraicValidator(Validator):
+    def __init__(self, exprs):
+        super().__init__(exprs=exprs)
+        errlist = []
+        for e in exprs:
+            if e.find(Derivative) or e.find(Integral):
+                errlist.append(e)
+
+        if errlist:
+            raise AssertionError(f'There are some differential or integral operators here {errlist}')
+
+
+class CompletenessValidator(Validator):
     def __init__(self, expressions, variables_info):
+        super().__init__(expressions=expressions, variables_info=variables_info)
         used_variables = set()
         variables = [*variables_info.keys()]
         for rel in expressions:
@@ -23,14 +85,15 @@ class CompletenessValidator:
                 f'There is more inited variables than used in expressions: {iterable_substract(variables, used_variables)}')
 
 
-class ExpressionDimensionValidator:
+class ExpressionDimensionValidator(Validator):
     ultimate_dimension = sympify('X')
     zero_dimension = sympify(1)
 
     def __init__(self, relations, variables_info, deep=False):
-
+        super().__init__(relations=relations, variables_info=variables_info)
         random_coef = rand(len(variables_info, ))
-        var2dim = {kv[0] if isinstance(kv[0], Symbol) else Symbol(kv[0].func.name): kv[1].dim * random_coef[i] for i, kv in enumerate(variables_info.items())}
+        var2dim = {kv[0] if isinstance(kv[0], Symbol) else Symbol(kv[0].func.name): kv[1].dim * random_coef[i] for i, kv
+                   in enumerate(variables_info.items())}
 
         errors = []
         spec_stack = set()

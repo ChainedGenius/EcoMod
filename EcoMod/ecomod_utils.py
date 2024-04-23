@@ -186,7 +186,6 @@ def deriv_degree(bc):
     return deg
 
 
-#@dispatch(dict)
 def span_dict(d: dict):
     """
     Return linear span of KV-storage. ret = sum_0^N[K[i] * V[i]]
@@ -201,8 +200,6 @@ def span_dict(d: dict):
     return ret
 
 
-#@dispatch(set, set)
-#@dispatch(list, list)
 def span(coefs, variables):
     """
     Return linear span of KV-storage. ret = sum_0^N[L_1[i] * L_2[i]]
