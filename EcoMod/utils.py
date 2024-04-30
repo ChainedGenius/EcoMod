@@ -118,8 +118,5 @@ def iterable_substract(a, b):
     """
     return a.__class__([i for i in a if i not in b])
 
-
-if __name__ == "__main__":
-    s = "$J = \int_0^T (\exp^{-\delta*t} \ln(c(x(t))))dt ->        max$"
-    a = find_objective_markers(s)
-    print(a)
+def naive_extrapolation(l, N):
+    return l + [l[-1] for _ in range(N - len(l))]

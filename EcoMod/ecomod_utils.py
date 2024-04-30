@@ -1,13 +1,44 @@
 import random
 from itertools import chain
 
-from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq, Symbol
+from sympy import sympify, Expr, Function, sinh, cosh, tanh, exp, log, Derivative, symbols, simplify, Eq, Symbol, Subs
+from sympy.core.function import AppliedUndef
 from sympy.core.relational import Relational
 from sympy.parsing.latex import parse_latex
 from sympy import sin, cos, tan, cot, sinh, cosh, tanh, coth, exp, log
 from multipledispatch import dispatch
 from sympy import GreaterThan, Basic
 from sympy.printing.latex import latex
+
+
+def crawl(expr, func, *args, **kwargs):
+    """Crawl the expression tree, and apply func to every node."""
+    val = func(expr, *args, **kwargs)
+    if val is not None:
+        return val
+    new_args = (crawl(arg, func, *args, **kwargs) for arg in expr.args)
+    return expr.func(*new_args)
+
+
+def quantize(expr, net=None, i=None):
+    if not net or not i:
+        raise TypeError('Parameters net and i should be filled')
+    if issubclass(expr.func, Subs):
+        subs_map = {k.subs(k, i): net.to_point(v) for k, v in zip(expr.args[1], expr.args[2])}
+        return expr.func(expr.args[0].subs(subs_map), [*subs_map.keys()], [*subs_map.values()]).simplify()
+    if issubclass(expr.func, AppliedUndef):
+        return expr.func(*(net.to_point(v) for v in expr.args))
+    if not expr.args:
+        return expr
+
+
+def printer(expr):
+    """Print out every node"""
+
+    print(expr)
+    print(expr.func)
+    if not expr.args:
+        return expr
 
 
 def is_substricted(symb, tag=None):
