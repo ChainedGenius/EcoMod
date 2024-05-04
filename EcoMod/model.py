@@ -93,6 +93,13 @@ class Model(ModelValidator):
         if f:
             plt.savefig(f)
 
+    def as_optimal_system(self):
+        ret = []
+        for agent in self.lagents:
+            ret.extend(agent.as_optimal_system())
+        ret.extend(self.balances.balances)
+        return ret
+
 
 if __name__ == "__main__":
     f1 = '../inputs/agent.tex'

@@ -1,4 +1,7 @@
-from sympy import symbols, Function, Integral, Eq
+from itertools import chain
+
+from sympy import symbols, Function, Integral, Eq, Symbol
+from sympy.core.function import AppliedUndef
 
 from EcoMod.math_tasks.agent import LinkedAgent, create_empty_agents, AbstractAgent
 from EcoMod.market import Flow, Balances
@@ -216,23 +219,34 @@ def variational():
 
 
 def opt_control1_from_latex():
-    # a, name = LaTeXSerializer.serialize(r'C:\Users\BaTe\Documents\GitHub\EcoMod\models\inputs\Pmodel_2products\H.tex')
-    # a = TaskSanitizer(a, name)
-    # # print(a.kwargs)
-    # # print(a.functions)
-    # # print(a.symbols)
-    # # print(a.config_template)
-    # # print(a.config)
-    H = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\H.tex', new=True)
+    H = AbstractAgent.read_from_tex(r'\models\inputs\Pmodel_2products\H.tex', new=True)
+    H = LinkedAgent.from_abstract(H)
     H.process()
-    P = OptimalControlProblem.read_from_tex(r'\models\inputs\Pmodel_2products\P.tex', new=True)
+    print(eqs:=[i.subs(H.config) for i in H.as_optimal_system()])
+    print(len(eqs))
+    print(vars:=[i for i in {*chain(*[e.atoms(AppliedUndef, Symbol) for e in eqs])} if i != H.time])
+    print(len(vars))
+    P = AbstractAgent.read_from_tex(r'\models\inputs\Pmodel_2products\P.tex', new=True)
+    P = LinkedAgent.from_abstract(P)
     P.process()
+    print(peqs:=[i.subs(P.config) for i in P.as_optimal_system()])
+    print(len(peqs))
+    print(pvars := [i for i in {*chain(*[e.atoms(AppliedUndef, Symbol) for e in peqs])} if i != P.time])
+    print(len(pvars))
+
     B = Balances.read_from_tex(r'\models\inputs\Pmodel_2products\flows.tex')
 
     M = Model('Pmodel', B, [H, P])
     M.process()
-    # print(get_root_dir() + r'\models\outputs\Pmodel_2products')
-    M.dump(get_root_dir() + r'\models\outputs\Pmodel_2products')
+    syst = M.as_optimal_system()
+    assert P.time == H.time
+    print(len(syst))
+    print(mvars := [i for i in {*chain(*[e.atoms(AppliedUndef, Symbol) for e in syst])} if i != P.time or i != H.time])
+    print(len(mvars))
+
+
+
+    # M.dump(get_root_dir() + r'\models\outputs\Pmodel_2products')
 
 if __name__ == "__main__":
     opt_control1_from_latex()

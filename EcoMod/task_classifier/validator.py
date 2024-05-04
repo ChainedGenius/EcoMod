@@ -3,7 +3,7 @@ from types import FunctionType
 from numpy.random import rand
 from sympy import Symbol, Integral, Derivative, Expr
 from sympy import sympify, evaluate, Mul
-from sympy.core.function import AppliedUndef, Function
+from sympy.core.function import AppliedUndef, Function, FunctionClass
 
 from EcoMod.utils import iterable_substract
 
@@ -71,9 +71,10 @@ class CompletenessValidator(Validator):
     def __init__(self, expressions, variables_info):
         super().__init__(expressions=expressions, variables_info=variables_info)
         used_variables = set()
-        variables = [*variables_info.keys()]
+        variables = [i.func if isinstance(i.__class__, FunctionClass) else i for i in variables_info.keys()]
         for rel in expressions:
-            used_variables.update(rel.atoms(Symbol, AppliedUndef))
+            used_variables.update(rel.atoms(Symbol))
+            used_variables.update({f.func for f in rel.atoms(AppliedUndef)})
             # used_variables.update({f.func for f in rel.atoms(AppliedUndef)})
 
         if iterable_substract(used_variables, variables):

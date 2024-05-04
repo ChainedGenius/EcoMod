@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from itertools import chain
 
 from sympy import Number, Symbol, sympify, Integral
-from sympy.core.function import AppliedUndef, Derivative
+from sympy.core.function import AppliedUndef, Derivative, FunctionClass
 from sympy.core.numbers import One
 from sympy.core.relational import Relational
 
@@ -73,8 +73,8 @@ class TaskSanitizer:
 
     def __sanitize(self):
         self.__extract_external_functions()
-        self.__sanitize_equations()
         self.__find_function_args()
+        self.__sanitize_equations()
         self.__sanitize_symbols()
         self.__extract_config()
         self.__extract_scalar_info()
@@ -89,11 +89,22 @@ class TaskSanitizer:
 
     def __sanitize_equations(self):
         sanitized_equations = self.equations.copy()
+
+        # remove obvious config
         for e in self.equations:
-            if e.args[0] in self.symbols and (e.args[1].is_constant() or e.args[1] in self.external_functions):
+            if ((e.args[0] in self.symbols and e.args[1].is_constant())
+                    or (e.args[0] in self.external_functions)):
                 self.config.update({e.args[0]: e.args[1]})
                 sanitized_equations.remove(e)
-        self.equations = sanitized_equations
+
+        # remove deep config (aka Cauchy problem conditions)
+        sanitized_equations_step_1 = sanitized_equations.copy()
+        for e in sanitized_equations:
+            func_args = {*chain(*{i.args for i in e.find(AppliedUndef)})}
+            if all([a in self.config or a.is_constant() for a in func_args]):
+                sanitized_equations_step_1.remove(e)
+
+        self.equations = sanitized_equations_step_1
 
     def __find_function_args(self):
         unsanitized_fargs = [*chain(*[f.args for f in self.functions])] + [
@@ -113,7 +124,7 @@ class TaskSanitizer:
             self.variable_info[s] = ScalarInfo(dim=sympify(dim) if dim else One(), desc=desc)
 
     def __sanitize_functions(self):
-        self.functions = [f for f in self.functions if any(i not in self.config for i in f.args)]
+        self.functions = [f for f in self.functions if not all(i.subs(self.config).is_constant() for i in f.args)]
 
     def __dedup(self):
         attr_copy = self.__dict__.copy()

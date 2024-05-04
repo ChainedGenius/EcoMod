@@ -36,7 +36,7 @@ class Config(dict):
             super().__setitem__(sympify(key), value)
 
         elif (issubclass(sympify(key).__class__, AppliedUndef)
-              and issubclass(sympify(value).__class__, (AppliedUndef, FunctionClass))):
+              and isinstance(sympify(value).__class__, FunctionClass)):
             super().__setitem__(sympify(key), sympify(value))
 
         else:

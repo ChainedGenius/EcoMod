@@ -299,7 +299,8 @@ class OptimalControlProblem:
             'equations': self.equations,
             'functions': self.functions,
             'params': self.params,
-            'dim_dict': self.dim_dict
+            'dim_dict': self.dim_dict,
+            'config': self.config
         }
 
     @property
@@ -425,6 +426,9 @@ class OptimalControlProblem:
         self.__generate_duals()
         self.processed = True
 
+    def as_optimal_system(self):
+        return self.euler_equations() + self.control_optimality() + self.transversality_conditions() + self.KKT() + self.equations + self.inequations
+
     def compress(self, to_tex=False, headers=True):
         """
 
@@ -498,8 +502,8 @@ class LinkedAgent(OptimalControlProblem):
 
     """
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.flows = []
         self.__merge_prepare()
 
@@ -509,7 +513,7 @@ class LinkedAgent(OptimalControlProblem):
         :return:
         """
         # gaining tagged system
-        merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls}
+        merge_map = {symb: add_subscript(symb, self.name) for symb in self.phases + self.controls + [*self.duals.keys()] + [*self.lambdas.keys()]}
         merge_map_t0 = {
             f.subs(self.time, self.time_horizon[0]): add_subscript(f.subs(self.time, self.time_horizon[0]), self.name)
             for f in self.functions}
@@ -519,7 +523,7 @@ class LinkedAgent(OptimalControlProblem):
         merge_map = merge_map | merge_map_t0 | merge_map_t1
         new_kwargs = {}
         for k, v in self.kwargs.items():
-            if k != 'name' and k != 'dim_dict':
+            if k != 'name' and k != 'dim_dict' and k != 'config':
                 new_kwargs[k] = [expr.xreplace(merge_map) for expr in v]
 
         self.__dict__.update(new_kwargs)
@@ -542,7 +546,7 @@ class LinkedAgent(OptimalControlProblem):
     @staticmethod
     def from_abstract(a: OptimalControlProblem):
         kwargs = a.kwargs
-        return LinkedAgent(*kwargs.values())
+        return LinkedAgent(**kwargs)
 
 
 def create_empty_agents(names, cls=OptimalControlProblem):
